@@ -6,8 +6,13 @@ import {
   Trash2,
   X,
   Sparkles,
+  ArrowUpRight,
+  Square,
+  Clock,
   Check
 } from 'lucide-react';
+
+export type DrawingTool = 'pen' | 'highlighter' | 'arrow' | 'rectangle' | 'eraser';
 
 interface StrokePoint {
   x: number;
@@ -18,7 +23,7 @@ interface PathStroke {
   points: StrokePoint[];
   color: string;
   width: number;
-  tool: 'pen' | 'highlighter';
+  tool: DrawingTool;
   vanishing: boolean;
   timestamp: number;
 }
@@ -32,7 +37,7 @@ interface ClickRipple {
 
 export const DrawingOverlayView: React.FC = () => {
   const [active, setActive] = useState(false);
-  const [tool, setTool] = useState<'pen' | 'highlighter' | 'eraser'>('pen');
+  const [tool, setTool] = useState<DrawingTool>('pen');
   const [color, setColor] = useState('#ff5b4f'); // Loom Coral
   const [strokeWidth, setStrokeWidth] = useState(4);
   const [vanishingInk, setVanishingInk] = useState(true);
@@ -56,7 +61,7 @@ export const DrawingOverlayView: React.FC = () => {
     const cleanupToggled = window.electronAPI.onDrawingToggled((isActive) => {
       setActive(isActive);
       if (!isActive) {
-        // Clear when closed
+        // Clear strokes when tool closed
         strokesRef.current = [];
         redraw();
       }
@@ -70,8 +75,15 @@ export const DrawingOverlayView: React.FC = () => {
       }
     };
 
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape' && active) {
+        handleClose();
+      }
+    };
+
     handleResize();
     window.addEventListener('resize', handleResize);
+    window.addEventListener('keydown', handleKeyDown);
 
     // Continuous smooth animation loop for click ripples and vanishing ink
     let animId: number;
@@ -95,9 +107,38 @@ export const DrawingOverlayView: React.FC = () => {
     return () => {
       cleanupToggled();
       window.removeEventListener('resize', handleResize);
+      window.removeEventListener('keydown', handleKeyDown);
       cancelAnimationFrame(animId);
     };
-  }, []);
+  }, [active]);
+
+  const drawArrowShape = (ctx: CanvasRenderingContext2D, fromX: number, fromY: number, toX: number, toY: number, width: number) => {
+    const headLen = Math.max(14, width * 3.5);
+    const angle = Math.atan2(toY - fromY, toX - fromX);
+
+    ctx.beginPath();
+    ctx.moveTo(fromX, fromY);
+    ctx.lineTo(toX, toY);
+    ctx.stroke();
+
+    ctx.beginPath();
+    ctx.moveTo(toX, toY);
+    ctx.lineTo(toX - headLen * Math.cos(angle - Math.PI / 6), toY - headLen * Math.sin(angle - Math.PI / 6));
+    ctx.lineTo(toX - headLen * Math.cos(angle + Math.PI / 6), toY - headLen * Math.sin(angle + Math.PI / 6));
+    ctx.closePath();
+    ctx.fillStyle = ctx.strokeStyle;
+    ctx.fill();
+  };
+
+  const drawBoxShape = (ctx: CanvasRenderingContext2D, x1: number, y1: number, x2: number, y2: number) => {
+    const x = Math.min(x1, x2);
+    const y = Math.min(y1, y2);
+    const w = Math.abs(x2 - x1);
+    const h = Math.abs(y2 - y1);
+    ctx.beginPath();
+    ctx.roundRect ? ctx.roundRect(x, y, w, h, 6) : ctx.rect(x, y, w, h);
+    ctx.stroke();
+  };
 
   const redraw = () => {
     const canvas = canvasRef.current;
@@ -106,20 +147,13 @@ export const DrawingOverlayView: React.FC = () => {
     if (!ctx) return;
 
     ctx.clearRect(0, 0, canvas.width, canvas.height);
-
     const now = Date.now();
 
+    // 1. Render all past committed strokes
     strokesRef.current.forEach((stroke) => {
       if (stroke.points.length < 2) return;
 
       ctx.save();
-      ctx.beginPath();
-      ctx.moveTo(stroke.points[0].x, stroke.points[0].y);
-
-      for (let i = 1; i < stroke.points.length; i++) {
-        ctx.lineTo(stroke.points[i].x, stroke.points[i].y);
-      }
-
       ctx.strokeStyle = stroke.color;
       ctx.lineWidth = stroke.width;
       ctx.lineCap = 'round';
@@ -128,7 +162,6 @@ export const DrawingOverlayView: React.FC = () => {
       if (stroke.tool === 'highlighter') {
         ctx.globalAlpha = 0.35;
       } else if (stroke.vanishing) {
-        // Fade out in the last 1000ms
         const age = now - stroke.timestamp;
         if (age > 2000) {
           const fadeProgress = (3000 - age) / 1000;
@@ -140,23 +173,77 @@ export const DrawingOverlayView: React.FC = () => {
         ctx.globalAlpha = 1.0;
       }
 
-      ctx.stroke();
+      if (stroke.tool === 'arrow') {
+        const start = stroke.points[0];
+        const end = stroke.points[stroke.points.length - 1];
+        drawArrowShape(ctx, start.x, start.y, end.x, end.y, stroke.width);
+      } else if (stroke.tool === 'rectangle') {
+        const start = stroke.points[0];
+        const end = stroke.points[stroke.points.length - 1];
+        drawBoxShape(ctx, start.x, start.y, end.x, end.y);
+      } else {
+        ctx.beginPath();
+        ctx.moveTo(stroke.points[0].x, stroke.points[0].y);
+        for (let i = 1; i < stroke.points.length; i++) {
+          ctx.lineTo(stroke.points[i].x, stroke.points[i].y);
+        }
+        ctx.stroke();
+      }
       ctx.restore();
     });
 
-    // Draw active click ripples
+    // 2. Render live in-progress stroke if currently drawing
+    if (isDrawingRef.current && currentPointsRef.current.length >= 2) {
+      const pts = currentPointsRef.current;
+      ctx.save();
+      ctx.strokeStyle = tool === 'eraser' ? '#ffffff' : color;
+      ctx.lineWidth = strokeWidth;
+      ctx.lineCap = 'round';
+      ctx.lineJoin = 'round';
+
+      if (tool === 'eraser') {
+        ctx.globalCompositeOperation = 'destination-out';
+      } else if (tool === 'highlighter') {
+        ctx.globalAlpha = 0.35;
+      } else {
+        ctx.globalAlpha = 1.0;
+      }
+
+      if (tool === 'arrow') {
+        drawArrowShape(ctx, pts[0].x, pts[0].y, pts[pts.length - 1].x, pts[pts.length - 1].y, strokeWidth);
+      } else if (tool === 'rectangle') {
+        drawBoxShape(ctx, pts[0].x, pts[0].y, pts[pts.length - 1].x, pts[pts.length - 1].y);
+      } else {
+        ctx.beginPath();
+        ctx.moveTo(pts[0].x, pts[0].y);
+        for (let i = 1; i < pts.length; i++) {
+          ctx.lineTo(pts[i].x, pts[i].y);
+        }
+        ctx.stroke();
+      }
+      ctx.restore();
+    }
+
+    // 3. Draw active click ripples with glowing ring effect
     ripplesRef.current.forEach((r) => {
       ctx.save();
       ctx.beginPath();
       ctx.arc(r.x, r.y, r.radius, 0, Math.PI * 2);
       ctx.strokeStyle = `rgba(255, 91, 79, ${r.alpha})`;
-      ctx.lineWidth = 2.5;
+      ctx.lineWidth = 3;
       ctx.shadowColor = '#ff5b4f';
-      ctx.shadowBlur = 8;
+      ctx.shadowBlur = 10;
       ctx.stroke();
+
+      // Golden center pip
+      ctx.beginPath();
+      ctx.arc(r.x, r.y, 3.5, 0, Math.PI * 2);
+      ctx.fillStyle = `rgba(255, 215, 0, ${r.alpha * 0.9})`;
+      ctx.fill();
       ctx.restore();
+
       r.radius += 2.5;
-      r.alpha -= 0.04;
+      r.alpha -= 0.045;
     });
     ripplesRef.current = ripplesRef.current.filter((r) => r.alpha > 0);
   };
@@ -171,38 +258,15 @@ export const DrawingOverlayView: React.FC = () => {
 
   const handleMouseMove = (e: React.MouseEvent<HTMLCanvasElement>) => {
     if (!active || !isDrawingRef.current) return;
-
     const newPoint = { x: e.clientX, y: e.clientY };
-    currentPointsRef.current.push(newPoint);
 
-    // Live draw stroke
-    const canvas = canvasRef.current;
-    if (!canvas) return;
-    const ctx = canvas.getContext('2d');
-    if (!ctx) return;
-
-    ctx.save();
-    ctx.strokeStyle = tool === 'eraser' ? '#000000' : color;
-    ctx.lineWidth = strokeWidth;
-    ctx.lineCap = 'round';
-    ctx.lineJoin = 'round';
-
-    if (tool === 'eraser') {
-      ctx.globalCompositeOperation = 'destination-out';
-    } else if (tool === 'highlighter') {
-      ctx.globalAlpha = 0.35;
+    if (tool === 'arrow' || tool === 'rectangle') {
+      // For shapes, keep start point and update current end point
+      currentPointsRef.current = [currentPointsRef.current[0], newPoint];
     } else {
-      ctx.globalAlpha = 1.0;
+      currentPointsRef.current.push(newPoint);
     }
-
-    const pts = currentPointsRef.current;
-    if (pts.length >= 2) {
-      ctx.beginPath();
-      ctx.moveTo(pts[pts.length - 2].x, pts[pts.length - 2].y);
-      ctx.lineTo(newPoint.x, newPoint.y);
-      ctx.stroke();
-    }
-    ctx.restore();
+    redraw();
   };
 
   const handleMouseUp = () => {
@@ -245,120 +309,134 @@ export const DrawingOverlayView: React.FC = () => {
         onMouseDown={handleMouseDown}
         onMouseMove={handleMouseMove}
         onMouseUp={handleMouseUp}
-        className={`w-full h-full block ${active ? 'pointer-events-auto' : 'pointer-events-auto'}`}
+        className="w-full h-full block pointer-events-auto"
       />
 
       {/* Floating Toolbar Palette only when active */}
       {active && (
-        <div className="absolute top-6 left-1/2 -translate-x-1/2 flex items-center space-x-3 bg-loom-dark/95 backdrop-blur-md px-4 py-2.5 rounded-2xl border border-loom-border shadow-2xl pointer-events-auto">
-        {/* Tools */}
-        <div className="flex items-center space-x-1">
-          <button
-            onClick={() => setTool('pen')}
-            title="Caneta"
-            className={`p-2 rounded-xl transition-colors ${
-              tool === 'pen' ? 'bg-loom-primary text-white shadow-sm' : 'text-loom-muted hover:text-white'
-            }`}
-          >
-            <Pen className="w-4 h-4" />
-          </button>
-
-          <button
-            onClick={() => setTool('highlighter')}
-            title="Marca-texto"
-            className={`p-2 rounded-xl transition-colors ${
-              tool === 'highlighter' ? 'bg-loom-primary text-white shadow-sm' : 'text-loom-muted hover:text-white'
-            }`}
-          >
-            <Highlighter className="w-4 h-4" />
-          </button>
-
-          <button
-            onClick={() => setTool('eraser')}
-            title="Borracha"
-            className={`p-2 rounded-xl transition-colors ${
-              tool === 'eraser' ? 'bg-loom-primary text-white shadow-sm' : 'text-loom-muted hover:text-white'
-            }`}
-          >
-            <Eraser className="w-4 h-4" />
-          </button>
-        </div>
-
-        <div className="w-px h-5 bg-loom-border" />
-
-        {/* Color Palette */}
-        <div className="flex items-center space-x-1.5">
-          {colors.map((c) => (
+        <div className="absolute top-6 left-1/2 -translate-x-1/2 flex items-center space-x-3 bg-[#111216]/95 backdrop-blur-md px-4 py-2.5 rounded-2xl border border-loom-border shadow-2xl pointer-events-auto">
+          {/* Drawing Tools */}
+          <div className="flex items-center space-x-1 border-r border-loom-border/80 pr-2.5">
             <button
-              key={c.hex}
-              onClick={() => {
-                setColor(c.hex);
-                if (tool === 'eraser') setTool('pen');
-              }}
-              className={`w-6 h-6 rounded-full transition-all flex items-center justify-center ${
-                color === c.hex && tool !== 'eraser' ? 'ring-2 ring-white scale-110' : 'opacity-80 hover:opacity-100'
-              }`}
-              style={{ backgroundColor: c.hex }}
-              title={c.name}
-            >
-              {color === c.hex && tool !== 'eraser' && (
-                <Check className={`w-3.5 h-3.5 ${c.hex === '#ffffff' ? 'text-black' : 'text-white'}`} />
-              )}
-            </button>
-          ))}
-        </div>
-
-        <div className="w-px h-5 bg-loom-border" />
-
-        {/* Stroke Width Selector */}
-        <div className="flex items-center space-x-1">
-          {[2, 5, 10].map((w) => (
-            <button
-              key={w}
-              onClick={() => setStrokeWidth(w)}
-              className={`px-2 py-1 rounded text-xs font-semibold ${
-                strokeWidth === w ? 'bg-loom-card text-white border border-loom-border' : 'text-loom-muted hover:text-white'
+              onClick={() => setTool('pen')}
+              title="Caneta Livre (P)"
+              className={`p-2 rounded-xl transition-all ${
+                tool === 'pen' ? 'bg-loom-primary text-white shadow-md' : 'text-loom-muted hover:text-white hover:bg-loom-card'
               }`}
             >
-              {w}px
+              <Pen className="w-4 h-4" />
             </button>
-          ))}
+
+            <button
+              onClick={() => setTool('arrow')}
+              title="Seta Indicadora (A)"
+              className={`p-2 rounded-xl transition-all ${
+                tool === 'arrow' ? 'bg-loom-primary text-white shadow-md' : 'text-loom-muted hover:text-white hover:bg-loom-card'
+              }`}
+            >
+              <ArrowUpRight className="w-4 h-4" />
+            </button>
+
+            <button
+              onClick={() => setTool('rectangle')}
+              title="Caixa de Destaque / Retângulo (R)"
+              className={`p-2 rounded-xl transition-all ${
+                tool === 'rectangle' ? 'bg-loom-primary text-white shadow-md' : 'text-loom-muted hover:text-white hover:bg-loom-card'
+              }`}
+            >
+              <Square className="w-4 h-4" />
+            </button>
+
+            <button
+              onClick={() => setTool('highlighter')}
+              title="Marca-texto Translúcido (H)"
+              className={`p-2 rounded-xl transition-all ${
+                tool === 'highlighter' ? 'bg-loom-primary text-white shadow-md' : 'text-loom-muted hover:text-white hover:bg-loom-card'
+              }`}
+            >
+              <Highlighter className="w-4 h-4" />
+            </button>
+
+            <button
+              onClick={() => setTool('eraser')}
+              title="Borracha (E)"
+              className={`p-2 rounded-xl transition-all ${
+                tool === 'eraser' ? 'bg-loom-coral text-white shadow-md' : 'text-loom-muted hover:text-white hover:bg-loom-card'
+              }`}
+            >
+              <Eraser className="w-4 h-4" />
+            </button>
+          </div>
+
+          {/* Color Palette */}
+          {tool !== 'eraser' && (
+            <div className="flex items-center space-x-1.5 border-r border-loom-border/80 pr-2.5">
+              {colors.map((c) => (
+                <button
+                  key={c.hex}
+                  onClick={() => setColor(c.hex)}
+                  title={c.name}
+                  className={`w-5 h-5 rounded-full transition-transform ${
+                    color === c.hex ? 'scale-125 ring-2 ring-white ring-offset-2 ring-offset-black' : 'hover:scale-110 opacity-80 hover:opacity-100'
+                  }`}
+                  style={{ backgroundColor: c.hex }}
+                />
+              ))}
+            </div>
+          )}
+
+          {/* Stroke Width Selector */}
+          <div className="flex items-center space-x-1 border-r border-loom-border/80 pr-2.5">
+            {[2, 4, 8].map((w) => (
+              <button
+                key={w}
+                onClick={() => setStrokeWidth(w)}
+                title={`Espessura: ${w}px`}
+                className={`w-7 h-7 rounded-lg flex items-center justify-center transition-all ${
+                  strokeWidth === w ? 'bg-loom-card text-white font-bold' : 'text-loom-muted hover:text-white'
+                }`}
+              >
+                <div
+                  className="rounded-full bg-current"
+                  style={{ width: `${w * 1.5}px`, height: `${w * 1.5}px` }}
+                />
+              </button>
+            ))}
+          </div>
+
+          {/* Vanishing Ink Mode Toggle */}
+          <button
+            onClick={() => setVanishingInk(!vanishingInk)}
+            title="Tinta que desaparece em 3 segundos (Loom Evanescent Ink)"
+            className={`flex items-center space-x-1.5 px-2.5 py-1.5 rounded-xl text-xs font-semibold transition-all ${
+              vanishingInk
+                ? 'bg-loom-primary/20 text-loom-primary border border-loom-primary/40 shadow-sm'
+                : 'text-loom-muted hover:text-white bg-loom-card/40'
+            }`}
+          >
+            <Clock className="w-3.5 h-3.5" />
+            <span>3s Auto-apagar</span>
+            {vanishingInk && <Check className="w-3 h-3 text-loom-primary ml-0.5" />}
+          </button>
+
+          {/* Clear Canvas */}
+          <button
+            onClick={handleClear}
+            title="Limpar todos os desenhos"
+            className="p-2 rounded-xl text-loom-muted hover:text-white hover:bg-loom-card transition-colors"
+          >
+            <Trash2 className="w-4 h-4" />
+          </button>
+
+          {/* Done / Close Drawing Mode */}
+          <button
+            onClick={handleClose}
+            className="flex items-center space-x-1 bg-loom-primary hover:bg-loom-primaryHover text-white px-3 py-1.5 rounded-xl text-xs font-bold transition-all shadow-md active:scale-95"
+          >
+            <span>Concluir</span>
+            <X className="w-3.5 h-3.5" />
+          </button>
         </div>
-
-        <div className="w-px h-5 bg-loom-border" />
-
-        {/* Vanishing Ink Toggle (Loom signature feature) */}
-        <button
-          onClick={() => setVanishingInk(!vanishingInk)}
-          className={`flex items-center space-x-1.5 px-2.5 py-1.5 rounded-xl text-xs font-medium transition-all ${
-            vanishingInk
-              ? 'bg-loom-coral/20 text-loom-coral border border-loom-coral/40'
-              : 'text-loom-muted hover:text-white bg-loom-card'
-          }`}
-          title="Tinta que desaparece automaticamente após 3 segundos"
-        >
-          <Sparkles className="w-3.5 h-3.5" />
-          <span>Tinta Mágica (Some)</span>
-        </button>
-
-        {/* Clear All */}
-        <button
-          onClick={handleClear}
-          title="Limpar Desenhos"
-          className="p-2 rounded-xl text-loom-muted hover:text-white hover:bg-loom-card transition-colors"
-        >
-          <Trash2 className="w-4 h-4" />
-        </button>
-
-        {/* Close Drawing Mode */}
-        <button
-          onClick={handleClose}
-          className="flex items-center space-x-1 bg-loom-primary hover:bg-loom-primaryHover text-white px-3 py-1.5 rounded-xl text-xs font-bold transition-all shadow-md"
-        >
-          <span>Concluir</span>
-          <X className="w-3.5 h-3.5" />
-        </button>
-      </div>
       )}
     </div>
   );

@@ -9,7 +9,9 @@ import {
   MicOff,
   User,
   Sparkles,
-  Move
+  Move,
+  Circle,
+  Square
 } from 'lucide-react';
 import { BubbleSize, RecordingOptions } from '../types';
 
@@ -21,6 +23,7 @@ export const CameraBubbleView: React.FC = () => {
   const [showControls, setShowControls] = useState(false);
   const [borderStyle, setBorderStyle] = useState<'default' | 'glow' | 'coral' | 'gradient'>('default');
   const [cameraFilter, setCameraFilter] = useState<'none' | 'blur' | 'studio' | 'vibrant'>('none');
+  const [bubbleShape, setBubbleShape] = useState<'circle' | 'squircle'>('circle');
 
   const videoRef = useRef<HTMLVideoElement>(null);
   const streamRef = useRef<MediaStream | null>(null);
@@ -97,9 +100,11 @@ export const CameraBubbleView: React.FC = () => {
         className="relative w-full h-full flex items-center justify-center group cursor-grab active:cursor-grabbing"
         style={{ WebkitAppRegion: 'drag' } as any}
       >
-        {/* Circular Bubble Outer Frame */}
+        {/* Bubble Outer Frame */}
         <div
-          className={`relative w-full h-full rounded-full overflow-hidden transition-all duration-300 ${
+          className={`relative w-full h-full overflow-hidden transition-all duration-300 ${
+            bubbleShape === 'circle' ? 'rounded-full' : 'rounded-3xl'
+          } ${
             borderStyle === 'glow'
               ? 'ring-4 ring-loom-primary shadow-bubble'
               : borderStyle === 'coral'
@@ -205,6 +210,15 @@ export const CameraBubbleView: React.FC = () => {
             className="p-1.5 rounded-full text-loom-muted hover:text-white transition-colors"
           >
             {isCameraActive ? <Video className="w-3.5 h-3.5" /> : <VideoOff className="w-3.5 h-3.5 text-loom-coral" />}
+          </button>
+
+          {/* Shape Toggle (Circle vs Squircle) */}
+          <button
+            onClick={() => setBubbleShape(bubbleShape === 'circle' ? 'squircle' : 'circle')}
+            title={bubbleShape === 'circle' ? 'Mudar para Quadrado Arredondado' : 'Mudar para Círculo'}
+            className="p-1.5 rounded-full text-loom-muted hover:text-white transition-colors"
+          >
+            {bubbleShape === 'circle' ? <Square className="w-3.5 h-3.5" /> : <Circle className="w-3.5 h-3.5" />}
           </button>
 
           {/* Camera Filter / Blur toggle */}

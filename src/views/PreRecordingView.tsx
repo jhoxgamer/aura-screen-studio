@@ -14,7 +14,7 @@ import {
 } from 'lucide-react';
 import { CaptureSource, RecordingMode, RecordingOptions, CropArea } from '../types';
 import { LibraryView } from './LibraryView';
-import { Crop, FileText, MousePointer, Globe } from 'lucide-react';
+import { Crop, FileText, MousePointer, Globe, RefreshCw } from 'lucide-react';
 
 export const PreRecordingView: React.FC = () => {
   const [activeTab, setActiveTab] = useState<'record' | 'library'>('record');
@@ -173,6 +173,13 @@ export const PreRecordingView: React.FC = () => {
         </div>
 
         <div className="flex items-center space-x-1" style={{ WebkitAppRegion: 'no-drag' } as any}>
+          <button
+            onClick={() => window.electronAPI.checkForUpdates()}
+            title="Verificar Atualizações do Sistema"
+            className="p-1 hover:bg-loom-hover rounded-md text-loom-muted hover:text-loom-primary transition-colors"
+          >
+            <RefreshCw className="w-3.5 h-3.5" />
+          </button>
           <button
             onClick={() => window.electronAPI.minimizeCurrentWindow()}
             className="p-1 hover:bg-loom-hover rounded-md text-loom-muted hover:text-white transition-colors"

@@ -8,7 +8,8 @@
     "dev": "vite",
     "build": "tsc && vite build",
     "build:electron": "tsc -p tsconfig.electron.json && node -e \"require('fs').writeFileSync('dist-electron/package.json', JSON.stringify({ type: 'commonjs' }))\"",
-    "start": "electron dist-electron/main.js"
+    "start": "electron dist-electron/main.js",
+    "dist:win": "electron-builder --win --x64"
   },
   "keywords": [
     "loom",
@@ -22,6 +23,7 @@
   "license": "MIT",
   "dependencies": {
     "canvas-confetti": "^1.9.4",
+    "electron-updater": "^6.8.9",
     "lucide-react": "^1.16.0",
     "react": "^19.0.0",
     "react-dom": "^19.0.0"
@@ -34,9 +36,60 @@
     "@vitejs/plugin-react": "^4.3.4",
     "autoprefixer": "^10.4.27",
     "electron": "^34.5.8",
+    "electron-builder": "^26.15.3",
     "postcss": "^8.5.8",
     "tailwindcss": "^3.4.17",
     "typescript": "^5.7.3",
     "vite": "^6.1.0"
+  },
+  "build": {
+    "appId": "com.loom.clone",
+    "productName": "Loom Desktop",
+    "copyright": "Copyright © 2026 Loom Clone",
+    "directories": {
+      "output": "release"
+    },
+    "files": [
+      "dist/**/*",
+      "dist-electron/**/*",
+      "public/**/*",
+      "package.json"
+    ],
+    "extraResources": [
+      {
+        "from": "bin/cloudflared.exe",
+        "to": "cloudflared.exe"
+      },
+      {
+        "from": "public/assets/application-icons/app-icon-tray.ico",
+        "to": "app-icon-tray.ico"
+      }
+    ],
+    "win": {
+      "target": [
+        {
+          "target": "nsis",
+          "arch": [
+            "x64"
+          ]
+        }
+      ],
+      "icon": "public/assets/application-icons/app-logo.ico"
+    },
+    "nsis": {
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true,
+      "createDesktopShortcut": true,
+      "createStartMenuShortcut": true,
+      "shortcutName": "Loom Desktop",
+      "installerIcon": "public/assets/application-icons/app-logo.ico",
+      "uninstallerIcon": "public/assets/application-icons/app-logo.ico",
+      "uninstallDisplayName": "Loom Desktop Clone",
+      "runAfterFinish": true
+    },
+    "publish": {
+      "provider": "generic",
+      "url": "https://releases.loomclone.local/updates/"
+    }
   }
 }

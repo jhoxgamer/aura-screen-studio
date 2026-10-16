@@ -92,6 +92,19 @@ export const electronAPI = {
     ipcRenderer.send('crop:start-selection');
   },
 
+  // Auto-Updater
+  checkForUpdates: async () => {
+    return await ipcRenderer.invoke('updater:check');
+  },
+  getAppVersion: async (): Promise<string> => {
+    return await ipcRenderer.invoke('updater:get-version');
+  },
+  onUpdateProgress: (callback: (percent: number) => void) => {
+    const handler = (_: any, pct: number) => callback(pct);
+    ipcRenderer.on('updater:progress', handler);
+    return () => ipcRenderer.removeListener('updater:progress', handler);
+  },
+
   // Window Controls
   closeCurrentWindow: () => {
     ipcRenderer.send('window:close-current');

@@ -72,6 +72,8 @@ export class ShareServer {
 
   private startTunnel() {
     const binPathCandidates = [
+      path.join(process.resourcesPath || '', 'cloudflared.exe'),
+      path.join(process.resourcesPath || '', 'bin', 'cloudflared.exe'),
       path.resolve(__dirname, '../../bin/cloudflared.exe'),
       path.resolve(__dirname, '../bin/cloudflared.exe'),
       path.resolve(process.cwd(), 'bin/cloudflared.exe'),

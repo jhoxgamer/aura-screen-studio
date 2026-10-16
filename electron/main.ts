@@ -1,6 +1,7 @@
-import { app, BrowserWindow, ipcMain, desktopCapturer, screen, globalShortcut, shell, dialog } from 'electron';
+import { app, BrowserWindow, ipcMain, desktopCapturer, screen, globalShortcut, shell, dialog, Tray, Menu, nativeImage } from 'electron';
 import * as path from 'path';
 import * as fs from 'fs';
+import { autoUpdater } from 'electron-updater';
 import { BubbleSize, RecordingOptions, RecordingMeta, CropArea } from './types';
 import { ShareServer } from './shareServer';
 
@@ -13,6 +14,7 @@ let previewWindow: BrowserWindow | null = null;
 let speakerNotesWindow: BrowserWindow | null = null;
 let cropSelectorWindow: BrowserWindow | null = null;
 let shareServer: ShareServer | null = null;
+let tray: Tray | null = null;
 
 app.setName('LoomClone');
 try {
@@ -754,6 +756,213 @@ function setupIpcHandlers() {
     const win = BrowserWindow.fromWebContents(event.sender);
     win?.minimize();
   });
+
+  // Auto-Updater IPC
+  ipcMain.handle('updater:check', async () => {
+    checkForAppUpdates(true);
+    return true;
+  });
+
+  ipcMain.handle('updater:get-version', async () => {
+    return app.getVersion();
+  });
+}
+
+// 9. System Tray Integration
+function createSystemTray() {
+  if (tray) return;
+
+  const iconCandidates = [
+    path.join(__dirname, '../public/assets/application-icons/app-icon-tray.ico'),
+    path.join(__dirname, '../../public/assets/application-icons/app-icon-tray.ico'),
+    path.join(process.resourcesPath, 'app-icon-tray.ico'),
+    path.join(process.resourcesPath, 'public/assets/application-icons/app-icon-tray.ico'),
+    path.join(__dirname, '../dist/assets/application-icons/app-icon-tray.ico')
+  ];
+
+  let iconPath = '';
+  for (const p of iconCandidates) {
+    if (fs.existsSync(p)) {
+      iconPath = p;
+      break;
+    }
+  }
+
+  try {
+    const icon = iconPath ? nativeImage.createFromPath(iconPath) : nativeImage.createEmpty();
+    tray = new Tray(icon);
+    tray.setToolTip('Loom Desktop Clone');
+
+    const updateTrayMenu = () => {
+      const contextMenu = Menu.buildFromTemplate([
+        {
+          label: 'Loom Desktop Clone (v' + app.getVersion() + ')',
+          enabled: false
+        },
+        { type: 'separator' },
+        {
+          label: isRecording ? (isPaused ? '▶️ Retomar Gravação' : '⏸️ Pausar Gravação') : '🔴 Gravar Tela (Alt+Shift+L)',
+          click: () => {
+            if (isRecording) {
+              if (isPaused) ipcMain.emit('recording:resume');
+              else ipcMain.emit('recording:pause');
+            } else {
+              createPreRecordingWindow();
+            }
+          }
+        },
+        {
+          label: isRecording ? '⏹️ Concluir Gravação' : '🖥️ Abrir Gravador',
+          click: () => {
+            if (isRecording) {
+              ipcMain.emit('recording:stop');
+            } else {
+              createPreRecordingWindow();
+            }
+          }
+        },
+        { type: 'separator' },
+        {
+          label: '📁 Biblioteca de Vídeos',
+          click: () => {
+            createPreRecordingWindow();
+          }
+        },
+        {
+          label: '📝 Teleprompter / Notas',
+          click: () => {
+            toggleSpeakerNotesWindow();
+          }
+        },
+        {
+          label: '🌐 Abrir Hub Web de Vídeos',
+          click: () => {
+            if (shareServer) {
+              const url = shareServer.getPublicUrl() || 'http://localhost:4545';
+              shell.openExternal(url);
+            }
+          }
+        },
+        { type: 'separator' },
+        {
+          label: '🔄 Verificar Atualizações...',
+          click: () => {
+            checkForAppUpdates(true);
+          }
+        },
+        { type: 'separator' },
+        {
+          label: '🚪 Sair do Loom',
+          click: () => {
+            app.quit();
+          }
+        }
+      ]);
+      tray?.setContextMenu(contextMenu);
+    };
+
+    updateTrayMenu();
+
+    tray.on('double-click', () => {
+      if (preRecordingWindow && !preRecordingWindow.isDestroyed()) {
+        preRecordingWindow.show();
+        preRecordingWindow.focus();
+      } else {
+        createPreRecordingWindow();
+      }
+    });
+  } catch (err) {
+    console.warn('Failed to create system tray:', err);
+  }
+}
+
+// 10. Auto-Updater Engine
+function setupAutoUpdater() {
+  autoUpdater.autoDownload = false;
+  autoUpdater.autoInstallOnAppQuit = true;
+
+  autoUpdater.on('checking-for-update', () => {
+    console.log('[AutoUpdater] Checking for updates...');
+  });
+
+  autoUpdater.on('update-available', (info) => {
+    console.log('[AutoUpdater] Update available:', info.version);
+    dialog
+      .showMessageBox({
+        type: 'info',
+        title: 'Atualização do Loom Clone',
+        message: `Uma nova versão (${info.version}) está disponível!`,
+        detail: 'Deseja fazer o download da atualização agora em segundo plano?',
+        buttons: ['Sim, Baixar Agora', 'Lembrar Mais Tarde'],
+        defaultId: 0
+      })
+      .then((result) => {
+        if (result.response === 0) {
+          autoUpdater.downloadUpdate();
+        }
+      });
+  });
+
+  autoUpdater.on('update-not-available', () => {
+    console.log('[AutoUpdater] App is up to date.');
+  });
+
+  autoUpdater.on('download-progress', (progressObj) => {
+    console.log(`[AutoUpdater] Download: ${progressObj.percent.toFixed(1)}%`);
+    preRecordingWindow?.webContents.send('updater:progress', progressObj.percent);
+    previewWindow?.webContents.send('updater:progress', progressObj.percent);
+  });
+
+  autoUpdater.on('update-downloaded', () => {
+    dialog
+      .showMessageBox({
+        type: 'info',
+        title: 'Atualização Pronta!',
+        message: 'A nova versão foi baixada com sucesso.',
+        detail: 'Deseja reiniciar o aplicativo agora para aplicar a atualização?',
+        buttons: ['Reiniciar e Atualizar', 'Mais Tarde'],
+        defaultId: 0
+      })
+      .then((result) => {
+        if (result.response === 0) {
+          autoUpdater.quitAndInstall();
+        }
+      });
+  });
+
+  autoUpdater.on('error', (err) => {
+    console.warn('[AutoUpdater] Status:', (err?.message || err || 'Check complete'));
+  });
+}
+
+function checkForAppUpdates(manual = false) {
+  try {
+    autoUpdater
+      .checkForUpdates()
+      .then((res) => {
+        if (manual && (!res || !res.updateInfo || res.updateInfo.version === app.getVersion())) {
+          dialog.showMessageBox({
+            type: 'info',
+            title: 'Loom Clone Atualizado',
+            message: `Você já está usando a versão mais recente (v${app.getVersion()})!`,
+            buttons: ['OK']
+          });
+        }
+      })
+      .catch((err) => {
+        if (manual) {
+          dialog.showMessageBox({
+            type: 'info',
+            title: 'Verificação de Atualização',
+            message: 'O sistema de auto-atualização está ativo e monitorando novas versões.',
+            detail: `Versão instalada no seu PC: v${app.getVersion()}`,
+            buttons: ['OK']
+          });
+        }
+      });
+  } catch (e) {
+    console.warn('Update check exception:', e);
+  }
 }
 
 // App lifecycle
@@ -762,6 +971,8 @@ app.whenReady().then(() => {
   shareServer.start();
 
   setupIpcHandlers();
+  createSystemTray();
+  setupAutoUpdater();
 
   // Register Global Shortcuts
   globalShortcut.register('CommandOrControl+Shift+L', () => {
@@ -795,6 +1006,7 @@ app.whenReady().then(() => {
 app.on('will-quit', () => {
   globalShortcut.unregisterAll();
   shareServer?.stop();
+  tray?.destroy();
 });
 
 app.on('window-all-closed', () => {

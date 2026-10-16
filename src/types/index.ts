@@ -98,6 +98,9 @@ declare global {
       openExternalUrl: (url: string) => void;
       toggleSpeakerNotes: () => void;
       startCropSelection: () => void;
+      checkForUpdates: () => Promise<boolean>;
+      getAppVersion: () => Promise<string>;
+      onUpdateProgress: (callback: (percent: number) => void) => () => void;
       closeCurrentWindow: () => void;
       minimizeCurrentWindow: () => void;
       onRecordingStateChanged: (callback: (state: string) => void) => () => void;
