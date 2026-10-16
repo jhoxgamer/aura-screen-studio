@@ -14,11 +14,12 @@ import {
 } from 'lucide-react';
 import { CaptureSource, RecordingMode, RecordingOptions, CropArea } from '../types';
 import { LibraryView } from './LibraryView';
-import { Crop, FileText, MousePointer } from 'lucide-react';
+import { Crop, FileText, MousePointer, Globe } from 'lucide-react';
 
 export const PreRecordingView: React.FC = () => {
   const [activeTab, setActiveTab] = useState<'record' | 'library'>('record');
   const [mode, setMode] = useState<RecordingMode>('screen-cam');
+  const [publicUrl, setPublicUrl] = useState<string | null>(null);
   const [sources, setSources] = useState<CaptureSource[]>([]);
   const [selectedSourceId, setSelectedSourceId] = useState<string>('');
   
@@ -77,6 +78,15 @@ export const PreRecordingView: React.FC = () => {
       }
     }
     initDevices();
+
+    const interval = setInterval(async () => {
+      try {
+        const pub = await window.electronAPI.getPublicUrl();
+        if (pub) setPublicUrl(pub);
+      } catch (e) {}
+    }, 1500);
+
+    return () => clearInterval(interval);
   }, []);
 
   // Microphone VU Meter
@@ -459,8 +469,38 @@ export const PreRecordingView: React.FC = () => {
             </div>
           </div>
 
+          {/* Global Share Link Status Pill */}
+          <div className="bg-loom-card/80 border border-loom-border/80 rounded-xl px-3 py-2 flex items-center justify-between text-xs">
+            <div className="flex items-center space-x-2 truncate">
+              <Globe className="w-3.5 h-3.5 text-loom-primary shrink-0" />
+              <span className="text-[11px] text-loom-muted">Link Público:</span>
+              {publicUrl ? (
+                <span className="text-[11px] text-emerald-400 font-semibold font-mono truncate flex items-center space-x-1">
+                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse inline-block" />
+                  <span>Ativo para qualquer pessoa</span>
+                </span>
+              ) : (
+                <span className="text-[11px] text-loom-muted flex items-center space-x-1">
+                  <span className="w-1.5 h-1.5 rounded-full bg-loom-primary animate-pulse inline-block" />
+                  <span>Iniciando túnel seguro...</span>
+                </span>
+              )}
+            </div>
+            {publicUrl && (
+              <button
+                onClick={() => {
+                  navigator.clipboard.writeText(publicUrl);
+                  alert('Link do Hub Público copiado!\n' + publicUrl);
+                }}
+                className="text-[11px] text-loom-primary hover:underline font-bold shrink-0 ml-2"
+              >
+                Copiar Hub
+              </button>
+            )}
+          </div>
+
           {/* Start Recording CTA Button */}
-          <div className="pt-2">
+          <div className="pt-1">
             <button
               onClick={handleStart}
               className="w-full bg-gradient-to-r from-loom-primary to-loom-primaryHover hover:brightness-110 active:scale-[0.99] text-white font-bold py-3.5 px-4 rounded-xl shadow-lg flex items-center justify-center space-x-2.5 transition-all"

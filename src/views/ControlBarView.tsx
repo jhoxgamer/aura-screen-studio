@@ -7,7 +7,9 @@ import {
   Trash2,
   PenTool,
   GripVertical,
-  FileText
+  FileText,
+  Mic,
+  MicOff
 } from 'lucide-react';
 import { RecordingOptions } from '../types';
 import { recorderService } from '../services/recorderService';
@@ -17,6 +19,7 @@ export const ControlBarView: React.FC = () => {
   const [seconds, setSeconds] = useState(0);
   const [isPaused, setIsPaused] = useState(false);
   const [isDrawing, setIsDrawing] = useState(false);
+  const [isMicMuted, setIsMicMuted] = useState(false);
   const [isStopping, setIsStopping] = useState(false);
   const optionsRef = useRef<RecordingOptions | null>(null);
 
@@ -109,6 +112,12 @@ export const ControlBarView: React.FC = () => {
     window.electronAPI.cancelRecording();
   };
 
+  const handleToggleMic = () => {
+    const nextMuted = !isMicMuted;
+    recorderService.setMicMuted(nextMuted);
+    setIsMicMuted(nextMuted);
+  };
+
   const handleToggleDrawing = () => {
     window.electronAPI.toggleDrawing();
   };
@@ -154,6 +163,21 @@ export const ControlBarView: React.FC = () => {
             }`}
           >
             {isPaused ? <Play className="w-4 h-4 fill-current" /> : <Pause className="w-4 h-4" />}
+          </button>
+        </div>
+
+        {/* Microphone Mute / Unmute Button */}
+        <div style={{ WebkitAppRegion: 'no-drag' } as any}>
+          <button
+            onClick={handleToggleMic}
+            title={isMicMuted ? 'Ativar Microfone' : 'Mutar Microfone'}
+            className={`p-2 rounded-xl transition-all ${
+              isMicMuted
+                ? 'bg-red-500/20 text-red-400 font-bold'
+                : 'text-loom-muted hover:text-white hover:bg-loom-card'
+            }`}
+          >
+            {isMicMuted ? <MicOff className="w-4 h-4 text-red-400" /> : <Mic className="w-4 h-4" />}
           </button>
         </div>
 

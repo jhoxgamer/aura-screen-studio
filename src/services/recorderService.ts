@@ -220,6 +220,16 @@ export class RecorderService {
     }
   }
 
+  setMicMuted(muted: boolean): boolean {
+    if (this.micStream) {
+      this.micStream.getAudioTracks().forEach((track) => {
+        track.enabled = !muted;
+      });
+      return !muted;
+    }
+    return false;
+  }
+
   async stop(): Promise<{ blob: Blob; buffer: ArrayBuffer; durationMs: number }> {
     clearInterval(this.durationInterval);
     const durationMs = Date.now() - this.startTime;

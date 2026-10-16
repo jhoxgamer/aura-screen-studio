@@ -1,4 +1,4 @@
-import { app, BrowserWindow, ipcMain, desktopCapturer, screen, globalShortcut, shell } from 'electron';
+import { app, BrowserWindow, ipcMain, desktopCapturer, screen, globalShortcut, shell, dialog } from 'electron';
 import * as path from 'path';
 import * as fs from 'fs';
 import { BubbleSize, RecordingOptions, RecordingMeta, CropArea } from './types';
@@ -178,7 +178,7 @@ function createControlBarWindow() {
   const { height } = primaryDisplay.workAreaSize;
 
   controlBarWindow = new BrowserWindow({
-    width: 320,
+    width: 370,
     height: 64,
     x: 320,
     y: Math.round(height - 100),
@@ -682,6 +682,60 @@ function setupIpcHandlers() {
     return true;
   });
 
+  ipcMain.handle('recordings:update-title', async (_, id: string, newTitle: string) => {
+    const list = readMetadata();
+    const target = list.find((r) => r.id === id);
+    if (target) {
+      target.title = newTitle.trim();
+      writeMetadata(list);
+      return true;
+    }
+    return false;
+  });
+
+  ipcMain.handle('recordings:download', async (_, id: string) => {
+    const list = readMetadata();
+    const item = list.find((r) => r.id === id);
+    if (!item || !fs.existsSync(item.filePath)) return false;
+    const { filePath, canceled } = await dialog.showSaveDialog({
+      title: 'Salvar Vídeo no Computador',
+      defaultPath: `${item.title.replace(/[\\/:*?"<>|]/g, '_')}.webm`,
+      filters: [{ name: 'Vídeo WebM (*.webm)', extensions: ['webm'] }, { name: 'Todos os Arquivos', extensions: ['*'] }]
+    });
+    if (!canceled && filePath) {
+      await fs.promises.copyFile(item.filePath, filePath);
+      return true;
+    }
+    return false;
+  });
+
+  ipcMain.handle('recordings:trim', async (_, id: string, arrayBuffer: ArrayBuffer, newDurationMs: number) => {
+    const list = readMetadata();
+    const item = list.find((r) => r.id === id);
+    if (item && fs.existsSync(item.filePath)) {
+      const buffer = Buffer.from(arrayBuffer);
+      await fs.promises.writeFile(item.filePath, buffer);
+      item.durationMs = newDurationMs;
+      item.fileSize = buffer.length;
+      writeMetadata(list);
+      return item;
+    }
+    return null;
+  });
+
+  ipcMain.handle('share:get-public-url', async () => {
+    return shareServer ? shareServer.getPublicUrl() : null;
+  });
+
+  ipcMain.on('window:open-pre-recording', () => {
+    if (preRecordingWindow && !preRecordingWindow.isDestroyed()) {
+      preRecordingWindow.show();
+      preRecordingWindow.focus();
+    } else {
+      createPreRecordingWindow();
+    }
+  });
+
   ipcMain.on('recordings:open-folder', (_, filePath: string) => {
     if (fs.existsSync(filePath)) {
       shell.showItemInFolder(filePath);
@@ -740,6 +794,7 @@ app.whenReady().then(() => {
 
 app.on('will-quit', () => {
   globalShortcut.unregisterAll();
+  shareServer?.stop();
 });
 
 app.on('window-all-closed', () => {

@@ -15,26 +15,36 @@ import {
   Sparkles,
   ArrowLeft,
   Globe,
-  ExternalLink
+  ExternalLink,
+  Edit2,
+  PlusCircle,
+  Clock,
+  Video,
+  CheckCircle2
 } from 'lucide-react';
 import confetti from 'canvas-confetti';
 import { RecordingMeta } from '../types';
 
 export const PreviewView: React.FC = () => {
   const [meta, setMeta] = useState<RecordingMeta | null>(null);
+  const [shareUrl, setShareUrl] = useState<string>('');
+  const [publicUrl, setPublicUrl] = useState<string | null>(null);
   const [isPlaying, setIsPlaying] = useState(false);
   const [currentTime, setCurrentTime] = useState(0);
   const [duration, setDuration] = useState(0);
   const [playbackRate, setPlaybackRate] = useState(1);
-  const [volume, setVolume] = useState(1);
   const [isMuted, setIsMuted] = useState(false);
-  const [isCopied, setIsCopied] = useState(false);
   const [isLinkCopied, setIsLinkCopied] = useState(false);
+
+  // Title editing state
+  const [isEditingTitle, setIsEditingTitle] = useState(false);
+  const [editedTitle, setEditedTitle] = useState('');
 
   // Trimming states
   const [trimStart, setTrimStart] = useState(0);
   const [trimEnd, setTrimEnd] = useState(0);
   const [isTrimming, setIsTrimming] = useState(false);
+  const [isTrimmingSaving, setIsTrimmingSaving] = useState(false);
 
   const videoRef = useRef<HTMLVideoElement>(null);
 
@@ -48,25 +58,75 @@ export const PreviewView: React.FC = () => {
       });
     } catch (e) {}
 
-    const cleanup = window.electronAPI.onOpenPreview((receivedMeta) => {
+    const cleanup = window.electronAPI.onOpenPreview(async (receivedMeta) => {
       setMeta(receivedMeta);
+      setEditedTitle(receivedMeta.title || '');
+      try {
+        const url = await window.electronAPI.getShareUrl(receivedMeta.id);
+        setShareUrl(url);
+        const pub = await window.electronAPI.getPublicUrl();
+        setPublicUrl(pub);
+      } catch (e) {}
     });
 
-    return cleanup;
-  }, []);
+    // Check public URL periodically until ready
+    const pubInterval = setInterval(async () => {
+      try {
+        const pub = await window.electronAPI.getPublicUrl();
+        if (pub) {
+          setPublicUrl(pub);
+          if (meta) {
+            const url = await window.electronAPI.getShareUrl(meta.id);
+            setShareUrl(url);
+          }
+        }
+      } catch (e) {}
+    }, 1500);
+
+    return () => {
+      cleanup();
+      clearInterval(pubInterval);
+    };
+  }, [meta?.id]);
 
   const handleShareLink = async () => {
     if (!meta) return;
-    const shareUrl = meta.shareUrl || await window.electronAPI.getShareUrl(meta.id);
-    navigator.clipboard.writeText(shareUrl);
+    const url = shareUrl || await window.electronAPI.getShareUrl(meta.id);
+    navigator.clipboard.writeText(url);
     setIsLinkCopied(true);
     setTimeout(() => setIsLinkCopied(false), 2500);
   };
 
   const handleOpenInBrowser = async () => {
     if (!meta) return;
-    const shareUrl = meta.shareUrl || await window.electronAPI.getShareUrl(meta.id);
-    window.electronAPI.openExternalUrl(shareUrl);
+    const url = shareUrl || await window.electronAPI.getShareUrl(meta.id);
+    window.electronAPI.openExternalUrl(url);
+  };
+
+  const handleSaveTitle = async () => {
+    if (!meta || !editedTitle.trim()) return;
+    await window.electronAPI.updateTitle(meta.id, editedTitle.trim());
+    setMeta({ ...meta, title: editedTitle.trim() });
+    setIsEditingTitle(false);
+  };
+
+  const handleDownload = async () => {
+    if (!meta) return;
+    await window.electronAPI.downloadRecording(meta.id);
+  };
+
+  const handleNewRecording = () => {
+    window.electronAPI.openPreRecording();
+    window.electronAPI.closeCurrentWindow();
+  };
+
+  const handleDelete = async () => {
+    if (!meta) return;
+    if (confirm('Deseja realmente excluir esta gravação?')) {
+      await window.electronAPI.deleteRecording(meta.id);
+      window.electronAPI.openPreRecording();
+      window.electronAPI.closeCurrentWindow();
+    }
   };
 
   const handleLoadedMetadata = () => {
@@ -125,17 +185,66 @@ export const PreviewView: React.FC = () => {
     videoRef.current.muted = nextMute;
   };
 
-  const handleCopyPath = () => {
-    if (meta?.filePath) {
-      navigator.clipboard.writeText(meta.filePath);
-      setIsCopied(true);
-      setTimeout(() => setIsCopied(false), 2000);
-    }
-  };
-
   const handleOpenFolder = () => {
     if (meta?.filePath) {
       window.electronAPI.openFileFolder(meta.filePath);
+    }
+  };
+
+  const handleSaveTrim = async () => {
+    if (!meta || !videoRef.current) return;
+    setIsTrimmingSaving(true);
+    try {
+      const vid = videoRef.current;
+      vid.pause();
+      vid.currentTime = trimStart;
+      await new Promise((r) => setTimeout(r, 200));
+
+      const stream = (vid as any).captureStream ? (vid as any).captureStream() : null;
+      if (!stream) {
+        alert('Corte direto não suportado pelo navegador.');
+        setIsTrimmingSaving(false);
+        return;
+      }
+
+      const recorder = new MediaRecorder(stream, { mimeType: 'video/webm' });
+      const chunks: Blob[] = [];
+      recorder.ondataavailable = (e) => {
+        if (e.data.size > 0) chunks.push(e.data);
+      };
+
+      const durationToRecord = (trimEnd - trimStart) * 1000;
+      recorder.start();
+      vid.play();
+
+      await new Promise<void>((resolve) => {
+        const check = () => {
+          if (vid.currentTime >= trimEnd || vid.ended) {
+            recorder.stop();
+            vid.pause();
+            resolve();
+          } else {
+            requestAnimationFrame(check);
+          }
+        };
+        check();
+      });
+
+      await new Promise((r) => (recorder.onstop = r as any));
+      const trimmedBlob = new Blob(chunks, { type: 'video/webm' });
+      const buffer = await trimmedBlob.arrayBuffer();
+
+      const updated = await window.electronAPI.trimRecording(meta.id, buffer, durationToRecord);
+      if (updated) {
+        setMeta(updated);
+        setIsTrimming(false);
+        alert('Vídeo cortado e salvo com sucesso!');
+      }
+    } catch (e) {
+      console.error('Error saving trim:', e);
+      alert('Erro ao salvar corte.');
+    } finally {
+      setIsTrimmingSaving(false);
     }
   };
 
@@ -150,53 +259,141 @@ export const PreviewView: React.FC = () => {
     return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
   };
 
+  const isPublicInternetLink = shareUrl.includes('trycloudflare.com');
+
   return (
     <div className="w-full h-full min-h-screen bg-loom-dark text-white flex flex-col select-none overflow-hidden">
       {/* Top Header */}
-      <div className="h-14 bg-loom-panel border-b border-loom-border px-6 flex items-center justify-between">
-        <div className="flex items-center space-x-3">
-          <div className="w-7 h-7 rounded-lg bg-loom-primary flex items-center justify-center shadow-md">
+      <div className="h-16 bg-loom-panel border-b border-loom-border px-6 flex items-center justify-between shrink-0">
+        <div className="flex items-center space-x-3 min-w-0">
+          <div className="w-8 h-8 rounded-xl bg-loom-primary flex items-center justify-center shadow-md shrink-0">
             <Sparkles className="w-4 h-4 text-white" />
           </div>
-          <div>
-            <h1 className="text-sm font-bold text-white leading-tight">
-              {meta?.title || 'Gravação Concluída'}
-            </h1>
-            <span className="text-[11px] text-loom-muted">
-              {meta ? `${formatFileSize(meta.fileSize)} • ${meta.resolution} • ${new Date(meta.createdAt).toLocaleTimeString('pt-BR')}` : ''}
-            </span>
+
+          <div className="min-w-0">
+            {isEditingTitle ? (
+              <div className="flex items-center space-x-2">
+                <input
+                  type="text"
+                  value={editedTitle}
+                  onChange={(e) => setEditedTitle(e.target.value)}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter') handleSaveTitle();
+                    if (e.key === 'Escape') setIsEditingTitle(false);
+                  }}
+                  autoFocus
+                  className="bg-loom-card border border-loom-primary rounded px-2 py-0.5 text-xs text-white font-bold focus:outline-none"
+                />
+                <button
+                  onClick={handleSaveTitle}
+                  className="text-xs bg-loom-primary hover:bg-loom-primaryHover text-white px-2 py-0.5 rounded font-semibold"
+                >
+                  Salvar
+                </button>
+              </div>
+            ) : (
+              <div className="flex items-center space-x-2 group cursor-pointer" onClick={() => setIsEditingTitle(true)}>
+                <h1 className="text-sm font-bold text-white leading-tight truncate max-w-sm hover:text-loom-primary transition-colors">
+                  {meta?.title || 'Gravação Concluída'}
+                </h1>
+                <Edit2 className="w-3 h-3 text-loom-muted group-hover:text-loom-primary transition-colors shrink-0" />
+              </div>
+            )}
+
+            <div className="flex items-center space-x-2 mt-0.5 text-[11px] text-loom-muted">
+              <span>{meta ? `${formatFileSize(meta.fileSize)} • ${meta.resolution} • ${(duration).toFixed(0)}s` : ''}</span>
+              <span>•</span>
+              {isPublicInternetLink ? (
+                <span className="inline-flex items-center space-x-1 text-emerald-400 font-semibold">
+                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
+                  <span>Link Público na Internet Ativo</span>
+                </span>
+              ) : (
+                <span className="inline-flex items-center space-x-1 text-loom-primary font-medium">
+                  <span className="w-1.5 h-1.5 rounded-full bg-loom-primary animate-pulse" />
+                  <span>Conectando link global...</span>
+                </span>
+              )}
+            </div>
           </div>
         </div>
 
-        <div className="flex items-center space-x-2">
+        {/* Action Buttons */}
+        <div className="flex items-center space-x-2 shrink-0">
           {/* Share Link Button */}
           <button
             onClick={handleShareLink}
-            className="flex items-center space-x-1.5 bg-loom-primary hover:bg-loom-primaryHover text-white px-3.5 py-1.5 rounded-xl text-xs font-semibold transition-all shadow-md shadow-indigo-600/30"
+            className="flex items-center space-x-1.5 bg-gradient-to-r from-loom-primary to-indigo-600 hover:brightness-110 active:scale-95 text-white px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all shadow-md shadow-indigo-600/30"
           >
             {isLinkCopied ? <Check className="w-3.5 h-3.5" /> : <Share2 className="w-3.5 h-3.5" />}
-            <span>{isLinkCopied ? 'Link Copiado!' : 'Compartilhar Link'}</span>
+            <span>{isLinkCopied ? 'Link Copiado!' : 'Copiar Link Público'}</span>
           </button>
 
           {/* Open in Browser */}
           <button
             onClick={handleOpenInBrowser}
-            className="flex items-center space-x-1.5 bg-loom-card hover:bg-loom-hover border border-loom-border px-3 py-1.5 rounded-xl text-xs font-medium text-white transition-all shadow-sm"
+            className="flex items-center space-x-1.5 bg-loom-card hover:bg-loom-hover border border-loom-border px-3 py-1.5 rounded-xl text-xs font-semibold text-white transition-all shadow-sm"
             title="Abrir página pública no navegador"
           >
             <ExternalLink className="w-3.5 h-3.5 text-loom-secondary" />
             <span>Ver no Navegador</span>
           </button>
 
+          {/* Download Video */}
+          <button
+            onClick={handleDownload}
+            className="flex items-center space-x-1.5 bg-loom-card hover:bg-loom-hover border border-loom-border px-3 py-1.5 rounded-xl text-xs font-semibold text-white transition-all shadow-sm"
+            title="Salvar arquivo de vídeo no computador"
+          >
+            <Download className="w-3.5 h-3.5 text-loom-accent" />
+            <span>Baixar Vídeo</span>
+          </button>
+
           {/* Open Folder */}
           <button
             onClick={handleOpenFolder}
-            className="flex items-center space-x-1.5 bg-loom-card hover:bg-loom-hover border border-loom-border px-3 py-1.5 rounded-xl text-xs font-medium text-loom-muted hover:text-white transition-all shadow-sm"
+            className="p-2 rounded-xl bg-loom-card hover:bg-loom-hover border border-loom-border text-loom-muted hover:text-white transition-all shadow-sm"
+            title="Abrir pasta no Windows Explorer"
           >
             <FolderOpen className="w-3.5 h-3.5" />
-            <span>Pasta</span>
+          </button>
+
+          {/* New Recording */}
+          <button
+            onClick={handleNewRecording}
+            className="flex items-center space-x-1.5 bg-loom-card hover:bg-loom-hover border border-loom-border px-3 py-1.5 rounded-xl text-xs font-semibold text-white transition-all shadow-sm"
+            title="Iniciar nova gravação"
+          >
+            <PlusCircle className="w-3.5 h-3.5 text-loom-primary" />
+            <span>Nova Gravação</span>
+          </button>
+
+          {/* Delete */}
+          <button
+            onClick={handleDelete}
+            className="p-2 rounded-xl bg-loom-card hover:bg-red-500/20 border border-loom-border text-loom-muted hover:text-red-400 transition-all shadow-sm"
+            title="Excluir gravação"
+          >
+            <Trash2 className="w-3.5 h-3.5" />
           </button>
         </div>
+      </div>
+
+      {/* Share Link Banner Alert */}
+      <div className="bg-loom-card/80 border-b border-loom-border/60 px-6 py-2 flex items-center justify-between text-xs">
+        <div className="flex items-center space-x-2 truncate">
+          <Globe className="w-3.5 h-3.5 text-loom-primary shrink-0" />
+          <span className="text-loom-muted">Link de compartilhamento para qualquer pessoa assistir:</span>
+          <span className="font-mono text-loom-secondary font-semibold select-all truncate max-w-lg">
+            {shareUrl || 'Gerando link público...'}
+          </span>
+        </div>
+        <button
+          onClick={handleShareLink}
+          className="text-xs text-loom-primary hover:underline font-semibold shrink-0 ml-4"
+        >
+          {isLinkCopied ? 'Copiado!' : 'Copiar'}
+        </button>
       </div>
 
       {/* Main Content Area: Video Player & Editor */}
@@ -300,14 +497,17 @@ export const PreviewView: React.FC = () => {
         </div>
 
         {/* Trimming & Video Editing Section */}
-        <div className="w-full mt-4 bg-loom-panel border border-loom-border rounded-xl p-4 flex items-center justify-between shrink-0">
+        <div className="w-full mt-4 bg-loom-panel border border-loom-border rounded-xl p-4 flex flex-col md:flex-row md:items-center justify-between gap-3 shrink-0">
           <div className="flex items-center space-x-2">
-            <Scissors className="w-4 h-4 text-loom-primary" />
-            <span className="text-xs font-semibold text-white">Ajustar e Cortar Vídeo (Trimming)</span>
+            <Scissors className="w-4 h-4 text-loom-primary shrink-0" />
+            <div>
+              <span className="text-xs font-bold text-white block">Ajustar e Cortar Vídeo (Trimming)</span>
+              <span className="text-[11px] text-loom-muted">Defina início e fim para remover partes indesejadas</span>
+            </div>
           </div>
 
-          <div className="flex items-center space-x-4">
-            <div className="flex items-center space-x-2 text-xs">
+          <div className="flex items-center space-x-3">
+            <div className="flex items-center space-x-1.5 text-xs">
               <span className="text-loom-muted">Início:</span>
               <input
                 type="number"
@@ -320,12 +520,12 @@ export const PreviewView: React.FC = () => {
                   setTrimStart(val);
                   if (videoRef.current) videoRef.current.currentTime = val;
                 }}
-                className="w-16 bg-loom-card border border-loom-border rounded px-2 py-1 text-white font-mono"
+                className="w-16 bg-loom-card border border-loom-border rounded px-2 py-1 text-white font-mono text-xs"
               />
               <span className="text-loom-muted">s</span>
             </div>
 
-            <div className="flex items-center space-x-2 text-xs">
+            <div className="flex items-center space-x-1.5 text-xs">
               <span className="text-loom-muted">Fim:</span>
               <input
                 type="number"
@@ -337,20 +537,28 @@ export const PreviewView: React.FC = () => {
                   const val = Number(e.target.value);
                   setTrimEnd(val);
                 }}
-                className="w-16 bg-loom-card border border-loom-border rounded px-2 py-1 text-white font-mono"
+                className="w-16 bg-loom-card border border-loom-border rounded px-2 py-1 text-white font-mono text-xs"
               />
               <span className="text-loom-muted">s</span>
             </div>
 
             <button
               onClick={() => setIsTrimming(!isTrimming)}
-              className={`px-3 py-1 rounded-lg text-xs font-semibold transition-all ${
+              className={`px-3 py-1.5 rounded-xl text-xs font-semibold transition-all ${
                 isTrimming
-                  ? 'bg-loom-coral text-white shadow-sm'
+                  ? 'bg-loom-warning text-loom-dark font-bold'
                   : 'bg-loom-card border border-loom-border text-loom-muted hover:text-white'
               }`}
             >
-              {isTrimming ? 'Modo Corte Ativo' : 'Ativar Prévia de Corte'}
+              {isTrimming ? 'Prévia Ativa' : 'Testar Prévia'}
+            </button>
+
+            <button
+              onClick={handleSaveTrim}
+              disabled={isTrimmingSaving || (trimStart === 0 && trimEnd === duration)}
+              className="px-3.5 py-1.5 rounded-xl text-xs font-bold bg-loom-coral hover:brightness-110 disabled:opacity-40 disabled:cursor-not-allowed text-white shadow-sm transition-all"
+            >
+              {isTrimmingSaving ? 'Cortando...' : 'Salvar Corte'}
             </button>
           </div>
         </div>
@@ -364,7 +572,7 @@ export const PreviewView: React.FC = () => {
               <span>Resumo Inteligente por IA</span>
             </div>
             <p className="text-xs text-gray-300 leading-relaxed whitespace-pre-line">
-              {meta?.aiSummary || 'Explicação gravada com sucesso. Nenhuma transcrição de voz foi gerada.'}
+              {meta?.aiSummary || 'Explicação gravada com sucesso pelo Loom Clone.'}
             </p>
           </div>
 

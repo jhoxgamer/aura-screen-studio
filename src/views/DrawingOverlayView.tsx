@@ -73,28 +73,29 @@ export const DrawingOverlayView: React.FC = () => {
     handleResize();
     window.addEventListener('resize', handleResize);
 
-    // Vanishing ink cleanup loop
-    const vanishingLoop = setInterval(() => {
+    // Continuous smooth animation loop for click ripples and vanishing ink
+    let animId: number;
+    const renderLoop = () => {
       const now = Date.now();
       let changed = false;
 
-      strokesRef.current = strokesRef.current.filter((stroke) => {
-        if (stroke.vanishing && now - stroke.timestamp > 3000) {
-          changed = true;
-          return false;
-        }
-        return true;
-      });
+      if (strokesRef.current.some((s) => s.vanishing && now - s.timestamp > 3000)) {
+        strokesRef.current = strokesRef.current.filter((s) => !s.vanishing || now - s.timestamp <= 3000);
+        changed = true;
+      }
 
-      if (changed) {
+      if (ripplesRef.current.length > 0 || isDrawingRef.current || changed || strokesRef.current.length > 0) {
         redraw();
       }
-    }, 100);
+
+      animId = requestAnimationFrame(renderLoop);
+    };
+    animId = requestAnimationFrame(renderLoop);
 
     return () => {
       cleanupToggled();
       window.removeEventListener('resize', handleResize);
-      clearInterval(vanishingLoop);
+      cancelAnimationFrame(animId);
     };
   }, []);
 
@@ -161,13 +162,15 @@ export const DrawingOverlayView: React.FC = () => {
   };
 
   const handleMouseDown = (e: React.MouseEvent<HTMLCanvasElement>) => {
-    isDrawingRef.current = true;
-    currentPointsRef.current = [{ x: e.clientX, y: e.clientY }];
-    ripplesRef.current.push({ x: e.clientX, y: e.clientY, radius: 8, alpha: 0.9 });
+    ripplesRef.current.push({ x: e.clientX, y: e.clientY, radius: 8, alpha: 0.95 });
+    if (active) {
+      isDrawingRef.current = true;
+      currentPointsRef.current = [{ x: e.clientX, y: e.clientY }];
+    }
   };
 
   const handleMouseMove = (e: React.MouseEvent<HTMLCanvasElement>) => {
-    if (!isDrawingRef.current) return;
+    if (!active || !isDrawingRef.current) return;
 
     const newPoint = { x: e.clientX, y: e.clientY };
     currentPointsRef.current.push(newPoint);
@@ -203,7 +206,7 @@ export const DrawingOverlayView: React.FC = () => {
   };
 
   const handleMouseUp = () => {
-    if (!isDrawingRef.current) return;
+    if (!active || !isDrawingRef.current) return;
     isDrawingRef.current = false;
 
     if (tool !== 'eraser' && currentPointsRef.current.length > 1) {
@@ -230,23 +233,24 @@ export const DrawingOverlayView: React.FC = () => {
     window.electronAPI.setDrawingActive(false);
   };
 
-  if (!active) {
-    return null;
-  }
-
   return (
-    <div className="w-screen h-screen relative overflow-hidden bg-transparent cursor-crosshair select-none">
+    <div
+      className={`w-screen h-screen relative overflow-hidden bg-transparent select-none ${
+        active ? 'cursor-crosshair' : 'cursor-default pointer-events-none'
+      }`}
+    >
       {/* Canvas */}
       <canvas
         ref={canvasRef}
         onMouseDown={handleMouseDown}
         onMouseMove={handleMouseMove}
         onMouseUp={handleMouseUp}
-        className="w-full h-full block"
+        className={`w-full h-full block ${active ? 'pointer-events-auto' : 'pointer-events-auto'}`}
       />
 
-      {/* Floating Toolbar Palette */}
-      <div className="absolute top-6 left-1/2 -translate-x-1/2 flex items-center space-x-3 bg-loom-dark/95 backdrop-blur-md px-4 py-2.5 rounded-2xl border border-loom-border shadow-2xl">
+      {/* Floating Toolbar Palette only when active */}
+      {active && (
+        <div className="absolute top-6 left-1/2 -translate-x-1/2 flex items-center space-x-3 bg-loom-dark/95 backdrop-blur-md px-4 py-2.5 rounded-2xl border border-loom-border shadow-2xl pointer-events-auto">
         {/* Tools */}
         <div className="flex items-center space-x-1">
           <button
@@ -355,6 +359,7 @@ export const DrawingOverlayView: React.FC = () => {
           <X className="w-3.5 h-3.5" />
         </button>
       </div>
+      )}
     </div>
   );
 };

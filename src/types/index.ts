@@ -90,6 +90,11 @@ declare global {
       deleteRecording: (id: string) => Promise<boolean>;
       openFileFolder: (filePath: string) => void;
       getShareUrl: (id: string) => Promise<string>;
+      getPublicUrl: () => Promise<string | null>;
+      updateTitle: (id: string, newTitle: string) => Promise<boolean>;
+      downloadRecording: (id: string) => Promise<boolean>;
+      trimRecording: (id: string, buffer: ArrayBuffer, newDurationMs: number) => Promise<any>;
+      openPreRecording: () => void;
       openExternalUrl: (url: string) => void;
       toggleSpeakerNotes: () => void;
       startCropSelection: () => void;

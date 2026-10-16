@@ -2,6 +2,7 @@ import * as http from 'http';
 import * as fs from 'fs';
 import * as path from 'path';
 import * as os from 'os';
+import { spawn, ChildProcess } from 'child_process';
 import { RecordingMeta, VideoComment, VideoReaction } from './types';
 
 export class ShareServer {
@@ -10,6 +11,8 @@ export class ShareServer {
   private localIp: string = 'localhost';
   private getMetadata: () => RecordingMeta[];
   private saveMetadata: (list: RecordingMeta[]) => void;
+  private tunnelProcess: ChildProcess | null = null;
+  private publicTunnelUrl: string | null = null;
 
   constructor(getMetadata: () => RecordingMeta[], saveMetadata: (list: RecordingMeta[]) => void) {
     this.getMetadata = getMetadata;
@@ -29,7 +32,14 @@ export class ShareServer {
     return 'localhost';
   }
 
+  public getPublicUrl(): string | null {
+    return this.publicTunnelUrl;
+  }
+
   public getShareUrl(id: string): string {
+    if (this.publicTunnelUrl) {
+      return `${this.publicTunnelUrl}/share/${id}`;
+    }
     return `http://${this.localIp}:${this.port}/share/${id}`;
   }
 
@@ -44,7 +54,8 @@ export class ShareServer {
       });
 
       this.server.listen(this.port, () => {
-        console.log(`[Loom Share Server] Running at http://${this.localIp}:${this.port}`);
+        console.log(`[Loom Share Server] Running locally at http://${this.localIp}:${this.port}`);
+        this.startTunnel();
         resolve(this.port);
       });
 
@@ -57,6 +68,76 @@ export class ShareServer {
         }
       });
     });
+  }
+
+  private startTunnel() {
+    const binPathCandidates = [
+      path.resolve(__dirname, '../../bin/cloudflared.exe'),
+      path.resolve(__dirname, '../bin/cloudflared.exe'),
+      path.resolve(process.cwd(), 'bin/cloudflared.exe'),
+      'cloudflared.exe',
+      'cloudflared'
+    ];
+
+    let chosenBin = '';
+    for (const p of binPathCandidates) {
+      if (fs.existsSync(p)) {
+        chosenBin = p;
+        break;
+      }
+    }
+
+    if (!chosenBin) {
+      console.warn('[Loom Cloudflare Tunnel] cloudflared.exe not found. Running local-only mode.');
+      return;
+    }
+
+    try {
+      console.log(`[Loom Cloudflare Tunnel] Launching public tunnel using ${chosenBin} for port ${this.port}...`);
+      this.tunnelProcess = spawn(chosenBin, ['tunnel', '--url', `http://localhost:${this.port}`], {
+        windowsHide: true
+      });
+
+      const handleData = (chunk: Buffer) => {
+        const text = chunk.toString();
+        const match = text.match(/https:\/\/[a-zA-Z0-9-]+\.trycloudflare\.com/);
+        if (match && !this.publicTunnelUrl) {
+          this.publicTunnelUrl = match[0];
+          console.log(`\n======================================================`);
+          console.log(`🚀 [Loom Public Internet Link READY]`);
+          console.log(`🔗 Global URL: ${this.publicTunnelUrl}`);
+          console.log(`======================================================\n`);
+        }
+      };
+
+      this.tunnelProcess.stdout?.on('data', handleData);
+      this.tunnelProcess.stderr?.on('data', handleData);
+
+      this.tunnelProcess.on('error', (err) => {
+        console.warn('[Loom Cloudflare Tunnel] Process error:', err.message);
+      });
+
+      this.tunnelProcess.on('exit', (code) => {
+        console.log('[Loom Cloudflare Tunnel] Exited with code:', code);
+        this.tunnelProcess = null;
+        this.publicTunnelUrl = null;
+      });
+    } catch (err) {
+      console.warn('[Loom Cloudflare Tunnel] Failed to start:', err);
+    }
+  }
+
+  public stop() {
+    if (this.tunnelProcess) {
+      try {
+        this.tunnelProcess.kill();
+      } catch (e) {}
+      this.tunnelProcess = null;
+    }
+    if (this.server) {
+      this.server.close();
+      this.server = null;
+    }
   }
 
   private handleRequest(req: http.IncomingMessage, res: http.ServerResponse) {

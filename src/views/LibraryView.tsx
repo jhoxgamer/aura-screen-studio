@@ -8,7 +8,8 @@ import {
   Clock,
   HardDrive,
   Share2,
-  ExternalLink
+  ExternalLink,
+  Download
 } from 'lucide-react';
 import { RecordingMeta } from '../types';
 
@@ -116,10 +117,19 @@ export const LibraryView: React.FC = () => {
                 <Share2 className="w-3.5 h-3.5" />
               </button>
 
+              {/* Download video */}
+              <button
+                onClick={() => window.electronAPI.downloadRecording(rec.id)}
+                title="Baixar Vídeo no Computador"
+                className="p-1.5 rounded-lg text-loom-accent hover:bg-loom-hover transition-colors"
+              >
+                <Download className="w-3.5 h-3.5" />
+              </button>
+
               {/* Open in web browser */}
               <button
                 onClick={async () => {
-                  const url = rec.shareUrl || await window.electronAPI.getShareUrl(rec.id);
+                  const url = await window.electronAPI.getShareUrl(rec.id);
                   window.electronAPI.openExternalUrl(url);
                 }}
                 title="Assistir no Navegador"

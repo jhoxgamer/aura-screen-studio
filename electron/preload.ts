@@ -67,6 +67,21 @@ export const electronAPI = {
   getShareUrl: async (id: string): Promise<string> => {
     return await ipcRenderer.invoke('recordings:get-share-url', id);
   },
+  getPublicUrl: async (): Promise<string | null> => {
+    return await ipcRenderer.invoke('share:get-public-url');
+  },
+  updateTitle: async (id: string, newTitle: string): Promise<boolean> => {
+    return await ipcRenderer.invoke('recordings:update-title', id, newTitle);
+  },
+  downloadRecording: async (id: string): Promise<boolean> => {
+    return await ipcRenderer.invoke('recordings:download', id);
+  },
+  trimRecording: async (id: string, buffer: ArrayBuffer, newDurationMs: number): Promise<any> => {
+    return await ipcRenderer.invoke('recordings:trim', id, buffer, newDurationMs);
+  },
+  openPreRecording: () => {
+    ipcRenderer.send('window:open-pre-recording');
+  },
   openExternalUrl: (url: string) => {
     ipcRenderer.send('window:open-external', url);
   },
