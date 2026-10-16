@@ -28,6 +28,28 @@ export class RecorderService {
 
     // 1. Capture screen, window, or camera
     if (options.mode === 'screen-cam' || options.mode === 'screen-only' || options.mode === 'custom-area') {
+      let sourceId = options.sourceId;
+      if (!sourceId && window.electronAPI?.getSources) {
+        try {
+          const list = await window.electronAPI.getSources();
+          if (list.length > 0) sourceId = list[0].id;
+        } catch (e) {}
+      }
+
+      const videoConstraints: any = {
+        mandatory: {
+          chromeMediaSource: 'desktop',
+          minWidth: 1280,
+          maxWidth: width,
+          minHeight: 720,
+          maxHeight: height,
+          maxFrameRate: fps
+        }
+      };
+      if (sourceId) {
+        videoConstraints.mandatory.chromeMediaSourceId = sourceId;
+      }
+
       try {
         this.screenStream = await navigator.mediaDevices.getUserMedia({
           audio: options.includeSystemAudio
@@ -37,25 +59,22 @@ export class RecorderService {
                 }
               } as any
             : false,
-          video: {
-            mandatory: {
-              chromeMediaSource: 'desktop',
-              chromeMediaSourceId: options.sourceId,
-              minWidth: 1280,
-              maxWidth: width,
-              minHeight: 720,
-              maxHeight: height,
-              maxFrameRate: fps
-            }
-          } as any
+          video: videoConstraints
         });
       } catch (err) {
-        console.warn('Failed desktop audio/video constraint, falling back to standard displayMedia:', err);
-        // Fallback for modern standard getDisplayMedia
-        this.screenStream = await navigator.mediaDevices.getDisplayMedia({
-          video: { width: { max: width }, height: { max: height }, frameRate: fps },
-          audio: options.includeSystemAudio
-        });
+        console.warn('Initial desktop capture failed, retrying without desktop audio:', err);
+        try {
+          this.screenStream = await navigator.mediaDevices.getUserMedia({
+            audio: false,
+            video: videoConstraints
+          });
+        } catch (videoErr) {
+          console.warn('Desktop getUserMedia failed, trying displayMedia fallback:', videoErr);
+          this.screenStream = await navigator.mediaDevices.getDisplayMedia({
+            video: { width: { max: width }, height: { max: height }, frameRate: fps },
+            audio: options.includeSystemAudio
+          });
+        }
       }
 
       // If custom-area mode is active with defined crop coordinates

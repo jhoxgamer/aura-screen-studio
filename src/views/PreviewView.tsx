@@ -206,7 +206,13 @@ export const PreviewView: React.FC = () => {
           {meta?.filePath ? (
             <video
               ref={videoRef}
-              src={`file://${meta.filePath}`}
+              src={
+                meta.shareUrl
+                  ? meta.shareUrl.replace('/share/', '/video/')
+                  : meta.id
+                  ? `http://localhost:4545/video/${meta.id}`
+                  : `file://${meta.filePath}`
+              }
               onLoadedMetadata={handleLoadedMetadata}
               onTimeUpdate={handleTimeUpdate}
               onClick={togglePlay}

@@ -14,6 +14,15 @@ let speakerNotesWindow: BrowserWindow | null = null;
 let cropSelectorWindow: BrowserWindow | null = null;
 let shareServer: ShareServer | null = null;
 
+app.setName('LoomClone');
+try {
+  app.setPath('userData', path.join(app.getPath('appData'), 'LoomClone'));
+} catch (e) {}
+
+// Disable Chromium flags that cause cache lock and WGC capturer failures on Windows
+app.commandLine.appendSwitch('disable-features', 'WebRtcAllowWgcScreenCapturer,WebRtcAllowWgcWindowCapturer');
+app.commandLine.appendSwitch('disable-gpu-shader-disk-cache');
+
 let isRecording = false;
 let isPaused = false;
 let currentOptions: RecordingOptions | null = null;
@@ -445,13 +454,15 @@ function setupIpcHandlers() {
       fetchWindowIcons: true
     });
 
-    return sources.map((s) => ({
-      id: s.id,
-      name: s.name,
-      thumbnail: s.thumbnail.toDataURL(),
-      display_id: s.display_id,
-      appIcon: s.appIcon?.toDataURL()
-    }));
+    return sources
+      .filter((s) => !s.name.includes('Loom Clone') && !s.name.includes('Teleprompter') && s.name.trim() !== '')
+      .map((s) => ({
+        id: s.id,
+        name: s.name,
+        thumbnail: s.thumbnail.toDataURL(),
+        display_id: s.display_id,
+        appIcon: s.appIcon?.toDataURL()
+      }));
   });
 
   // Recording Lifecycle
