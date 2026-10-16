@@ -119,6 +119,8 @@ export const CameraBubbleView: React.FC = () => {
                 playsInline
                 muted
                 style={{
+                  transform: isMirrored ? 'scaleX(-1) translateZ(0)' : 'translateZ(0)',
+                  willChange: 'transform',
                   filter: cameraFilter === 'blur'
                     ? 'contrast(1.1) brightness(1.05) saturate(1.15)'
                     : cameraFilter === 'studio'
@@ -127,9 +129,7 @@ export const CameraBubbleView: React.FC = () => {
                     ? 'saturate(1.4) contrast(1.1)'
                     : 'none'
                 }}
-                className={`w-full h-full object-cover transition-all duration-200 ${
-                  isMirrored ? 'scale-x-[-1]' : ''
-                }`}
+                className="w-full h-full object-cover transition-all duration-200"
               />
             </div>
           ) : (

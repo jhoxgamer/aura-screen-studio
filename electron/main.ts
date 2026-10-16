@@ -25,6 +25,11 @@ try {
 app.commandLine.appendSwitch('disable-features', 'WebRtcAllowWgcScreenCapturer,WebRtcAllowWgcWindowCapturer');
 app.commandLine.appendSwitch('disable-gpu-shader-disk-cache');
 
+// Hardware acceleration & low-latency video streaming optimizations
+app.commandLine.appendSwitch('enable-gpu-rasterization');
+app.commandLine.appendSwitch('enable-zero-copy');
+app.commandLine.appendSwitch('high-dpi-support', '1');
+
 let isRecording = false;
 let isPaused = false;
 let currentOptions: RecordingOptions | null = null;
@@ -790,8 +795,7 @@ function setupIpcHandlers() {
 
   // Auto-Updater IPC
   ipcMain.handle('updater:check', async () => {
-    checkForAppUpdates(true);
-    return true;
+    return await checkForAppUpdates(true);
   });
 
   ipcMain.handle('updater:get-version', async () => {
@@ -920,7 +924,8 @@ let updateState = {
   state: 'idle' as 'idle' | 'checking' | 'available' | 'downloading' | 'downloaded',
   version: '',
   percent: 0,
-  releaseNotes: ''
+  releaseNotes: '',
+  upToDate: false
 };
 
 function broadcastUpdateState(state: 'idle' | 'checking' | 'available' | 'downloading' | 'downloaded', details: Partial<typeof updateState> = {}) {
@@ -961,59 +966,31 @@ function setupAutoUpdater() {
   });
 
   autoUpdater.on('update-downloaded', (info) => {
-    console.log('[AutoUpdater] Update downloaded:', info?.version);
+    console.log('[AutoUpdater] Update downloaded successfully:', info?.version);
     broadcastUpdateState('downloaded', { version: info?.version || '' });
-    dialog
-      .showMessageBox({
-        type: 'info',
-        title: 'Atualização Pronta!',
-        message: `A nova versão (${info?.version || 'mais recente'}) foi baixada com sucesso.`,
-        detail: 'Deseja reiniciar o aplicativo agora para aplicar a atualização?',
-        buttons: ['Reiniciar e Atualizar', 'Mais Tarde'],
-        defaultId: 0
-      })
-      .then((result) => {
-        if (result.response === 0) {
-          autoUpdater.quitAndInstall();
-        }
-      });
+    // Zero unnecessary blocking modals: the in-app UI displays the instant 1-click update button!
   });
 
   autoUpdater.on('error', (err) => {
-    console.warn('[AutoUpdater] Status:', (err?.message || err || 'Check complete'));
+    console.warn('[AutoUpdater] Status notice:', (err?.message || err || 'Check complete'));
     broadcastUpdateState('idle', { version: app.getVersion() });
   });
 }
 
-function checkForAppUpdates(manual = false) {
+async function checkForAppUpdates(manual = false): Promise<{ isLatest: boolean; version: string; error?: string }> {
   try {
     broadcastUpdateState('checking');
-    autoUpdater
-      .checkForUpdates()
-      .then((res) => {
-        if (manual && (!res || !res.updateInfo || res.updateInfo.version === app.getVersion())) {
-          dialog.showMessageBox({
-            type: 'info',
-            title: 'Aura Screen Studio Atualizado',
-            message: `Você já está usando a versão mais recente (v${app.getVersion()})!`,
-            buttons: ['OK']
-          });
-        }
-      })
-      .catch((err) => {
-        broadcastUpdateState('idle', { version: app.getVersion() });
-        if (manual) {
-          dialog.showMessageBox({
-            type: 'info',
-            title: 'Verificação de Atualização',
-            message: 'O sistema de auto-atualização está ativo e monitorando novas versões.',
-            detail: `Versão instalada no seu PC: v${app.getVersion()}`,
-            buttons: ['OK']
-          });
-        }
-      });
-  } catch (e) {
-    console.warn('Update check exception:', e);
+    const res = await autoUpdater.checkForUpdates();
+    const currentVer = app.getVersion();
+    const isLatest = !res || !res.updateInfo || res.updateInfo.version === currentVer;
+    if (isLatest) {
+      broadcastUpdateState('idle', { version: currentVer, upToDate: true });
+    }
+    return { isLatest, version: res?.updateInfo?.version || currentVer };
+  } catch (e: any) {
+    console.warn('[AutoUpdater] Update check notice:', e?.message || e);
+    broadcastUpdateState('idle', { version: app.getVersion() });
+    return { isLatest: true, version: app.getVersion(), error: e?.message };
   }
 }
 

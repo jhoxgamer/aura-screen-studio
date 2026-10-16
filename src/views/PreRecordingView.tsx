@@ -43,6 +43,7 @@ export const PreRecordingView: React.FC = () => {
   const [updaterStatus, setUpdaterStatus] = useState<{ state: string; version?: string; percent?: number }>({ state: 'idle' });
   const [appVersion, setAppVersion] = useState<string>('');
   const [isCheckingUpdate, setIsCheckingUpdate] = useState(false);
+  const [updateFeedback, setUpdateFeedback] = useState<string | null>(null);
   
   const camVideoRef = useRef<HTMLVideoElement>(null);
   const camStreamRef = useRef<MediaStream | null>(null);
@@ -109,7 +110,10 @@ export const PreRecordingView: React.FC = () => {
     const interval = setInterval(async () => {
       try {
         const pub = await window.electronAPI.getPublicUrl();
-        if (pub) setPublicUrl(pub);
+        if (pub) {
+          setPublicUrl(pub);
+          clearInterval(interval);
+        }
       } catch (e) {}
     }, 1500);
 
@@ -697,12 +701,28 @@ export const PreRecordingView: React.FC = () => {
 
             {/* App Version & Manual Update Check */}
             <div className="flex items-center justify-between pt-2 border-t border-loom-border/40 text-[11px] text-loom-muted">
-              <span className="font-mono">v{appVersion || '1.1.0'}</span>
+              <span className="font-mono flex items-center gap-1.5">
+                <span>v{appVersion || '1.2.0'}</span>
+                {updateFeedback && (
+                  <span className="text-emerald-400 font-sans font-semibold text-[10px] bg-emerald-950/60 border border-emerald-500/40 px-1.5 py-0.5 rounded animate-fade-in">
+                    {updateFeedback}
+                  </span>
+                )}
+              </span>
               <button
                 onClick={async () => {
                   setIsCheckingUpdate(true);
-                  await window.electronAPI?.checkForUpdates?.();
-                  setTimeout(() => setIsCheckingUpdate(false), 3000);
+                  setUpdateFeedback(null);
+                  try {
+                    const res = await window.electronAPI?.checkForUpdates?.();
+                    setIsCheckingUpdate(false);
+                    if (res?.isLatest) {
+                      setUpdateFeedback('Versão mais recente!');
+                      setTimeout(() => setUpdateFeedback(null), 3500);
+                    }
+                  } catch (e) {
+                    setIsCheckingUpdate(false);
+                  }
                 }}
                 disabled={isCheckingUpdate}
                 className="flex items-center space-x-1.5 hover:text-cyan-400 text-slate-400 transition-colors"

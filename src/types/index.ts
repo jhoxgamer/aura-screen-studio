@@ -100,7 +100,7 @@ declare global {
       startCropSelection: () => void;
       sendCropArea: (area: CropArea) => void;
       cancelCropSelection: () => void;
-      checkForUpdates: () => Promise<boolean>;
+      checkForUpdates: () => Promise<{ isLatest: boolean; version: string; error?: string }>;
       getAppVersion: () => Promise<string>;
       startUpdateDownload: () => void;
       installUpdateNow: () => void;

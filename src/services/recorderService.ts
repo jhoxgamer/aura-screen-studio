@@ -136,7 +136,7 @@ export class RecorderService {
           const canvas = document.createElement('canvas');
           canvas.width = targetW;
           canvas.height = targetH;
-          const ctx = canvas.getContext('2d', { alpha: false });
+          const ctx = canvas.getContext('2d', { alpha: false, desynchronized: true } as any) as CanvasRenderingContext2D | null;
 
           this.isCroppingActive = true;
 
@@ -227,18 +227,25 @@ export class RecorderService {
 
     const combinedStream = new MediaStream(tracks);
 
-    // 4. Initialize MediaRecorder with best supported codecs
-    let mimeType = 'video/webm; codecs=vp9,opus';
+    // 4. Initialize MediaRecorder with hardware-accelerated codecs
+    let mimeType = 'video/webm; codecs=h264,opus';
     if (!MediaRecorder.isTypeSupported(mimeType)) {
-      mimeType = 'video/webm; codecs=vp8,opus';
+      mimeType = 'video/webm; codecs=vp9,opus';
       if (!MediaRecorder.isTypeSupported(mimeType)) {
-        mimeType = 'video/webm';
+        mimeType = 'video/webm; codecs=vp8,opus';
+        if (!MediaRecorder.isTypeSupported(mimeType)) {
+          mimeType = 'video/webm';
+        }
       }
     }
 
+    const targetBitrate =
+      options.resolution === '4k' ? 12000000 : options.resolution === '720p' ? 3000000 : 6000000;
+
     this.mediaRecorder = new MediaRecorder(combinedStream, {
       mimeType,
-      videoBitsPerSecond: options.resolution === '4k' ? 12000000 : 6000000
+      videoBitsPerSecond: targetBitrate,
+      audioBitsPerSecond: 128000
     });
 
     this.mediaRecorder.ondataavailable = (event) => {
