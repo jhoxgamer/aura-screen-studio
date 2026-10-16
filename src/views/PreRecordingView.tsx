@@ -37,6 +37,10 @@ export const PreRecordingView: React.FC = () => {
   const [speakerNotesEnabled, setSpeakerNotesEnabled] = useState(false);
   const [highlightCursor, setHighlightCursor] = useState(true);
   const [cropArea, setCropArea] = useState<CropArea | null>(null);
+  const [showLiveCamPreview, setShowLiveCamPreview] = useState(true);
+  
+  const camVideoRef = useRef<HTMLVideoElement>(null);
+  const camStreamRef = useRef<MediaStream | null>(null);
   
   const [audioLevel, setAudioLevel] = useState<number>(0);
   const audioContextRef = useRef<AudioContext | null>(null);
@@ -141,7 +145,55 @@ export const PreRecordingView: React.FC = () => {
     };
   }, [selectedAudioId, activeTab]);
 
+  // Live Camera Preview in Launcher
+  useEffect(() => {
+    let active = true;
+    async function initCam() {
+      if (mode === 'screen-only' || !showLiveCamPreview || activeTab !== 'record') {
+        if (camStreamRef.current) {
+          camStreamRef.current.getTracks().forEach((t) => t.stop());
+          camStreamRef.current = null;
+        }
+        return;
+      }
+      try {
+        if (camStreamRef.current) {
+          camStreamRef.current.getTracks().forEach((t) => t.stop());
+        }
+        const stream = await navigator.mediaDevices.getUserMedia({
+          video: selectedVideoId ? { deviceId: { exact: selectedVideoId }, width: { ideal: 640 }, height: { ideal: 360 } } : true,
+          audio: false
+        });
+        if (!active) {
+          stream.getTracks().forEach((t) => t.stop());
+          return;
+        }
+        camStreamRef.current = stream;
+        if (camVideoRef.current) {
+          camVideoRef.current.srcObject = stream;
+        }
+      } catch (err) {
+        console.warn('Camera preview error:', err);
+      }
+    }
+    initCam();
+
+    return () => {
+      active = false;
+      if (camStreamRef.current) {
+        camStreamRef.current.getTracks().forEach((t) => t.stop());
+        camStreamRef.current = null;
+      }
+    };
+  }, [selectedVideoId, mode, showLiveCamPreview, activeTab]);
+
   const handleStart = () => {
+    // Release launcher camera preview so camera bubble takes exclusive hardware access
+    if (camStreamRef.current) {
+      camStreamRef.current.getTracks().forEach((t) => t.stop());
+      camStreamRef.current = null;
+    }
+
     const options: RecordingOptions = {
       mode,
       sourceId: selectedSourceId,
@@ -349,14 +401,24 @@ export const PreRecordingView: React.FC = () => {
             </div>
           )}
 
-          {/* Camera Selector */}
+          {/* Camera Selector & Live Framing Preview */}
           {mode !== 'screen-only' && (
-            <div>
-              <label className="text-xs font-semibold text-loom-muted uppercase tracking-wider block mb-2">
-                Câmera / Webcam
-              </label>
+            <div className="space-y-2">
+              <div className="flex items-center justify-between">
+                <label className="text-xs font-semibold text-loom-muted uppercase tracking-wider block">
+                  Câmera / Webcam
+                </label>
+                <button
+                  type="button"
+                  onClick={() => setShowLiveCamPreview(!showLiveCamPreview)}
+                  className="text-[10px] text-cyan-400 hover:underline font-bold"
+                >
+                  {showLiveCamPreview ? 'Ocultar Preview' : 'Exibir Preview'}
+                </button>
+              </div>
+
               <div className="bg-loom-card border border-loom-border rounded-xl p-2.5 flex items-center space-x-2">
-                <Camera className="w-4 h-4 text-loom-primary shrink-0" />
+                <Camera className="w-4 h-4 text-cyan-400 shrink-0" />
                 <select
                   value={selectedVideoId}
                   onChange={(e) => setSelectedVideoId(e.target.value)}
@@ -369,24 +431,42 @@ export const PreRecordingView: React.FC = () => {
                   ))}
                 </select>
               </div>
+
+              {/* Live Webcam Framing Box */}
+              {showLiveCamPreview && (
+                <div className="relative w-full h-28 bg-black/80 rounded-xl overflow-hidden border border-cyan-500/30 shadow-inner group">
+                  <video
+                    ref={camVideoRef}
+                    autoPlay
+                    playsInline
+                    muted
+                    className="w-full h-full object-cover -scale-x-100"
+                  />
+                  <div className="absolute inset-0 border border-dashed border-white/20 rounded-xl pointer-events-none" />
+                  <div className="absolute top-2 left-2 px-2 py-0.5 rounded-full bg-black/60 backdrop-blur-md text-[10px] text-cyan-400 font-bold flex items-center space-x-1 border border-cyan-500/30">
+                    <span className="w-1.5 h-1.5 rounded-full bg-cyan-400 animate-pulse" />
+                    <span>Enquadramento ao Vivo</span>
+                  </div>
+                </div>
+              )}
             </div>
           )}
 
-          {/* Microphone Selector & VU Meter */}
+          {/* Microphone Selector & 16-Segment LED VU Meter */}
           <div>
             <div className="flex items-center justify-between mb-2">
               <label className="text-xs font-semibold text-loom-muted uppercase tracking-wider">
                 Microfone
               </label>
-              <span className="text-[10px] text-loom-accent font-medium flex items-center space-x-1">
-                <span className="w-1.5 h-1.5 rounded-full bg-loom-accent animate-pulse" />
-                <span>Ativo</span>
+              <span className="text-[10px] text-emerald-400 font-bold flex items-center space-x-1">
+                <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
+                <span>Nível: {audioLevel}%</span>
               </span>
             </div>
 
             <div className="bg-loom-card border border-loom-border rounded-xl p-3 space-y-2.5">
               <div className="flex items-center space-x-2">
-                <Mic className="w-4 h-4 text-loom-primary shrink-0" />
+                <Mic className="w-4 h-4 text-cyan-400 shrink-0" />
                 <select
                   value={selectedAudioId}
                   onChange={(e) => setSelectedAudioId(e.target.value)}
@@ -400,13 +480,28 @@ export const PreRecordingView: React.FC = () => {
                 </select>
               </div>
 
-              {/* VU Meter Visualizer */}
-              <div className="space-y-1">
-                <div className="h-1.5 w-full bg-loom-panel rounded-full overflow-hidden flex">
-                  <div
-                    className="h-full bg-gradient-to-r from-loom-accent via-loom-warning to-loom-coral rounded-full transition-all duration-75"
-                    style={{ width: `${audioLevel}%` }}
-                  />
+              {/* 16-Segment LED VU Meter */}
+              <div className="space-y-1 pt-1">
+                <div className="flex items-center space-x-1 h-2.5 w-full bg-[#090b10] p-0.5 rounded-lg border border-slate-800">
+                  {Array.from({ length: 16 }).map((_, idx) => {
+                    const activeThreshold = ((idx + 1) / 16) * 100;
+                    const isLit = audioLevel >= activeThreshold;
+                    const isRed = idx >= 13;
+                    const isYellow = idx >= 9 && idx < 13;
+                    const barColor = isLit
+                      ? isRed
+                        ? 'bg-rose-500 shadow-sm shadow-rose-500/50'
+                        : isYellow
+                        ? 'bg-amber-400 shadow-sm shadow-amber-400/50'
+                        : 'bg-emerald-400 shadow-sm shadow-emerald-400/50'
+                      : 'bg-slate-800/60';
+                    return (
+                      <div
+                        key={idx}
+                        className={`flex-1 h-full rounded-sm transition-all duration-75 ${barColor}`}
+                      />
+                    );
+                  })}
                 </div>
               </div>
             </div>

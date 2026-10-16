@@ -38,7 +38,7 @@ interface ClickRipple {
 export const DrawingOverlayView: React.FC = () => {
   const [active, setActive] = useState(false);
   const [tool, setTool] = useState<DrawingTool>('pen');
-  const [color, setColor] = useState('#ff5b4f'); // Loom Coral
+  const [color, setColor] = useState('#06b6d4'); // Aura Cyan
   const [strokeWidth, setStrokeWidth] = useState(4);
   const [vanishingInk, setVanishingInk] = useState(true);
 
@@ -49,12 +49,12 @@ export const DrawingOverlayView: React.FC = () => {
   const currentPointsRef = useRef<StrokePoint[]>([]);
 
   const colors = [
-    { name: 'Coral', hex: '#ff5b4f' },
-    { name: 'Roxo', hex: '#625df5' },
-    { name: 'Verde', hex: '#10b981' },
-    { name: 'Amarelo', hex: '#f59e0b' },
-    { name: 'Azul', hex: '#3b82f6' },
-    { name: 'Branco', hex: '#ffffff' }
+    { name: 'Ciano Elétrico', hex: '#06b6d4' },
+    { name: 'Violeta Cósmico', hex: '#8b5cf6' },
+    { name: 'Rosa Neon', hex: '#f43f5e' },
+    { name: 'Esmeralda', hex: '#10b981' },
+    { name: 'Âmbar Dourado', hex: '#f59e0b' },
+    { name: 'Branco Puro', hex: '#ffffff' }
   ];
 
   useEffect(() => {
@@ -407,7 +407,7 @@ export const DrawingOverlayView: React.FC = () => {
           {/* Vanishing Ink Mode Toggle */}
           <button
             onClick={() => setVanishingInk(!vanishingInk)}
-            title="Tinta que desaparece em 3 segundos (Loom Evanescent Ink)"
+            title="Tinta inteligente que desaparece em 3 segundos (Aura Evanescent Ink)"
             className={`flex items-center space-x-1.5 px-2.5 py-1.5 rounded-xl text-xs font-semibold transition-all ${
               vanishingInk
                 ? 'bg-loom-primary/20 text-loom-primary border border-loom-primary/40 shadow-sm'

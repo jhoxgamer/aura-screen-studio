@@ -503,9 +503,14 @@ export const PreviewView: React.FC = () => {
         {/* Trimming & Video Editing Section */}
         <div className="w-full mt-4 bg-loom-panel border border-loom-border rounded-xl p-4 flex flex-col md:flex-row md:items-center justify-between gap-3 shrink-0">
           <div className="flex items-center space-x-2">
-            <Scissors className="w-4 h-4 text-loom-primary shrink-0" />
+            <Scissors className="w-4 h-4 text-cyan-400 shrink-0" />
             <div>
-              <span className="text-xs font-bold text-white block">Ajustar e Cortar Vídeo (Trimming)</span>
+              <div className="flex items-center space-x-2">
+                <span className="text-xs font-bold text-white block">Ajustar e Cortar Vídeo (Trimming)</span>
+                <span className="text-[10px] bg-cyan-500/10 text-cyan-400 border border-cyan-500/20 px-1.5 py-0.2 rounded font-mono font-semibold">
+                  Final: {Math.max(0, trimEnd - trimStart).toFixed(1)}s
+                </span>
+              </div>
               <span className="text-[11px] text-loom-muted">Defina início e fim para remover partes indesejadas</span>
             </div>
           </div>
@@ -524,7 +529,7 @@ export const PreviewView: React.FC = () => {
                   setTrimStart(val);
                   if (videoRef.current) videoRef.current.currentTime = val;
                 }}
-                className="w-16 bg-loom-card border border-loom-border rounded px-2 py-1 text-white font-mono text-xs"
+                className="w-16 bg-loom-card border border-loom-border rounded px-2 py-1 text-white font-mono text-xs focus:border-cyan-500 outline-none"
               />
               <span className="text-loom-muted">s</span>
             </div>
@@ -541,7 +546,7 @@ export const PreviewView: React.FC = () => {
                   const val = Number(e.target.value);
                   setTrimEnd(val);
                 }}
-                className="w-16 bg-loom-card border border-loom-border rounded px-2 py-1 text-white font-mono text-xs"
+                className="w-16 bg-loom-card border border-loom-border rounded px-2 py-1 text-white font-mono text-xs focus:border-cyan-500 outline-none"
               />
               <span className="text-loom-muted">s</span>
             </div>
@@ -550,7 +555,7 @@ export const PreviewView: React.FC = () => {
               onClick={() => setIsTrimming(!isTrimming)}
               className={`px-3 py-1.5 rounded-xl text-xs font-semibold transition-all ${
                 isTrimming
-                  ? 'bg-loom-warning text-loom-dark font-bold'
+                  ? 'bg-amber-400 text-slate-950 font-bold shadow-md shadow-amber-400/20'
                   : 'bg-loom-card border border-loom-border text-loom-muted hover:text-white'
               }`}
             >
@@ -560,7 +565,7 @@ export const PreviewView: React.FC = () => {
             <button
               onClick={handleSaveTrim}
               disabled={isTrimmingSaving || (trimStart === 0 && trimEnd === duration)}
-              className="px-3.5 py-1.5 rounded-xl text-xs font-bold bg-loom-coral hover:brightness-110 disabled:opacity-40 disabled:cursor-not-allowed text-white shadow-sm transition-all"
+              className="px-3.5 py-1.5 rounded-xl text-xs font-bold bg-gradient-to-r from-rose-500 to-rose-600 hover:brightness-110 disabled:opacity-40 disabled:cursor-not-allowed text-white shadow-md shadow-rose-600/30 transition-all"
             >
               {isTrimmingSaving ? 'Cortando...' : 'Salvar Corte'}
             </button>

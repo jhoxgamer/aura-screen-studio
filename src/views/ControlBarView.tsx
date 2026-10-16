@@ -101,9 +101,8 @@ export const ControlBarView: React.FC = () => {
           setSeconds(Math.floor(ms / 1000));
         });
       }
-      window.electronAPI.restartRecording();
-    } catch (e) {
-      console.error('Restart failed:', e);
+    } catch (err) {
+      console.error('Error restarting recorder:', err);
     }
   };
 
@@ -131,23 +130,29 @@ export const ControlBarView: React.FC = () => {
   return (
     <div className="w-full h-full flex items-center justify-center p-1 select-none">
       <div
-        className="flex items-center space-x-2 bg-loom-dark/95 backdrop-blur-md px-3 py-2 rounded-2xl border border-loom-border shadow-2xl"
+        className="flex items-center space-x-1.5 bg-[#0b0e17]/95 backdrop-blur-xl px-2.5 py-1.5 rounded-2xl border border-cyan-500/30 shadow-2xl shadow-cyan-500/10"
         style={{ WebkitAppRegion: 'drag' } as any}
       >
-        {/* Drag Handle Icon */}
-        <div className="cursor-grab active:cursor-grabbing text-loom-muted hover:text-white transition-colors pl-0.5">
-          <GripVertical className="w-4 h-4" />
+        {/* Drag Handle */}
+        <div className="cursor-grab active:cursor-grabbing text-slate-500 hover:text-cyan-400 transition-colors pl-0.5">
+          <GripVertical className="w-3.5 h-3.5" />
         </div>
 
-        {/* Stop Recording Button with dynamic counter */}
+        {/* Stop Recording & Timer Pill */}
         <div style={{ WebkitAppRegion: 'no-drag' } as any}>
           <button
             onClick={handleStopRecording}
             disabled={isStopping}
-            className="flex items-center space-x-2 bg-loom-coral hover:brightness-110 active:scale-95 text-white px-3 py-1.5 rounded-xl font-bold text-xs transition-all shadow-md group"
+            title="Concluir e Salvar Gravação"
+            className="flex items-center space-x-2 bg-gradient-to-r from-rose-500 to-rose-600 hover:brightness-110 active:scale-95 text-white px-3 py-1.5 rounded-xl font-bold text-xs transition-all shadow-md shadow-rose-600/30 group"
           >
-            <div className="w-2.5 h-2.5 rounded bg-white group-hover:scale-110 transition-transform" />
-            <span className="font-mono text-[13px] tracking-tight">{formatTime(seconds)}</span>
+            <div className="w-2.5 h-2.5 rounded-sm bg-white group-hover:scale-110 transition-transform" />
+            <span className="font-mono text-xs tracking-tight font-semibold">{formatTime(seconds)}</span>
+            {isPaused && (
+              <span className="text-[10px] bg-amber-400/20 text-amber-300 px-1 py-0.2 rounded font-bold uppercase">
+                Pausa
+              </span>
+            )}
           </button>
         </div>
 
@@ -155,14 +160,14 @@ export const ControlBarView: React.FC = () => {
         <div style={{ WebkitAppRegion: 'no-drag' } as any}>
           <button
             onClick={handleTogglePause}
-            title={isPaused ? 'Retomar Gravação' : 'Pausar Gravação'}
+            title={isPaused ? 'Retomar Gravação (Alt+Shift+P)' : 'Pausar Gravação (Alt+Shift+P)'}
             className={`p-2 rounded-xl transition-all ${
               isPaused
-                ? 'bg-loom-warning text-loom-dark font-bold'
-                : 'text-loom-muted hover:text-white hover:bg-loom-card'
+                ? 'bg-amber-400 text-slate-950 font-bold shadow-md shadow-amber-400/30 scale-105'
+                : 'text-slate-400 hover:text-white hover:bg-slate-800/60'
             }`}
           >
-            {isPaused ? <Play className="w-4 h-4 fill-current" /> : <Pause className="w-4 h-4" />}
+            {isPaused ? <Play className="w-3.5 h-3.5 fill-current" /> : <Pause className="w-3.5 h-3.5" />}
           </button>
         </div>
 
@@ -170,14 +175,14 @@ export const ControlBarView: React.FC = () => {
         <div style={{ WebkitAppRegion: 'no-drag' } as any}>
           <button
             onClick={handleToggleMic}
-            title={isMicMuted ? 'Ativar Microfone' : 'Mutar Microfone'}
+            title={isMicMuted ? 'Ativar Microfone' : 'Silenciar Microfone'}
             className={`p-2 rounded-xl transition-all ${
               isMicMuted
-                ? 'bg-red-500/20 text-red-400 font-bold'
-                : 'text-loom-muted hover:text-white hover:bg-loom-card'
+                ? 'bg-rose-500/20 text-rose-400 border border-rose-500/40 shadow-sm'
+                : 'text-slate-400 hover:text-white hover:bg-slate-800/60'
             }`}
           >
-            {isMicMuted ? <MicOff className="w-4 h-4 text-red-400" /> : <Mic className="w-4 h-4" />}
+            {isMicMuted ? <MicOff className="w-3.5 h-3.5 text-rose-400" /> : <Mic className="w-3.5 h-3.5" />}
           </button>
         </div>
 
@@ -185,10 +190,10 @@ export const ControlBarView: React.FC = () => {
         <div style={{ WebkitAppRegion: 'no-drag' } as any}>
           <button
             onClick={handleRestart}
-            title="Reiniciar Gravação"
-            className="p-2 rounded-xl text-loom-muted hover:text-white hover:bg-loom-card transition-all"
+            title="Reiniciar Gravação do Zero"
+            className="p-2 rounded-xl text-slate-400 hover:text-white hover:bg-slate-800/60 transition-all"
           >
-            <RotateCcw className="w-4 h-4" />
+            <RotateCcw className="w-3.5 h-3.5" />
           </button>
         </div>
 
@@ -196,14 +201,14 @@ export const ControlBarView: React.FC = () => {
         <div style={{ WebkitAppRegion: 'no-drag' } as any}>
           <button
             onClick={handleToggleDrawing}
-            title="Anotar na Tela (Desenhar)"
+            title="Anotações na Tela (Caneta & Formas)"
             className={`p-2 rounded-xl transition-all ${
               isDrawing
-                ? 'bg-loom-primary text-white shadow-sm'
-                : 'text-loom-muted hover:text-white hover:bg-loom-card'
+                ? 'bg-cyan-500 text-slate-950 font-bold shadow-md shadow-cyan-500/30 scale-105'
+                : 'text-slate-400 hover:text-white hover:bg-slate-800/60'
             }`}
           >
-            <PenTool className="w-4 h-4" />
+            <PenTool className="w-3.5 h-3.5" />
           </button>
         </div>
 
@@ -211,10 +216,10 @@ export const ControlBarView: React.FC = () => {
         <div style={{ WebkitAppRegion: 'no-drag' } as any}>
           <button
             onClick={() => window.electronAPI.toggleSpeakerNotes()}
-            title="Teleprompter / Notas do Orador"
-            className="p-2 rounded-xl text-loom-muted hover:text-white hover:bg-loom-card transition-all"
+            title="Teleprompter / Roteiro do Apresentador"
+            className="p-2 rounded-xl text-slate-400 hover:text-white hover:bg-slate-800/60 transition-all"
           >
-            <FileText className="w-4 h-4" />
+            <FileText className="w-3.5 h-3.5" />
           </button>
         </div>
 
@@ -223,9 +228,9 @@ export const ControlBarView: React.FC = () => {
           <button
             onClick={handleCancel}
             title="Descartar Gravação"
-            className="p-2 rounded-xl text-loom-muted hover:text-red-400 hover:bg-red-500/20 transition-all"
+            className="p-2 rounded-xl text-slate-400 hover:text-rose-400 hover:bg-rose-500/10 transition-all"
           >
-            <Trash2 className="w-4 h-4" />
+            <Trash2 className="w-3.5 h-3.5" />
           </button>
         </div>
       </div>

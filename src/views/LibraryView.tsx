@@ -9,13 +9,17 @@ import {
   HardDrive,
   Share2,
   ExternalLink,
-  Download
+  Download,
+  Search,
+  Check
 } from 'lucide-react';
 import { RecordingMeta } from '../types';
 
 export const LibraryView: React.FC = () => {
   const [recordings, setRecordings] = useState<RecordingMeta[]>([]);
   const [loading, setLoading] = useState(true);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [copiedId, setCopiedId] = useState<string | null>(null);
 
   useEffect(() => {
     loadList();
@@ -57,106 +61,139 @@ export const LibraryView: React.FC = () => {
     return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
   };
 
+  const totalBytes = recordings.reduce((acc, r) => acc + (r.fileSize || 0), 0);
+  const filtered = recordings.filter((r) =>
+    r.title.toLowerCase().includes(searchQuery.toLowerCase())
+  );
+
   if (loading) {
     return (
-      <div className="flex-1 flex items-center justify-center text-loom-muted text-xs">
-        Carregando vídeos...
+      <div className="flex-1 flex items-center justify-center text-slate-400 text-xs">
+        <div className="w-5 h-5 rounded-full border-2 border-cyan-400 border-t-transparent animate-spin mr-2" />
+        <span>Carregando biblioteca Aura...</span>
       </div>
     );
   }
 
   return (
-    <div className="flex-1 p-4 overflow-y-auto space-y-3">
-      {recordings.length === 0 ? (
-        <div className="h-64 flex flex-col items-center justify-center text-loom-muted space-y-2 text-center p-4">
-          <Film className="w-10 h-10 text-loom-border stroke-[1.5]" />
-          <p className="text-xs font-semibold text-white/80">Nenhuma gravação encontrada</p>
-          <p className="text-[11px] max-w-[240px] text-loom-muted">
-            Grave seu primeiro vídeo para vê-lo aqui na sua biblioteca local.
-          </p>
+    <div className="flex-1 flex flex-col p-4 overflow-hidden space-y-3">
+      {/* Search & Stats Bar */}
+      <div className="space-y-2 shrink-0">
+        <div className="relative">
+          <Search className="w-4 h-4 text-cyan-400 absolute left-3 top-1/2 -translate-y-1/2" />
+          <input
+            type="text"
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            placeholder="Buscar gravações por título..."
+            className="w-full bg-[#101420] border border-slate-800 rounded-xl pl-9 pr-3 py-2 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-cyan-500 transition-colors"
+          />
         </div>
-      ) : (
-        recordings.map((rec) => (
-          <div
-            key={rec.id}
-            className="bg-loom-card border border-loom-border hover:border-loom-primary/40 rounded-xl p-3 flex items-center justify-between transition-all group shadow-sm"
-          >
-            <div className="flex items-center space-x-3 min-w-0">
-              <div className="w-10 h-10 rounded-lg bg-loom-panel border border-loom-border flex items-center justify-center shrink-0">
-                <Film className="w-5 h-5 text-loom-primary" />
-              </div>
 
-              <div className="min-w-0">
-                <h3 className="text-xs font-bold text-white truncate max-w-[200px]" title={rec.title}>
-                  {rec.title}
-                </h3>
-                <div className="flex items-center space-x-2 text-[10px] text-loom-muted mt-0.5">
-                  <span className="flex items-center space-x-1">
-                    <Clock className="w-3 h-3" />
-                    <span>{formatDuration(rec.durationMs)}</span>
-                  </span>
-                  <span>•</span>
-                  <span>{formatSize(rec.fileSize)}</span>
-                  <span>•</span>
-                  <span>{rec.resolution}</span>
+        <div className="flex items-center justify-between text-[11px] text-slate-400 px-1">
+          <span>{recordings.length} {recordings.length === 1 ? 'vídeo gravado' : 'vídeos gravados'}</span>
+          <span className="font-mono text-cyan-400 font-medium">{formatSize(totalBytes)} em disco</span>
+        </div>
+      </div>
+
+      {/* Videos List */}
+      <div className="flex-1 overflow-y-auto space-y-2 pr-1">
+        {filtered.length === 0 ? (
+          <div className="h-64 flex flex-col items-center justify-center text-slate-500 space-y-2 text-center p-4">
+            <Film className="w-10 h-10 text-slate-800 stroke-[1.5]" />
+            <p className="text-xs font-semibold text-slate-300">
+              {searchQuery ? 'Nenhum vídeo com esse nome' : 'Nenhuma gravação encontrada'}
+            </p>
+            <p className="text-[11px] max-w-[240px] text-slate-500">
+              {searchQuery ? 'Tente buscar com outras palavras-chave.' : 'Inicie sua primeira gravação na aba "Nova Gravação".'}
+            </p>
+          </div>
+        ) : (
+          filtered.map((rec) => (
+            <div
+              key={rec.id}
+              className="bg-[#121624] border border-slate-800/80 hover:border-cyan-500/40 rounded-xl p-3 flex items-center justify-between transition-all group shadow-sm hover:shadow-cyan-500/5"
+            >
+              <div className="flex items-center space-x-3 min-w-0">
+                <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-indigo-950 to-slate-900 border border-slate-800 flex items-center justify-center shrink-0 group-hover:border-cyan-500/50 transition-colors">
+                  <Film className="w-5 h-5 text-cyan-400" />
+                </div>
+
+                <div className="min-w-0">
+                  <h3 className="text-xs font-bold text-white truncate max-w-[190px]" title={rec.title}>
+                    {rec.title}
+                  </h3>
+                  <div className="flex items-center space-x-2 text-[10px] text-slate-400 mt-0.5">
+                    <span className="flex items-center space-x-1">
+                      <Clock className="w-3 h-3 text-cyan-400/80" />
+                      <span>{formatDuration(rec.durationMs)}</span>
+                    </span>
+                    <span>•</span>
+                    <span>{formatSize(rec.fileSize)}</span>
+                    <span>•</span>
+                    <span className="font-mono text-slate-500">{rec.resolution || '1080p'}</span>
+                  </div>
                 </div>
               </div>
+
+              <div className="flex items-center space-x-1 shrink-0">
+                {/* Copy share link */}
+                <button
+                  onClick={async () => {
+                    const url = rec.shareUrl || await window.electronAPI.getShareUrl(rec.id);
+                    navigator.clipboard.writeText(url);
+                    setCopiedId(rec.id);
+                    setTimeout(() => setCopiedId(null), 2000);
+                  }}
+                  title="Copiar Link Compartilhável"
+                  className="p-1.5 rounded-lg text-cyan-400 hover:bg-cyan-500/10 transition-colors"
+                >
+                  {copiedId === rec.id ? <Check className="w-3.5 h-3.5 text-emerald-400" /> : <Share2 className="w-3.5 h-3.5" />}
+                </button>
+
+                {/* Download video */}
+                <button
+                  onClick={() => window.electronAPI.downloadRecording(rec.id)}
+                  title="Baixar Vídeo no Computador"
+                  className="p-1.5 rounded-lg text-emerald-400 hover:bg-emerald-500/10 transition-colors"
+                >
+                  <Download className="w-3.5 h-3.5" />
+                </button>
+
+                {/* Open in web browser */}
+                <button
+                  onClick={async () => {
+                    const url = await window.electronAPI.getShareUrl(rec.id);
+                    window.electronAPI.openExternalUrl(url);
+                  }}
+                  title="Assistir no Navegador"
+                  className="p-1.5 rounded-lg text-indigo-400 hover:bg-indigo-500/10 transition-colors"
+                >
+                  <ExternalLink className="w-3.5 h-3.5" />
+                </button>
+
+                {/* Open folder */}
+                <button
+                  onClick={() => handleOpenFolder(rec.filePath)}
+                  title="Abrir Pasta no Windows Explorer"
+                  className="p-1.5 rounded-lg text-slate-400 hover:text-white hover:bg-slate-800 transition-colors"
+                >
+                  <FolderOpen className="w-3.5 h-3.5" />
+                </button>
+
+                {/* Delete */}
+                <button
+                  onClick={() => handleDelete(rec.id)}
+                  title="Excluir Gravação"
+                  className="p-1.5 rounded-lg text-slate-400 hover:text-rose-400 hover:bg-rose-500/10 transition-colors"
+                >
+                  <Trash2 className="w-3.5 h-3.5" />
+                </button>
+              </div>
             </div>
-
-            <div className="flex items-center space-x-1">
-              {/* Copy share link */}
-              <button
-                onClick={async () => {
-                  const url = rec.shareUrl || await window.electronAPI.getShareUrl(rec.id);
-                  navigator.clipboard.writeText(url);
-                  alert('Link de compartilhamento copiado!');
-                }}
-                title="Copiar Link Compartilhável"
-                className="p-1.5 rounded-lg text-loom-primary hover:bg-loom-primary/20 transition-colors"
-              >
-                <Share2 className="w-3.5 h-3.5" />
-              </button>
-
-              {/* Download video */}
-              <button
-                onClick={() => window.electronAPI.downloadRecording(rec.id)}
-                title="Baixar Vídeo no Computador"
-                className="p-1.5 rounded-lg text-loom-accent hover:bg-loom-hover transition-colors"
-              >
-                <Download className="w-3.5 h-3.5" />
-              </button>
-
-              {/* Open in web browser */}
-              <button
-                onClick={async () => {
-                  const url = await window.electronAPI.getShareUrl(rec.id);
-                  window.electronAPI.openExternalUrl(url);
-                }}
-                title="Assistir no Navegador"
-                className="p-1.5 rounded-lg text-loom-secondary hover:bg-loom-hover transition-colors"
-              >
-                <ExternalLink className="w-3.5 h-3.5" />
-              </button>
-
-              <button
-                onClick={() => handleOpenFolder(rec.filePath)}
-                title="Abrir Pasta"
-                className="p-1.5 rounded-lg text-loom-muted hover:text-white hover:bg-loom-hover transition-colors"
-              >
-                <FolderOpen className="w-3.5 h-3.5" />
-              </button>
-
-              <button
-                onClick={() => handleDelete(rec.id)}
-                title="Excluir"
-                className="p-1.5 rounded-lg text-loom-muted hover:text-red-400 hover:bg-red-500/10 transition-colors"
-              >
-                <Trash2 className="w-3.5 h-3.5" />
-              </button>
-            </div>
-          </div>
-        ))
-      )}
+          ))
+        )}
+      </div>
     </div>
   );
 };

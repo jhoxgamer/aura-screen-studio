@@ -413,7 +413,7 @@ export class ShareServer {
         </video>
 
         <!-- Big Play Button Overlay -->
-        <button id="big-play-btn" onclick="togglePlay()" class="absolute w-20 h-20 rounded-full bg-[#625df5]/90 text-white flex items-center justify-center shadow-2xl hover:scale-110 active:scale-95 transition-all">
+        <button id="big-play-btn" onclick="togglePlay()" class="absolute w-20 h-20 rounded-full bg-gradient-to-tr from-indigo-600 via-cyan-500 to-violet-500 text-white flex items-center justify-center shadow-2xl shadow-cyan-500/30 hover:scale-110 active:scale-95 transition-all">
           <svg class="w-9 h-9 fill-current ml-1" viewBox="0 0 24 24"><polygon points="5 3 19 12 5 21 5 3"/></svg>
         </button>
 
@@ -430,7 +430,7 @@ export class ShareServer {
 
           <div class="flex items-center justify-between">
             <div class="flex items-center space-x-3">
-              <button onclick="togglePlay()" id="play-pause-btn" class="text-white hover:text-indigo-400 p-1">
+              <button onclick="togglePlay()" id="play-pause-btn" class="text-white hover:text-cyan-400 p-1">
                 <svg class="w-5 h-5 fill-current" viewBox="0 0 24 24"><polygon points="5 3 19 12 5 21 5 3"/></svg>
               </button>
 
@@ -442,7 +442,7 @@ export class ShareServer {
               <button onclick="cycleSpeed()" id="speed-btn" class="text-xs font-bold bg-white/10 hover:bg-white/20 px-2 py-1 rounded-lg text-white">1x</button>
 
               <!-- Fullscreen -->
-              <button onclick="toggleFullscreen()" class="text-white hover:text-indigo-400 p-1">
+              <button onclick="toggleFullscreen()" class="text-white hover:text-cyan-400 p-1">
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"/></svg>
               </button>
             </div>
@@ -451,9 +451,9 @@ export class ShareServer {
       </div>
 
       <!-- Emoji Reactions Bar (Aura Interactive Timeline) -->
-      <div class="bg-[#16171d] border border-gray-800 rounded-2xl p-3 flex items-center justify-between shadow-md">
+      <div class="bg-[#0d111c] border border-slate-800/90 rounded-2xl p-3 flex items-center justify-between shadow-md">
         <div class="flex items-center space-x-1.5">
-          <span class="text-xs font-medium text-gray-400 mr-2">Reagir no segundo atual:</span>
+          <span class="text-xs font-medium text-slate-400 mr-2">Reagir no segundo atual:</span>
           <button onclick="sendReaction('👍')" class="p-2 hover:bg-white/10 rounded-xl text-xl hover:scale-125 transition-all">👍</button>
           <button onclick="sendReaction('❤️')" class="p-2 hover:bg-white/10 rounded-xl text-xl hover:scale-125 transition-all">❤️</button>
           <button onclick="sendReaction('👏')" class="p-2 hover:bg-white/10 rounded-xl text-xl hover:scale-125 transition-all">👏</button>
@@ -465,43 +465,43 @@ export class ShareServer {
       </div>
 
       <!-- Video Details & AI Summary Card -->
-      <div class="bg-[#16171d] border border-gray-800 rounded-2xl p-5 space-y-3">
-        <div class="flex items-center space-x-2 text-indigo-400 text-xs font-semibold uppercase tracking-wider">
+      <div class="bg-[#0d111c] border border-slate-800/90 rounded-2xl p-5 space-y-3">
+        <div class="flex items-center space-x-2 text-cyan-400 text-xs font-semibold uppercase tracking-wider">
           <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
           <span>Resumo Inteligente por IA</span>
         </div>
-        <p class="text-sm text-gray-300 leading-relaxed">${this.escapeHtml(aiSummary)}</p>
+        <p class="text-sm text-slate-300 leading-relaxed">${this.escapeHtml(aiSummary)}</p>
       </div>
     </div>
 
     <!-- Right Sidebar: Comments & Transcript (1 col) -->
     <div class="flex flex-col space-y-4">
       <!-- Tabs header -->
-      <div class="bg-[#16171d] border border-gray-800 rounded-2xl p-1 flex space-x-1">
-        <button onclick="switchTab('comments')" id="tab-comments-btn" class="flex-1 py-2 text-xs font-semibold rounded-xl bg-[#625df5] text-white transition-all shadow-sm">
+      <div class="bg-[#0d111c] border border-slate-800/90 rounded-2xl p-1 flex space-x-1">
+        <button onclick="switchTab('comments')" id="tab-comments-btn" class="flex-1 py-2 text-xs font-semibold rounded-xl bg-gradient-to-r from-indigo-600 to-cyan-600 text-white transition-all shadow-sm">
           Comentários (<span id="comments-count">0</span>)
         </button>
-        <button onclick="switchTab('transcript')" id="tab-transcript-btn" class="flex-1 py-2 text-xs font-medium rounded-xl text-gray-400 hover:text-white transition-all">
+        <button onclick="switchTab('transcript')" id="tab-transcript-btn" class="flex-1 py-2 text-xs font-medium rounded-xl text-slate-400 hover:text-white transition-all">
           Transcrição
         </button>
       </div>
 
       <!-- Tab 1: Comments Section -->
-      <div id="comments-tab" class="bg-[#16171d] border border-gray-800 rounded-2xl p-4 flex-1 flex flex-col h-[520px]">
+      <div id="comments-tab" class="bg-[#0d111c] border border-slate-800/90 rounded-2xl p-4 flex-1 flex flex-col h-[520px]">
         <!-- Comments list -->
         <div id="comments-list" class="flex-1 overflow-y-auto space-y-3 pr-1 text-sm">
           <!-- Populated by JS -->
         </div>
 
         <!-- Add Comment Form -->
-        <div class="pt-3 border-t border-gray-800/80 mt-2 space-y-2">
+        <div class="pt-3 border-t border-slate-800 mt-2 space-y-2">
           <div class="flex items-center space-x-2">
-            <input type="text" id="comment-author" placeholder="Seu nome..." value="Espectador" class="bg-gray-800/70 border border-gray-700/60 rounded-xl px-2.5 py-1 text-xs text-white focus:outline-none focus:border-indigo-500 w-32">
-            <span class="text-xs text-indigo-400 font-mono" id="current-timestamp-badge">em 00:00</span>
+            <input type="text" id="comment-author" placeholder="Seu nome..." value="Espectador" class="bg-slate-900 border border-slate-700/60 rounded-xl px-2.5 py-1 text-xs text-white focus:outline-none focus:border-cyan-500 w-32">
+            <span class="text-xs text-cyan-400 font-mono" id="current-timestamp-badge">em 00:00</span>
           </div>
           <div class="flex space-x-2">
-            <input type="text" id="comment-text" placeholder="Adicione seu comentário..." class="flex-1 bg-gray-800/70 border border-gray-700/60 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-indigo-500" onkeydown="if(event.key==='Enter') submitComment()">
-            <button onclick="submitComment()" class="bg-[#625df5] hover:bg-[#524be3] text-white px-3 py-2 rounded-xl text-xs font-semibold transition-all">
+            <input type="text" id="comment-text" placeholder="Adicione seu comentário..." class="flex-1 bg-slate-900 border border-slate-700/60 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-cyan-500" onkeydown="if(event.key==='Enter') submitComment()">
+            <button onclick="submitComment()" class="bg-gradient-to-r from-indigo-600 to-cyan-600 hover:brightness-110 text-white px-3.5 py-2 rounded-xl text-xs font-semibold transition-all shadow-md">
               Enviar
             </button>
           </div>
@@ -509,7 +509,7 @@ export class ShareServer {
       </div>
 
       <!-- Tab 2: Transcript Section -->
-      <div id="transcript-tab" class="hidden bg-[#16171d] border border-gray-800 rounded-2xl p-4 flex-1 flex flex-col h-[520px]">
+      <div id="transcript-tab" class="hidden bg-[#0d111c] border border-slate-800/90 rounded-2xl p-4 flex-1 flex flex-col h-[520px]">
         <div id="transcript-list" class="flex-1 overflow-y-auto space-y-2.5 pr-1 text-xs">
           <!-- Populated by JS -->
         </div>
