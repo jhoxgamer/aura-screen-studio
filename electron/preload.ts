@@ -1,5 +1,5 @@
 import { contextBridge, ipcRenderer } from 'electron';
-import { BubbleSize, RecordingOptions, RecordingMeta } from './types';
+import { BubbleSize, RecordingOptions, RecordingMeta, CropArea } from './types';
 
 export const electronAPI = {
   // Capture Sources (Screens & Windows)
@@ -91,6 +91,12 @@ export const electronAPI = {
   startCropSelection: () => {
     ipcRenderer.send('crop:start-selection');
   },
+  sendCropArea: (area: CropArea) => {
+    ipcRenderer.send('crop:area-selected', area);
+  },
+  cancelCropSelection: () => {
+    ipcRenderer.send('crop:cancel-selection');
+  },
 
   // Auto-Updater
   checkForUpdates: async () => {
@@ -98,6 +104,17 @@ export const electronAPI = {
   },
   getAppVersion: async (): Promise<string> => {
     return await ipcRenderer.invoke('updater:get-version');
+  },
+  startUpdateDownload: () => {
+    ipcRenderer.send('updater:start-download');
+  },
+  installUpdateNow: () => {
+    ipcRenderer.send('updater:install-now');
+  },
+  onUpdateStatusChanged: (callback: (status: { state: string; version?: string; percent?: number; releaseNotes?: string }) => void) => {
+    const handler = (_: any, status: any) => callback(status);
+    ipcRenderer.on('updater:status-changed', handler);
+    return () => ipcRenderer.removeListener('updater:status-changed', handler);
   },
   onUpdateProgress: (callback: (percent: number) => void) => {
     const handler = (_: any, pct: number) => callback(pct);

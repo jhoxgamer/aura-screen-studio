@@ -98,8 +98,13 @@ declare global {
       openExternalUrl: (url: string) => void;
       toggleSpeakerNotes: () => void;
       startCropSelection: () => void;
+      sendCropArea: (area: CropArea) => void;
+      cancelCropSelection: () => void;
       checkForUpdates: () => Promise<boolean>;
       getAppVersion: () => Promise<string>;
+      startUpdateDownload: () => void;
+      installUpdateNow: () => void;
+      onUpdateStatusChanged: (callback: (status: { state: string; version?: string; percent?: number; releaseNotes?: string }) => void) => () => void;
       onUpdateProgress: (callback: (percent: number) => void) => () => void;
       closeCurrentWindow: () => void;
       minimizeCurrentWindow: () => void;

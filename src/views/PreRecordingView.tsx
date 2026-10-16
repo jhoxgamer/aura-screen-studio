@@ -38,6 +38,11 @@ export const PreRecordingView: React.FC = () => {
   const [highlightCursor, setHighlightCursor] = useState(true);
   const [cropArea, setCropArea] = useState<CropArea | null>(null);
   const [showLiveCamPreview, setShowLiveCamPreview] = useState(true);
+
+  // Auto-Updater in-app state
+  const [updaterStatus, setUpdaterStatus] = useState<{ state: string; version?: string; percent?: number }>({ state: 'idle' });
+  const [appVersion, setAppVersion] = useState<string>('');
+  const [isCheckingUpdate, setIsCheckingUpdate] = useState(false);
   
   const camVideoRef = useRef<HTMLVideoElement>(null);
   const camStreamRef = useRef<MediaStream | null>(null);
@@ -47,13 +52,31 @@ export const PreRecordingView: React.FC = () => {
   const analyserRef = useRef<AnalyserNode | null>(null);
   const animFrameRef = useRef<number | null>(null);
 
-  // Listen for crop area selection
+  // Listen for crop area selection & auto-updater events
   useEffect(() => {
     const cleanupCrop = window.electronAPI.onCropAreaSelected((area) => {
       setCropArea(area);
       setMode('custom-area');
     });
-    return cleanupCrop;
+
+    if (window.electronAPI?.getAppVersion) {
+      window.electronAPI.getAppVersion().then((v) => setAppVersion(v));
+    }
+
+    const cleanupUpdaterStatus = window.electronAPI?.onUpdateStatusChanged?.((status) => {
+      setUpdaterStatus(status);
+      if (status.state === 'idle') setIsCheckingUpdate(false);
+    });
+
+    const cleanupUpdaterProgress = window.electronAPI?.onUpdateProgress?.((pct) => {
+      setUpdaterStatus((prev) => ({ ...prev, percent: pct, state: 'downloading' }));
+    });
+
+    return () => {
+      cleanupCrop();
+      cleanupUpdaterStatus?.();
+      cleanupUpdaterProgress?.();
+    };
   }, []);
 
   // Load capture sources & media devices
@@ -283,6 +306,45 @@ export const PreRecordingView: React.FC = () => {
         <LibraryView />
       ) : (
         <div className="flex-1 p-5 overflow-y-auto space-y-4">
+          {/* In-App Auto-Update Notification Banner */}
+          {updaterStatus.state === 'downloading' && (
+            <div className="p-3 bg-gradient-to-r from-cyan-950/70 to-indigo-950/70 border border-cyan-500/40 rounded-xl space-y-1.5 shadow-lg shadow-cyan-950/40 animate-pulse">
+              <div className="flex items-center justify-between text-xs font-semibold text-cyan-300">
+                <span className="flex items-center space-x-1.5">
+                  <RefreshCw className="w-3.5 h-3.5 animate-spin text-cyan-400" />
+                  <span>Baixando nova atualização v{updaterStatus.version || ''}...</span>
+                </span>
+                <span className="font-mono text-cyan-200">{updaterStatus.percent || 0}%</span>
+              </div>
+              <div className="w-full bg-slate-900 rounded-full h-1.5 overflow-hidden">
+                <div
+                  className="bg-gradient-to-r from-cyan-400 to-indigo-500 h-full rounded-full transition-all duration-300"
+                  style={{ width: `${updaterStatus.percent || 0}%` }}
+                />
+              </div>
+            </div>
+          )}
+
+          {updaterStatus.state === 'downloaded' && (
+            <div className="p-3 bg-gradient-to-r from-emerald-950/70 to-cyan-950/70 border border-emerald-500/60 rounded-xl flex items-center justify-between shadow-xl shadow-emerald-950/40">
+              <div className="text-xs">
+                <span className="font-bold text-emerald-300 flex items-center gap-1.5">
+                  <span className="w-2 h-2 rounded-full bg-emerald-400 animate-ping inline-block" />
+                  Atualização v{updaterStatus.version || ''} Pronta!
+                </span>
+                <span className="text-[11px] text-slate-300 block">
+                  Clique para reiniciar e aplicar melhorias.
+                </span>
+              </div>
+              <button
+                onClick={() => window.electronAPI?.installUpdateNow?.()}
+                className="px-3 py-1.5 bg-gradient-to-r from-emerald-400 to-cyan-500 hover:brightness-110 text-slate-950 text-xs font-bold rounded-lg shadow-md transition-all active:scale-95 whitespace-nowrap"
+              >
+                Reiniciar e Atualizar
+              </button>
+            </div>
+          )}
+
           {/* Mode Selector */}
           <div>
             <label className="text-xs font-semibold text-loom-muted uppercase tracking-wider block mb-2">
@@ -349,16 +411,27 @@ export const PreRecordingView: React.FC = () => {
               <div className="mt-2.5 p-2.5 bg-loom-card border border-loom-border rounded-xl flex items-center justify-between">
                 <div className="text-xs">
                   <span className="text-loom-muted">Área: </span>
-                  <span className="font-mono text-white font-semibold">
+                  <span className="font-mono text-cyan-400 font-semibold">
                     {cropArea ? `${Math.round(cropArea.width)} × ${Math.round(cropArea.height)} px` : 'Nenhuma definida'}
                   </span>
                 </div>
-                <button
-                  onClick={() => window.electronAPI.startCropSelection()}
-                  className="px-2.5 py-1 rounded-lg bg-loom-primary/20 hover:bg-loom-primary/30 text-loom-primary text-xs font-semibold transition-colors"
-                >
-                  {cropArea ? 'Alterar Área' : 'Selecionar na Tela'}
-                </button>
+                <div className="flex items-center space-x-1.5">
+                  {cropArea && (
+                    <button
+                      onClick={() => setCropArea(null)}
+                      className="px-2 py-1 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-400 hover:text-rose-400 text-xs transition-colors"
+                      title="Redefinir para tela inteira"
+                    >
+                      Redefinir
+                    </button>
+                  )}
+                  <button
+                    onClick={() => window.electronAPI.startCropSelection()}
+                    className="px-2.5 py-1 rounded-lg bg-cyan-500/20 hover:bg-cyan-500/30 text-cyan-300 text-xs font-semibold transition-colors"
+                  >
+                    {cropArea ? 'Alterar Área' : 'Selecionar na Tela'}
+                  </button>
+                </div>
               </div>
             )}
           </div>
@@ -616,10 +689,28 @@ export const PreRecordingView: React.FC = () => {
               <div className="w-3 h-3 rounded-full bg-loom-coral animate-ping" />
               <span className="tracking-wide">INICIAR GRAVAÇÃO</span>
             </button>
-            <div className="text-center mt-2">
+            <div className="text-center mt-2 mb-2">
               <span className="text-[11px] text-loom-muted">
                 Ou use o atalho global <kbd className="bg-loom-card px-1.5 py-0.5 rounded border border-loom-border text-white font-mono text-[10px]">Alt + Shift + A</kbd> (ou Alt + Shift + L)
               </span>
+            </div>
+
+            {/* App Version & Manual Update Check */}
+            <div className="flex items-center justify-between pt-2 border-t border-loom-border/40 text-[11px] text-loom-muted">
+              <span className="font-mono">v{appVersion || '1.1.0'}</span>
+              <button
+                onClick={async () => {
+                  setIsCheckingUpdate(true);
+                  await window.electronAPI?.checkForUpdates?.();
+                  setTimeout(() => setIsCheckingUpdate(false), 3000);
+                }}
+                disabled={isCheckingUpdate}
+                className="flex items-center space-x-1.5 hover:text-cyan-400 text-slate-400 transition-colors"
+                title="Checar se há novas versões no GitHub"
+              >
+                <RefreshCw className={`w-3 h-3 ${isCheckingUpdate ? 'animate-spin text-cyan-400' : ''}`} />
+                <span>{isCheckingUpdate ? 'Verificando...' : 'Buscar Atualizações'}</span>
+              </button>
             </div>
           </div>
         </div>

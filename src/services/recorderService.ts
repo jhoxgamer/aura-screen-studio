@@ -9,6 +9,10 @@ export class RecorderService {
   private startTime: number = 0;
   private durationInterval: any = null;
   private onDurationUpdate?: (ms: number) => void;
+  private isCroppingActive: boolean = false;
+  private cropVideoElement: HTMLVideoElement | null = null;
+  private cropAnimFrame: number | null = null;
+  private rawScreenStream: MediaStream | null = null;
 
   async start(options: RecordingOptions, onDuration?: (ms: number) => void): Promise<void> {
     this.recordedChunks = [];
@@ -80,43 +84,88 @@ export class RecorderService {
       // If custom-area mode is active with defined crop coordinates
       if (options.mode === 'custom-area' && options.cropArea && this.screenStream) {
         try {
+          this.rawScreenStream = this.screenStream;
           const crop = options.cropArea;
-          const rawStream = this.screenStream;
+
           const hiddenVideo = document.createElement('video');
-          hiddenVideo.srcObject = rawStream;
+          hiddenVideo.autoplay = true;
           hiddenVideo.muted = true;
-          await hiddenVideo.play();
+          hiddenVideo.playsInline = true;
+          hiddenVideo.srcObject = this.rawScreenStream;
+          this.cropVideoElement = hiddenVideo;
+
+          await new Promise<void>((resolve) => {
+            if (hiddenVideo.readyState >= 2 && hiddenVideo.videoWidth > 0) {
+              resolve();
+            } else {
+              const onReady = () => {
+                if (hiddenVideo.videoWidth > 0) {
+                  hiddenVideo.removeEventListener('loadedmetadata', onReady);
+                  hiddenVideo.removeEventListener('canplay', onReady);
+                  resolve();
+                }
+              };
+              hiddenVideo.addEventListener('loadedmetadata', onReady);
+              hiddenVideo.addEventListener('canplay', onReady);
+              setTimeout(resolve, 500);
+            }
+          });
+
+          try {
+            await hiddenVideo.play();
+          } catch (e) {
+            console.warn('hiddenVideo play notification:', e);
+          }
+
+          const vidW = hiddenVideo.videoWidth || 1920;
+          const vidH = hiddenVideo.videoHeight || 1080;
+          const screenW = window.screen.width || vidW;
+          const screenH = window.screen.height || vidH;
+
+          const scaleX = vidW / screenW;
+          const scaleY = vidH / screenH;
+
+          const sourceX = Math.max(0, Math.round(crop.x * scaleX));
+          const sourceY = Math.max(0, Math.round(crop.y * scaleY));
+          const sourceW = Math.min(vidW - sourceX, Math.max(2, Math.round(crop.width * scaleX)));
+          const sourceH = Math.min(vidH - sourceY, Math.max(2, Math.round(crop.height * scaleY)));
+
+          const targetW = sourceW % 2 === 0 ? sourceW : sourceW - 1;
+          const targetH = sourceH % 2 === 0 ? sourceH : sourceH - 1;
 
           const canvas = document.createElement('canvas');
-          canvas.width = crop.width;
-          canvas.height = crop.height;
-          const ctx = canvas.getContext('2d');
+          canvas.width = targetW;
+          canvas.height = targetH;
+          const ctx = canvas.getContext('2d', { alpha: false });
+
+          this.isCroppingActive = true;
 
           const renderCrop = () => {
-            if (this.mediaRecorder && this.mediaRecorder.state !== 'inactive') {
-              if (ctx && hiddenVideo.readyState >= 2) {
-                ctx.drawImage(
-                  hiddenVideo,
-                  crop.x,
-                  crop.y,
-                  crop.width,
-                  crop.height,
-                  0,
-                  0,
-                  crop.width,
-                  crop.height
-                );
-              }
-              requestAnimationFrame(renderCrop);
+            if (!this.isCroppingActive) return;
+
+            if (ctx && hiddenVideo.readyState >= 2) {
+              ctx.drawImage(
+                hiddenVideo,
+                sourceX,
+                sourceY,
+                sourceW,
+                sourceH,
+                0,
+                0,
+                targetW,
+                targetH
+              );
             }
+            this.cropAnimFrame = requestAnimationFrame(renderCrop);
           };
+
           renderCrop();
 
           const croppedStream = (canvas as any).captureStream(fps);
-          rawStream.getAudioTracks().forEach((t) => croppedStream.addTrack(t));
+          this.rawScreenStream.getAudioTracks().forEach((t) => croppedStream.addTrack(t));
           this.screenStream = croppedStream;
         } catch (cropErr) {
-          console.warn('Error applying crop to stream:', cropErr);
+          console.error('Error applying crop to stream:', cropErr);
         }
       }
     } else {
@@ -244,6 +293,21 @@ export class RecorderService {
         const buffer = await blob.arrayBuffer();
 
         // Cleanup tracks
+        this.isCroppingActive = false;
+        if (this.cropAnimFrame) {
+          cancelAnimationFrame(this.cropAnimFrame);
+          this.cropAnimFrame = null;
+        }
+        if (this.cropVideoElement) {
+          this.cropVideoElement.pause();
+          this.cropVideoElement.srcObject = null;
+          this.cropVideoElement.remove();
+          this.cropVideoElement = null;
+        }
+        if (this.rawScreenStream) {
+          this.rawScreenStream.getTracks().forEach((t) => t.stop());
+          this.rawScreenStream = null;
+        }
         this.screenStream?.getTracks().forEach((t) => t.stop());
         this.micStream?.getTracks().forEach((t) => t.stop());
         this.audioContext?.close().catch(() => {});
@@ -259,6 +323,21 @@ export class RecorderService {
 
   cleanup() {
     clearInterval(this.durationInterval);
+    this.isCroppingActive = false;
+    if (this.cropAnimFrame) {
+      cancelAnimationFrame(this.cropAnimFrame);
+      this.cropAnimFrame = null;
+    }
+    if (this.cropVideoElement) {
+      this.cropVideoElement.pause();
+      this.cropVideoElement.srcObject = null;
+      this.cropVideoElement.remove();
+      this.cropVideoElement = null;
+    }
+    if (this.rawScreenStream) {
+      this.rawScreenStream.getTracks().forEach((t) => t.stop());
+      this.rawScreenStream = null;
+    }
     this.screenStream?.getTracks().forEach((t) => t.stop());
     this.micStream?.getTracks().forEach((t) => t.stop());
     this.audioContext?.close().catch(() => {});

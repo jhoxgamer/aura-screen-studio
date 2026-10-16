@@ -388,6 +388,10 @@ function createCropSelectorWindow() {
   const primaryDisplay = screen.getPrimaryDisplay();
   const { width, height } = primaryDisplay.bounds;
 
+  if (preRecordingWindow && !preRecordingWindow.isDestroyed()) {
+    preRecordingWindow.hide();
+  }
+
   cropSelectorWindow = new BrowserWindow({
     x: 0,
     y: 0,
@@ -411,6 +415,10 @@ function createCropSelectorWindow() {
 
   cropSelectorWindow.on('closed', () => {
     cropSelectorWindow = null;
+    if (preRecordingWindow && !preRecordingWindow.isDestroyed() && !isRecording) {
+      preRecordingWindow.show();
+      preRecordingWindow.focus();
+    }
   });
 }
 
@@ -574,22 +582,25 @@ function setupIpcHandlers() {
     setBubbleSize(size);
   });
 
-  // Drawing mode toggle
+  // Drawing mode toggle with synchronized multi-window broadcast
   let isDrawingActive = false;
-  ipcMain.on('drawing:toggle', () => {
-    isDrawingActive = !isDrawingActive;
-    if (drawingOverlayWindow && !drawingOverlayWindow.isDestroyed()) {
-      drawingOverlayWindow.setIgnoreMouseEvents(!isDrawingActive, { forward: true });
-      drawingOverlayWindow.webContents.send('drawing:toggled', isDrawingActive);
-    }
-  });
-
-  ipcMain.on('drawing:set-active', (_, active: boolean) => {
+  const broadcastDrawingState = (active: boolean) => {
     isDrawingActive = active;
     if (drawingOverlayWindow && !drawingOverlayWindow.isDestroyed()) {
       drawingOverlayWindow.setIgnoreMouseEvents(!active, { forward: true });
       drawingOverlayWindow.webContents.send('drawing:toggled', active);
     }
+    if (controlBarWindow && !controlBarWindow.isDestroyed()) {
+      controlBarWindow.webContents.send('drawing:toggled', active);
+    }
+  };
+
+  ipcMain.on('drawing:toggle', () => {
+    broadcastDrawingState(!isDrawingActive);
+  });
+
+  ipcMain.on('drawing:set-active', (_, active: boolean) => {
+    broadcastDrawingState(active);
   });
 
   ipcMain.on('drawing:clear', () => {
@@ -660,6 +671,17 @@ function setupIpcHandlers() {
 
   ipcMain.on('crop:start-selection', () => {
     createCropSelectorWindow();
+  });
+
+  ipcMain.on('crop:cancel-selection', () => {
+    if (cropSelectorWindow && !cropSelectorWindow.isDestroyed()) {
+      cropSelectorWindow.close();
+      cropSelectorWindow = null;
+    }
+    if (preRecordingWindow && !preRecordingWindow.isDestroyed()) {
+      preRecordingWindow.show();
+      preRecordingWindow.focus();
+    }
   });
 
   ipcMain.on('crop:area-selected', (_, area: CropArea) => {
@@ -775,6 +797,14 @@ function setupIpcHandlers() {
   ipcMain.handle('updater:get-version', async () => {
     return app.getVersion();
   });
+
+  ipcMain.on('updater:start-download', () => {
+    autoUpdater.downloadUpdate();
+  });
+
+  ipcMain.on('updater:install-now', () => {
+    autoUpdater.quitAndInstall();
+  });
 }
 
 // 9. System Tray Integration
@@ -886,48 +916,58 @@ function createSystemTray() {
 }
 
 // 10. Auto-Updater Engine
+let updateState = {
+  state: 'idle' as 'idle' | 'checking' | 'available' | 'downloading' | 'downloaded',
+  version: '',
+  percent: 0,
+  releaseNotes: ''
+};
+
+function broadcastUpdateState(state: 'idle' | 'checking' | 'available' | 'downloading' | 'downloaded', details: Partial<typeof updateState> = {}) {
+  updateState = { ...updateState, state, ...details };
+  const targetWindows = [preRecordingWindow, previewWindow];
+  targetWindows.forEach((win) => {
+    if (win && !win.isDestroyed()) {
+      win.webContents.send('updater:status-changed', updateState);
+    }
+  });
+}
+
 function setupAutoUpdater() {
-  autoUpdater.autoDownload = false;
+  autoUpdater.autoDownload = true;
   autoUpdater.autoInstallOnAppQuit = true;
 
   autoUpdater.on('checking-for-update', () => {
     console.log('[AutoUpdater] Checking for updates...');
+    broadcastUpdateState('checking');
   });
 
   autoUpdater.on('update-available', (info) => {
     console.log('[AutoUpdater] Update available:', info.version);
-    dialog
-      .showMessageBox({
-        type: 'info',
-        title: 'Atualização do Aura Screen Studio',
-        message: `Uma nova versão (${info.version}) está disponível!`,
-        detail: 'Deseja fazer o download da atualização agora em segundo plano?',
-        buttons: ['Sim, Baixar Agora', 'Lembrar Mais Tarde'],
-        defaultId: 0
-      })
-      .then((result) => {
-        if (result.response === 0) {
-          autoUpdater.downloadUpdate();
-        }
-      });
+    broadcastUpdateState('available', { version: info.version });
   });
 
   autoUpdater.on('update-not-available', () => {
     console.log('[AutoUpdater] App is up to date.');
+    broadcastUpdateState('idle', { version: app.getVersion() });
   });
 
   autoUpdater.on('download-progress', (progressObj) => {
-    console.log(`[AutoUpdater] Download: ${progressObj.percent.toFixed(1)}%`);
-    preRecordingWindow?.webContents.send('updater:progress', progressObj.percent);
-    previewWindow?.webContents.send('updater:progress', progressObj.percent);
+    const pct = Math.round(progressObj.percent);
+    console.log(`[AutoUpdater] Download: ${pct}%`);
+    broadcastUpdateState('downloading', { percent: pct });
+    preRecordingWindow?.webContents.send('updater:progress', pct);
+    previewWindow?.webContents.send('updater:progress', pct);
   });
 
-  autoUpdater.on('update-downloaded', () => {
+  autoUpdater.on('update-downloaded', (info) => {
+    console.log('[AutoUpdater] Update downloaded:', info?.version);
+    broadcastUpdateState('downloaded', { version: info?.version || '' });
     dialog
       .showMessageBox({
         type: 'info',
         title: 'Atualização Pronta!',
-        message: 'A nova versão foi baixada com sucesso.',
+        message: `A nova versão (${info?.version || 'mais recente'}) foi baixada com sucesso.`,
         detail: 'Deseja reiniciar o aplicativo agora para aplicar a atualização?',
         buttons: ['Reiniciar e Atualizar', 'Mais Tarde'],
         defaultId: 0
@@ -941,11 +981,13 @@ function setupAutoUpdater() {
 
   autoUpdater.on('error', (err) => {
     console.warn('[AutoUpdater] Status:', (err?.message || err || 'Check complete'));
+    broadcastUpdateState('idle', { version: app.getVersion() });
   });
 }
 
 function checkForAppUpdates(manual = false) {
   try {
+    broadcastUpdateState('checking');
     autoUpdater
       .checkForUpdates()
       .then((res) => {
@@ -959,6 +1001,7 @@ function checkForAppUpdates(manual = false) {
         }
       })
       .catch((err) => {
+        broadcastUpdateState('idle', { version: app.getVersion() });
         if (manual) {
           dialog.showMessageBox({
             type: 'info',
@@ -982,6 +1025,15 @@ app.whenReady().then(() => {
   setupIpcHandlers();
   createSystemTray();
   setupAutoUpdater();
+
+  // Automatic background update checks on launch and periodically
+  setTimeout(() => {
+    checkForAppUpdates(false);
+  }, 4000);
+
+  setInterval(() => {
+    checkForAppUpdates(false);
+  }, 30 * 60 * 1000);
 
   // Register Global Shortcuts: Alt+Shift+A (Aura) and Alt+Shift+L (Legacy)
   const toggleRecording = () => {

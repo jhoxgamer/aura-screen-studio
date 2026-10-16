@@ -76,8 +76,19 @@ export const DrawingOverlayView: React.FC = () => {
     };
 
     const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === 'Escape' && active) {
+      if (!active) return;
+      if (e.key === 'Escape') {
         handleClose();
+      } else if (e.key === 'c' || e.key === 'C') {
+        handleClear();
+      } else if (e.key === 'p' || e.key === 'P') {
+        setTool('pen');
+      } else if (e.key === 'a' || e.key === 'A') {
+        setTool('arrow');
+      } else if (e.key === 'r' || e.key === 'R') {
+        setTool('rectangle');
+      } else if (e.key === 'e' || e.key === 'E') {
+        setTool('eraser');
       }
     };
 
@@ -85,18 +96,22 @@ export const DrawingOverlayView: React.FC = () => {
     window.addEventListener('resize', handleResize);
     window.addEventListener('keydown', handleKeyDown);
 
-    // Continuous smooth animation loop for click ripples and vanishing ink
+    // Optimized animation loop: updates only during active changes, ripples or fading
     let animId: number;
     const renderLoop = () => {
       const now = Date.now();
-      let changed = false;
+      let hasVanishing = false;
 
-      if (strokesRef.current.some((s) => s.vanishing && now - s.timestamp > 3000)) {
+      if (strokesRef.current.some((s) => s.vanishing)) {
+        hasVanishing = true;
+        const initialLen = strokesRef.current.length;
         strokesRef.current = strokesRef.current.filter((s) => !s.vanishing || now - s.timestamp <= 3000);
-        changed = true;
+        if (strokesRef.current.length !== initialLen) {
+          redraw();
+        }
       }
 
-      if (ripplesRef.current.length > 0 || isDrawingRef.current || changed || strokesRef.current.length > 0) {
+      if (ripplesRef.current.length > 0 || isDrawingRef.current || hasVanishing) {
         redraw();
       }
 
