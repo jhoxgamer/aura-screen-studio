@@ -1,8 +1,8 @@
 {
-  "name": "loom-clone",
+  "name": "aura-screen-studio",
   "version": "1.0.0",
   "type": "module",
-  "description": "Loom Desktop Clone - Professional Screen, Webcam & Audio Recorder in Electron + React + TypeScript",
+  "description": "Aura Screen Studio - Professional Screen, Webcam & Audio Recorder with Instant Global Video Sharing",
   "main": "dist-electron/main.js",
   "scripts": {
     "dev": "vite",
@@ -12,14 +12,15 @@
     "dist:win": "electron-builder --win --x64"
   },
   "keywords": [
-    "loom",
+    "aura",
     "screen-recorder",
     "webcam-bubble",
+    "video-sharing",
     "electron",
     "react",
     "typescript"
   ],
-  "author": "",
+  "author": "Aura Screen Studio",
   "license": "MIT",
   "dependencies": {
     "canvas-confetti": "^1.9.4",
@@ -43,9 +44,9 @@
     "vite": "^6.1.0"
   },
   "build": {
-    "appId": "com.loom.clone",
-    "productName": "Loom Desktop",
-    "copyright": "Copyright © 2026 Loom Clone",
+    "appId": "com.aurascreen.studio",
+    "productName": "Aura Screen Studio",
+    "copyright": "Copyright © 2026 Aura Screen Studio",
     "directories": {
       "output": "release"
     },
@@ -77,19 +78,20 @@
       "icon": "public/assets/application-icons/app-logo.ico"
     },
     "nsis": {
+      "artifactName": "Aura-Screen-Studio-Setup-${version}.${ext}",
       "oneClick": false,
       "allowToChangeInstallationDirectory": true,
       "createDesktopShortcut": true,
       "createStartMenuShortcut": true,
-      "shortcutName": "Loom Desktop",
+      "shortcutName": "Aura Screen Studio",
       "installerIcon": "public/assets/application-icons/app-logo.ico",
       "uninstallerIcon": "public/assets/application-icons/app-logo.ico",
-      "uninstallDisplayName": "Loom Desktop Clone",
+      "uninstallDisplayName": "Aura Screen Studio",
       "runAfterFinish": true
     },
     "publish": {
       "provider": "generic",
-      "url": "https://releases.loomclone.local/updates/"
+      "url": "https://releases.aurascreen.io/updates/"
     }
   }
 }

@@ -67,8 +67,8 @@ export class TranscriptionService {
       const keyPoints = this.transcriptItems.slice(0, 4).map(t => `• ${t.text}`);
       aiSummary = `Resumo automático da explicação gravada:\n${keyPoints.join('\n')}\n\nDuração total: ${Math.round((Date.now() - this.startTime) / 1000)}s com narração em áudio.`;
     } else {
-      aiTitle = `Gravação Loom ${new Date().toLocaleDateString('pt-BR')} ${new Date().toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })}`;
-      aiSummary = 'Gravação Loom com tela, câmera e áudio combinados. Nenhuma fala contínua detectada para transcrição.';
+      aiTitle = `Gravação Aura ${new Date().toLocaleDateString('pt-BR')} ${new Date().toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })}`;
+      aiSummary = 'Gravação Aura Studio com tela, câmera e áudio combinados. Nenhuma fala contínua detectada para transcrição.';
     }
 
     return {

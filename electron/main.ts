@@ -16,9 +16,9 @@ let cropSelectorWindow: BrowserWindow | null = null;
 let shareServer: ShareServer | null = null;
 let tray: Tray | null = null;
 
-app.setName('LoomClone');
+app.setName('AuraScreenStudio');
 try {
-  app.setPath('userData', path.join(app.getPath('appData'), 'LoomClone'));
+  app.setPath('userData', path.join(app.getPath('appData'), 'AuraScreenStudio'));
 } catch (e) {}
 
 // Disable Chromium flags that cause cache lock and WGC capturer failures on Windows
@@ -32,12 +32,21 @@ let currentOptions: RecordingOptions | null = null;
 const isDev = process.env.NODE_ENV === 'development' || !app.isPackaged;
 const VITE_DEV_SERVER_URL = 'http://localhost:5174';
 
-const RECORDINGS_DIR = path.join(app.getPath('videos'), 'LoomCloneRecordings');
+const RECORDINGS_DIR = path.join(app.getPath('videos'), 'AuraScreenRecordings');
+const LEGACY_DIR = path.join(app.getPath('videos'), 'LoomCloneRecordings');
 const METADATA_FILE = path.join(RECORDINGS_DIR, 'recordings_metadata.json');
 
-// Ensure recordings folder exists
+// Ensure recordings folder exists and migrate legacy recordings seamlessly
 if (!fs.existsSync(RECORDINGS_DIR)) {
   fs.mkdirSync(RECORDINGS_DIR, { recursive: true });
+}
+if (fs.existsSync(LEGACY_DIR) && !fs.existsSync(METADATA_FILE)) {
+  const legacyMeta = path.join(LEGACY_DIR, 'recordings_metadata.json');
+  if (fs.existsSync(legacyMeta)) {
+    try {
+      fs.copyFileSync(legacyMeta, METADATA_FILE);
+    } catch (e) {}
+  }
 }
 
 function getPreloadPath(): string {
@@ -307,9 +316,9 @@ function createPreviewWindow(meta: RecordingMeta) {
     minHeight: 600,
     frame: true,
     transparent: false,
-    backgroundColor: '#111216',
-    title: `Loom Clone - ${meta.title}`,
-    icon: path.join(__dirname, '../public/assets/application-icons/app-icon-tray.ico'),
+    backgroundColor: '#0b0d14',
+    title: `Aura Screen Studio - ${meta.title}`,
+    icon: path.join(__dirname, '../public/assets/application-icons/app-logo.ico'),
     webPreferences: {
       preload: getPreloadPath(),
       nodeIntegration: false,
@@ -457,7 +466,7 @@ function setupIpcHandlers() {
     });
 
     return sources
-      .filter((s) => !s.name.includes('Loom Clone') && !s.name.includes('Teleprompter') && s.name.trim() !== '')
+      .filter((s) => !s.name.includes('Aura') && !s.name.includes('Loom') && !s.name.includes('Teleprompter') && s.name.trim() !== '')
       .map((s) => ({
         id: s.id,
         name: s.name,
@@ -595,7 +604,7 @@ function setupIpcHandlers() {
   // Recording Storage
   ipcMain.handle('recordings:save', async (_, arrayBuffer: ArrayBuffer, meta: Omit<RecordingMeta, 'id' | 'filePath' | 'fileSize'>) => {
     const id = `rec_${Date.now()}`;
-    const filename = `Loom_Recording_${new Date().toISOString().replace(/[:.]/g, '-')}.webm`;
+    const filename = `Aura_Recording_${new Date().toISOString().replace(/[:.]/g, '-')}.webm`;
     const filePath = path.join(RECORDINGS_DIR, filename);
 
     const buffer = Buffer.from(arrayBuffer);
@@ -791,17 +800,17 @@ function createSystemTray() {
   try {
     const icon = iconPath ? nativeImage.createFromPath(iconPath) : nativeImage.createEmpty();
     tray = new Tray(icon);
-    tray.setToolTip('Loom Desktop Clone');
+    tray.setToolTip('Aura Screen Studio');
 
     const updateTrayMenu = () => {
       const contextMenu = Menu.buildFromTemplate([
         {
-          label: 'Loom Desktop Clone (v' + app.getVersion() + ')',
+          label: 'Aura Screen Studio (v' + app.getVersion() + ')',
           enabled: false
         },
         { type: 'separator' },
         {
-          label: isRecording ? (isPaused ? '▶️ Retomar Gravação' : '⏸️ Pausar Gravação') : '🔴 Gravar Tela (Alt+Shift+L)',
+          label: isRecording ? (isPaused ? '▶️ Retomar Gravação' : '⏸️ Pausar Gravação') : '🔴 Gravar Tela (Alt+Shift+A)',
           click: () => {
             if (isRecording) {
               if (isPaused) ipcMain.emit('recording:resume');
@@ -823,13 +832,13 @@ function createSystemTray() {
         },
         { type: 'separator' },
         {
-          label: '📁 Biblioteca de Vídeos',
+          label: '📁 Biblioteca de Vídeos Aura',
           click: () => {
             createPreRecordingWindow();
           }
         },
         {
-          label: '📝 Teleprompter / Notas',
+          label: '📝 Teleprompter / Notas do Orador',
           click: () => {
             toggleSpeakerNotesWindow();
           }
@@ -852,7 +861,7 @@ function createSystemTray() {
         },
         { type: 'separator' },
         {
-          label: '🚪 Sair do Loom',
+          label: '🚪 Sair do Aura Screen Studio',
           click: () => {
             app.quit();
           }
@@ -890,7 +899,7 @@ function setupAutoUpdater() {
     dialog
       .showMessageBox({
         type: 'info',
-        title: 'Atualização do Loom Clone',
+        title: 'Atualização do Aura Screen Studio',
         message: `Uma nova versão (${info.version}) está disponível!`,
         detail: 'Deseja fazer o download da atualização agora em segundo plano?',
         buttons: ['Sim, Baixar Agora', 'Lembrar Mais Tarde'],
@@ -943,7 +952,7 @@ function checkForAppUpdates(manual = false) {
         if (manual && (!res || !res.updateInfo || res.updateInfo.version === app.getVersion())) {
           dialog.showMessageBox({
             type: 'info',
-            title: 'Loom Clone Atualizado',
+            title: 'Aura Screen Studio Atualizado',
             message: `Você já está usando a versão mais recente (v${app.getVersion()})!`,
             buttons: ['OK']
           });
@@ -974,15 +983,20 @@ app.whenReady().then(() => {
   createSystemTray();
   setupAutoUpdater();
 
-  // Register Global Shortcuts
-  globalShortcut.register('CommandOrControl+Shift+L', () => {
+  // Register Global Shortcuts: Alt+Shift+A (Aura) and Alt+Shift+L (Legacy)
+  const toggleRecording = () => {
     if (isRecording) {
       ipcMain.emit('recording:stop');
-    } else if (preRecordingWindow) {
+    } else if (preRecordingWindow && !preRecordingWindow.isDestroyed()) {
       preRecordingWindow.show();
       preRecordingWindow.focus();
+    } else {
+      createPreRecordingWindow();
     }
-  });
+  };
+
+  globalShortcut.register('CommandOrControl+Shift+A', toggleRecording);
+  globalShortcut.register('CommandOrControl+Shift+L', toggleRecording);
 
   globalShortcut.register('CommandOrControl+Shift+P', () => {
     if (isRecording) {

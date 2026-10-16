@@ -12,8 +12,9 @@ import {
 
 export const SpeakerNotesView: React.FC = () => {
   const [text, setText] = useState<string>(() => {
-    return localStorage.getItem('loom_speaker_notes') ||
-      '📝 Bem-vindo ao Teleprompter do Loom!\n\nCole ou digite aqui seu roteiro da apresentação.\n\n• Use o botão Play para iniciar a rolagem automática.\n• Ajuste a velocidade e o tamanho do texto nos controles acima.\n• Ajuste a transparência para posicionar esta janela logo abaixo da sua webcam e manter contato visual!';
+    return localStorage.getItem('aura_speaker_notes') ||
+      localStorage.getItem('loom_speaker_notes') ||
+      '📝 Bem-vindo ao Teleprompter do Aura Screen Studio!\n\nCole ou digite aqui seu roteiro da apresentação.\n\n• Use o botão Play para iniciar a rolagem automática suave.\n• Ajuste a velocidade e o tamanho do texto nos controles acima.\n• Ajuste a transparência para posicionar esta janela logo abaixo da sua webcam e manter contato visual com seu público!';
   });
 
   const [isPlaying, setIsPlaying] = useState(false);
@@ -26,7 +27,7 @@ export const SpeakerNotesView: React.FC = () => {
 
   // Save text to localStorage
   useEffect(() => {
-    localStorage.setItem('loom_speaker_notes', text);
+    localStorage.setItem('aura_speaker_notes', text);
   }, [text]);
 
   // Teleprompter automatic scroll engine
@@ -89,9 +90,9 @@ export const SpeakerNotesView: React.FC = () => {
         style={{ WebkitAppRegion: 'drag' } as any}
       >
         <div className="flex items-center space-x-2">
-          <span className="w-2.5 h-2.5 rounded-full bg-loom-primary"></span>
+          <span className="w-2.5 h-2.5 rounded-full bg-cyan-400 shadow-sm shadow-cyan-400/50"></span>
           <span className="text-xs font-bold tracking-tight text-white flex items-center gap-1">
-            Teleprompter / Notas
+            Aura Teleprompter
           </span>
         </div>
 

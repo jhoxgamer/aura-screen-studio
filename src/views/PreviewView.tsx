@@ -266,8 +266,12 @@ export const PreviewView: React.FC = () => {
       {/* Top Header */}
       <div className="h-16 bg-loom-panel border-b border-loom-border px-6 flex items-center justify-between shrink-0">
         <div className="flex items-center space-x-3 min-w-0">
-          <div className="w-8 h-8 rounded-xl bg-loom-primary flex items-center justify-center shadow-md shrink-0">
-            <Sparkles className="w-4 h-4 text-white" />
+          <div className="w-8 h-8 rounded-xl bg-gradient-to-tr from-indigo-600 via-cyan-500 to-violet-500 p-0.5 shadow-md shadow-cyan-500/20 flex items-center justify-center shrink-0">
+            <div className="w-full h-full bg-[#0d111c] rounded-[10px] flex items-center justify-center">
+              <div className="w-4 h-4 rounded-full border border-cyan-400 flex items-center justify-center">
+                <div className="w-1.5 h-1.5 rounded-full bg-rose-500 animate-pulse" />
+              </div>
+            </div>
           </div>
 
           <div className="min-w-0">
@@ -572,7 +576,7 @@ export const PreviewView: React.FC = () => {
               <span>Resumo Inteligente por IA</span>
             </div>
             <p className="text-xs text-gray-300 leading-relaxed whitespace-pre-line">
-              {meta?.aiSummary || 'Explicação gravada com sucesso pelo Loom Clone.'}
+              {meta?.aiSummary || 'Explicação gravada com sucesso pelo Aura Screen Studio.'}
             </p>
           </div>
 

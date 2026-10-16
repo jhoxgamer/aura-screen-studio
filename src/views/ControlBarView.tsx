@@ -62,7 +62,7 @@ export const ControlBarView: React.FC = () => {
       const { buffer, durationMs } = await recorderService.stop();
       const { transcript, aiSummary, aiTitle } = transcriptionService.stop();
 
-      const title = aiTitle || `Gravação Loom ${new Date().toLocaleDateString('pt-BR')} ${new Date().toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })}`;
+      const title = aiTitle || `Gravação Aura ${new Date().toLocaleDateString('pt-BR')} ${new Date().toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })}`;
       
       await window.electronAPI.saveRecording(buffer, {
         title,

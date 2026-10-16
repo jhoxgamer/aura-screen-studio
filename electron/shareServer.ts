@@ -54,7 +54,7 @@ export class ShareServer {
       });
 
       this.server.listen(this.port, () => {
-        console.log(`[Loom Share Server] Running locally at http://${this.localIp}:${this.port}`);
+        console.log(`[Aura Share Server] Running locally at http://${this.localIp}:${this.port}`);
         this.startTunnel();
         resolve(this.port);
       });
@@ -64,7 +64,7 @@ export class ShareServer {
           this.port += 1;
           this.server?.listen(this.port);
         } else {
-          console.error('[Loom Share Server] Error:', err);
+          console.error('[Aura Share Server] Error:', err);
         }
       });
     });
@@ -90,12 +90,12 @@ export class ShareServer {
     }
 
     if (!chosenBin) {
-      console.warn('[Loom Cloudflare Tunnel] cloudflared.exe not found. Running local-only mode.');
+      console.warn('[Aura Cloudflare Tunnel] cloudflared.exe not found. Running local-only mode.');
       return;
     }
 
     try {
-      console.log(`[Loom Cloudflare Tunnel] Launching public tunnel using ${chosenBin} for port ${this.port}...`);
+      console.log(`[Aura Cloudflare Tunnel] Launching public tunnel using ${chosenBin} for port ${this.port}...`);
       this.tunnelProcess = spawn(chosenBin, ['tunnel', '--url', `http://localhost:${this.port}`], {
         windowsHide: true
       });
@@ -106,7 +106,7 @@ export class ShareServer {
         if (match && !this.publicTunnelUrl) {
           this.publicTunnelUrl = match[0];
           console.log(`\n======================================================`);
-          console.log(`🚀 [Loom Public Internet Link READY]`);
+          console.log(`🚀 [Aura Public Internet Link READY]`);
           console.log(`🔗 Global URL: ${this.publicTunnelUrl}`);
           console.log(`======================================================\n`);
         }
@@ -116,16 +116,16 @@ export class ShareServer {
       this.tunnelProcess.stderr?.on('data', handleData);
 
       this.tunnelProcess.on('error', (err) => {
-        console.warn('[Loom Cloudflare Tunnel] Process error:', err.message);
+        console.warn('[Aura Cloudflare Tunnel] Process error:', err.message);
       });
 
       this.tunnelProcess.on('exit', (code) => {
-        console.log('[Loom Cloudflare Tunnel] Exited with code:', code);
+        console.log('[Aura Cloudflare Tunnel] Exited with code:', code);
         this.tunnelProcess = null;
         this.publicTunnelUrl = null;
       });
     } catch (err) {
-      console.warn('[Loom Cloudflare Tunnel] Failed to start:', err);
+      console.warn('[Aura Cloudflare Tunnel] Failed to start:', err);
     }
   }
 
@@ -311,11 +311,11 @@ export class ShareServer {
       return;
     }
 
-    const title = video.title || 'Gravação Loom';
+    const title = video.title || 'Gravação Aura';
     const commentsJson = JSON.stringify(video.comments || []);
     const reactionsJson = JSON.stringify(video.reactions || []);
     const transcriptJson = JSON.stringify(video.transcript || []);
-    const aiSummary = video.aiSummary || 'Gravação gerada pelo Loom Desktop com tela, câmera e áudio combinados.';
+    const aiSummary = video.aiSummary || 'Gravação gerada pelo Aura Screen Studio com tela, câmera e áudio combinados.';
     const formattedDate = new Date(video.createdAt).toLocaleDateString('pt-BR', {
       day: '2-digit',
       month: 'long',
@@ -327,13 +327,13 @@ export class ShareServer {
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>${this.escapeHtml(title)} - Loom</title>
+  <title>${this.escapeHtml(title)} - Aura Screen</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
   <style>
-    body { font-family: 'Inter', sans-serif; background-color: #0b0c0e; color: #f3f4f6; }
-    .loom-gradient { background: linear-gradient(135deg, #625df5 0%, #ff5b4f 100%); }
+    body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: #080a0f; color: #f1f5f9; }
+    .aura-gradient { background: linear-gradient(135deg, #06b6d4 0%, #6366f1 50%, #8b5cf6 100%); }
     .floating-emoji {
       position: absolute;
       animation: floatUp 1.8s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
@@ -351,32 +351,51 @@ export class ShareServer {
       width: 14px;
       height: 14px;
       border-radius: 50%;
-      background: #ff5b4f;
+      background: #06b6d4;
       cursor: pointer;
-      box-shadow: 0 0 10px rgba(255, 91, 79, 0.8);
+      box-shadow: 0 0 12px rgba(6, 182, 212, 0.9);
     }
   </style>
 </head>
 <body class="min-h-screen flex flex-col">
   <!-- Top Navbar -->
-  <header class="border-b border-gray-800 bg-[#111216]/90 backdrop-blur sticky top-0 z-40 px-6 py-3.5 flex items-center justify-between">
+  <header class="border-b border-slate-800/80 bg-[#0d111c]/95 backdrop-blur sticky top-0 z-40 px-6 py-3.5 flex items-center justify-between">
     <div class="flex items-center space-x-3">
-      <div class="w-8 h-8 rounded-xl bg-[#625df5] flex items-center justify-center text-white font-bold shadow-md shadow-indigo-500/20">
-        <svg class="w-5 h-5 fill-current" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/></svg>
+      <div class="w-9 h-9 rounded-xl bg-gradient-to-tr from-indigo-600 via-cyan-500 to-violet-500 p-0.5 shadow-lg shadow-cyan-500/20 flex items-center justify-center">
+        <div class="w-full h-full bg-[#0d111c] rounded-[10px] flex items-center justify-center">
+          <svg class="w-5 h-5 text-cyan-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="12" cy="12" r="9" stroke="url(#hAuraGrad)" />
+            <circle cx="12" cy="12" r="3.5" fill="#f43f5e" />
+            <defs>
+              <linearGradient id="hAuraGrad" x1="0" y1="0" x2="1" y2="1">
+                <stop offset="0%" stop-color="#06b6d4"/>
+                <stop offset="100%" stop-color="#8b5cf6"/>
+              </linearGradient>
+            </defs>
+          </svg>
+        </div>
       </div>
       <div>
-        <h1 class="text-sm font-semibold text-white tracking-tight">${this.escapeHtml(title)}</h1>
-        <p class="text-xs text-gray-400">Gravado em ${formattedDate} • <span id="views-count">${video.viewsCount || 1}</span> visualizações</p>
+        <div class="flex items-center space-x-2">
+          <h1 class="text-sm font-bold text-white tracking-tight">${this.escapeHtml(title)}</h1>
+          <span class="text-[10px] uppercase font-bold tracking-wider px-2 py-0.5 rounded-full bg-cyan-500/10 text-cyan-400 border border-cyan-500/20">Aura</span>
+        </div>
+        <p class="text-xs text-slate-400">Gravado em ${formattedDate} • <span id="views-count">${video.viewsCount || 1}</span> visualizações</p>
       </div>
     </div>
 
     <div class="flex items-center space-x-2.5">
-      <button onclick="copyShareLink()" class="flex items-center space-x-1.5 bg-[#625df5] hover:bg-[#524be3] text-white px-3.5 py-1.5 rounded-xl text-xs font-medium transition-all shadow-md shadow-indigo-600/30">
+      <button onclick="copyShareLink()" class="flex items-center space-x-1.5 bg-gradient-to-r from-indigo-600 to-cyan-600 hover:brightness-110 active:scale-95 text-white px-4 py-1.5 rounded-xl text-xs font-semibold transition-all shadow-md shadow-indigo-600/30">
         <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>
-        <span id="copy-btn-text">Compartilhar</span>
+        <span id="copy-btn-text">Copiar Link</span>
       </button>
 
-      <a href="/video/${video.id}" download="${video.id}.webm" class="flex items-center space-x-1.5 bg-gray-800/80 hover:bg-gray-700 text-gray-200 border border-gray-700/60 px-3 py-1.5 rounded-xl text-xs font-medium transition-colors">
+      <button onclick="copyEmbedCode()" class="flex items-center space-x-1.5 bg-slate-800/80 hover:bg-slate-700 text-slate-200 border border-slate-700/60 px-3 py-1.5 rounded-xl text-xs font-medium transition-colors">
+        <svg class="w-3.5 h-3.5 text-cyan-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>
+        <span>Embed</span>
+      </button>
+
+      <a href="/video/${video.id}" download="${video.id}.webm" class="flex items-center space-x-1.5 bg-slate-800/80 hover:bg-slate-700 text-slate-200 border border-slate-700/60 px-3 py-1.5 rounded-xl text-xs font-medium transition-colors">
         <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
         <span>Baixar</span>
       </a>
@@ -431,7 +450,7 @@ export class ShareServer {
         </div>
       </div>
 
-      <!-- Emoji Reactions Bar (Authentic Loom Style) -->
+      <!-- Emoji Reactions Bar (Aura Interactive Timeline) -->
       <div class="bg-[#16171d] border border-gray-800 rounded-2xl p-3 flex items-center justify-between shadow-md">
         <div class="flex items-center space-x-1.5">
           <span class="text-xs font-medium text-gray-400 mr-2">Reagir no segundo atual:</span>
@@ -701,7 +720,13 @@ export class ShareServer {
       navigator.clipboard.writeText(window.location.href);
       const btn = document.getElementById('copy-btn-text');
       btn.textContent = 'Link Copiado!';
-      setTimeout(() => btn.textContent = 'Compartilhar', 2000);
+      setTimeout(() => btn.textContent = 'Copiar Link', 2000);
+    }
+
+    function copyEmbedCode() {
+      const embedHtml = '<iframe src="' + window.location.href + '" width="640" height="360" frameborder="0" allowfullscreen></iframe>';
+      navigator.clipboard.writeText(embedHtml);
+      alert('Código embed copiado para a área de transferência!');
     }
 
     function escapeText(str) {
@@ -750,25 +775,30 @@ export class ShareServer {
 <html lang="pt-BR">
 <head>
   <meta charset="UTF-8">
-  <title>Loom - Galeria de Vídeos Compartilhados</title>
+  <title>Aura Screen Studio - Galeria de Vídeos Compartilhados</title>
   <script src="https://cdn.tailwindcss.com"></script>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-  <style>body { font-family: 'Inter', sans-serif; background-color: #0b0c0e; color: #f3f4f6; }</style>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: #080a0f; color: #f1f5f9; }</style>
 </head>
 <body class="min-h-screen p-8">
   <div class="max-w-6xl mx-auto space-y-6">
-    <div class="flex items-center space-x-3 border-b border-gray-800 pb-5">
-      <div class="w-10 h-10 rounded-2xl bg-[#625df5] flex items-center justify-center text-white font-bold text-lg shadow-md">
-        <svg class="w-6 h-6 fill-current" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/></svg>
+    <div class="flex items-center space-x-3 border-b border-slate-800 pb-5">
+      <div class="w-11 h-11 rounded-2xl bg-gradient-to-tr from-indigo-600 via-cyan-500 to-violet-500 p-0.5 shadow-lg shadow-cyan-500/20 flex items-center justify-center">
+        <div class="w-full h-full bg-[#0d111c] rounded-[14px] flex items-center justify-center">
+          <svg class="w-6 h-6 text-cyan-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="12" cy="12" r="9" stroke="cyan" />
+            <circle cx="12" cy="12" r="3.5" fill="#f43f5e" />
+          </svg>
+        </div>
       </div>
       <div>
-        <h1 class="text-xl font-bold text-white">Loom Web Hub</h1>
-        <p class="text-xs text-gray-400">Vídeos gravados disponíveis na rede local e compartilháveis</p>
+        <h1 class="text-xl font-bold text-white tracking-tight">Aura Web Hub</h1>
+        <p class="text-xs text-slate-400">Vídeos gravados com Aura Screen Studio disponíveis para reprodução e download</p>
       </div>
     </div>
 
     <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
-      ${itemsHtml || '<div class="col-span-full py-16 text-center text-gray-500 text-sm">Nenhum vídeo gravado ainda. Grave um vídeo no aplicativo Loom Clone!</div>'}
+      ${itemsHtml || '<div class="col-span-full py-16 text-center text-slate-500 text-sm">Nenhum vídeo gravado ainda. Inicie sua primeira gravação com o Aura Screen Studio!</div>'}
     </div>
   </div>
 </body>

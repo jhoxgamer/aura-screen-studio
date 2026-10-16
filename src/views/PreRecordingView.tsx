@@ -164,12 +164,18 @@ export const PreRecordingView: React.FC = () => {
     <div className="w-[450px] h-[700px] bg-loom-panel rounded-2xl shadow-loom-float border border-loom-border flex flex-col overflow-hidden select-none">
       {/* Title Bar / Drag handle */}
       <div className="h-12 bg-loom-dark px-4 flex items-center justify-between border-b border-loom-border" style={{ WebkitAppRegion: 'drag' } as any}>
-        <div className="flex items-center space-x-2">
-          <div className="w-6 h-6 rounded-lg bg-loom-primary flex items-center justify-center shadow-md">
-            <Sparkles className="w-3.5 h-3.5 text-white" />
+        <div className="flex items-center space-x-2.5">
+          <div className="w-7 h-7 rounded-xl bg-gradient-to-tr from-indigo-600 via-cyan-500 to-violet-500 p-0.5 shadow-md shadow-cyan-500/20 flex items-center justify-center">
+            <div className="w-full h-full bg-[#0d111c] rounded-[10px] flex items-center justify-center">
+              <div className="w-3.5 h-3.5 rounded-full border border-cyan-400 flex items-center justify-center">
+                <div className="w-1.5 h-1.5 rounded-full bg-rose-500 animate-pulse" />
+              </div>
+            </div>
           </div>
-          <span className="font-bold text-sm tracking-wide text-white">Loom Clone</span>
-          <span className="text-[10px] bg-loom-border px-1.5 py-0.5 rounded text-loom-muted font-mono font-medium">v1.1</span>
+          <div className="flex items-center space-x-1.5">
+            <span className="font-extrabold text-sm tracking-tight text-white">Aura Studio</span>
+            <span className="text-[10px] bg-cyan-500/10 text-cyan-400 border border-cyan-500/20 px-1.5 py-0.5 rounded-full font-mono font-bold">PRO</span>
+          </div>
         </div>
 
         <div className="flex items-center space-x-1" style={{ WebkitAppRegion: 'no-drag' } as any}>
@@ -517,7 +523,7 @@ export const PreRecordingView: React.FC = () => {
             </button>
             <div className="text-center mt-2">
               <span className="text-[11px] text-loom-muted">
-                Ou use o atalho global <kbd className="bg-loom-card px-1.5 py-0.5 rounded border border-loom-border text-white font-mono text-[10px]">Alt + Shift + L</kbd>
+                Ou use o atalho global <kbd className="bg-loom-card px-1.5 py-0.5 rounded border border-loom-border text-white font-mono text-[10px]">Alt + Shift + A</kbd> (ou Alt + Shift + L)
               </span>
             </div>
           </div>
