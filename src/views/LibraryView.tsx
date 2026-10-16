@@ -6,7 +6,9 @@ import {
   Trash2,
   Calendar,
   Clock,
-  HardDrive
+  HardDrive,
+  Share2,
+  ExternalLink
 } from 'lucide-react';
 import { RecordingMeta } from '../types';
 
@@ -101,6 +103,31 @@ export const LibraryView: React.FC = () => {
             </div>
 
             <div className="flex items-center space-x-1">
+              {/* Copy share link */}
+              <button
+                onClick={async () => {
+                  const url = rec.shareUrl || await window.electronAPI.getShareUrl(rec.id);
+                  navigator.clipboard.writeText(url);
+                  alert('Link de compartilhamento copiado!');
+                }}
+                title="Copiar Link Compartilhável"
+                className="p-1.5 rounded-lg text-loom-primary hover:bg-loom-primary/20 transition-colors"
+              >
+                <Share2 className="w-3.5 h-3.5" />
+              </button>
+
+              {/* Open in web browser */}
+              <button
+                onClick={async () => {
+                  const url = rec.shareUrl || await window.electronAPI.getShareUrl(rec.id);
+                  window.electronAPI.openExternalUrl(url);
+                }}
+                title="Assistir no Navegador"
+                className="p-1.5 rounded-lg text-loom-secondary hover:bg-loom-hover transition-colors"
+              >
+                <ExternalLink className="w-3.5 h-3.5" />
+              </button>
+
               <button
                 onClick={() => handleOpenFolder(rec.filePath)}
                 title="Abrir Pasta"

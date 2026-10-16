@@ -12,8 +12,9 @@ import {
   Minus,
   PlayCircle
 } from 'lucide-react';
-import { CaptureSource, RecordingMode, RecordingOptions } from '../types';
+import { CaptureSource, RecordingMode, RecordingOptions, CropArea } from '../types';
 import { LibraryView } from './LibraryView';
+import { Crop, FileText, MousePointer } from 'lucide-react';
 
 export const PreRecordingView: React.FC = () => {
   const [activeTab, setActiveTab] = useState<'record' | 'library'>('record');
@@ -30,11 +31,25 @@ export const PreRecordingView: React.FC = () => {
   const [includeSystemAudio, setIncludeSystemAudio] = useState(true);
   const [resolution, setResolution] = useState<'720p' | '1080p' | '4k'>('1080p');
   const [fps, setFps] = useState<number>(60);
+
+  // Advanced feature toggles
+  const [speakerNotesEnabled, setSpeakerNotesEnabled] = useState(false);
+  const [highlightCursor, setHighlightCursor] = useState(true);
+  const [cropArea, setCropArea] = useState<CropArea | null>(null);
   
   const [audioLevel, setAudioLevel] = useState<number>(0);
   const audioContextRef = useRef<AudioContext | null>(null);
   const analyserRef = useRef<AnalyserNode | null>(null);
   const animFrameRef = useRef<number | null>(null);
+
+  // Listen for crop area selection
+  useEffect(() => {
+    const cleanupCrop = window.electronAPI.onCropAreaSelected((area) => {
+      setCropArea(area);
+      setMode('custom-area');
+    });
+    return cleanupCrop;
+  }, []);
 
   // Load capture sources & media devices
   useEffect(() => {
@@ -124,7 +139,10 @@ export const PreRecordingView: React.FC = () => {
       videoDeviceId: selectedVideoId,
       includeSystemAudio,
       resolution,
-      fps
+      fps,
+      speakerNotesEnabled,
+      highlightCursor,
+      cropArea: mode === 'custom-area' && cropArea ? cropArea : undefined
     };
 
     window.electronAPI.startRecording(options);
@@ -133,7 +151,7 @@ export const PreRecordingView: React.FC = () => {
   const selectedSource = sources.find((s) => s.id === selectedSourceId);
 
   return (
-    <div className="w-[440px] h-[680px] bg-loom-panel rounded-2xl shadow-loom-float border border-loom-border flex flex-col overflow-hidden select-none">
+    <div className="w-[450px] h-[700px] bg-loom-panel rounded-2xl shadow-loom-float border border-loom-border flex flex-col overflow-hidden select-none">
       {/* Title Bar / Drag handle */}
       <div className="h-12 bg-loom-dark px-4 flex items-center justify-between border-b border-loom-border" style={{ WebkitAppRegion: 'drag' } as any}>
         <div className="flex items-center space-x-2">
@@ -141,7 +159,7 @@ export const PreRecordingView: React.FC = () => {
             <Sparkles className="w-3.5 h-3.5 text-white" />
           </div>
           <span className="font-bold text-sm tracking-wide text-white">Loom Clone</span>
-          <span className="text-[10px] bg-loom-border px-1.5 py-0.5 rounded text-loom-muted font-mono font-medium">v1.0</span>
+          <span className="text-[10px] bg-loom-border px-1.5 py-0.5 rounded text-loom-muted font-mono font-medium">v1.1</span>
         </div>
 
         <div className="flex items-center space-x-1" style={{ WebkitAppRegion: 'no-drag' } as any}>
@@ -195,46 +213,79 @@ export const PreRecordingView: React.FC = () => {
             <label className="text-xs font-semibold text-loom-muted uppercase tracking-wider block mb-2">
               Modo de Gravação
             </label>
-            <div className="grid grid-cols-3 gap-2">
+            <div className="grid grid-cols-4 gap-1.5">
               <button
                 onClick={() => setMode('screen-cam')}
-                className={`flex flex-col items-center justify-center p-3 rounded-xl border text-center transition-all ${
+                className={`flex flex-col items-center justify-center p-2.5 rounded-xl border text-center transition-all ${
                   mode === 'screen-cam'
                     ? 'bg-loom-primary/10 border-loom-primary text-white shadow-sm'
                     : 'bg-loom-card border-loom-border text-loom-muted hover:border-loom-hover hover:text-white'
                 }`}
               >
-                <div className="relative mb-1.5">
-                  <Monitor className="w-5 h-5 text-loom-primary" />
-                  <span className="absolute -bottom-1 -right-1 w-2.5 h-2.5 rounded-full bg-loom-coral border border-loom-card" />
+                <div className="relative mb-1">
+                  <Monitor className="w-4 h-4 text-loom-primary" />
+                  <span className="absolute -bottom-0.5 -right-0.5 w-2 h-2 rounded-full bg-loom-coral border border-loom-card" />
                 </div>
-                <span className="text-xs font-medium">Tela + Cam</span>
+                <span className="text-[11px] font-medium leading-tight">Tela + Cam</span>
               </button>
 
               <button
                 onClick={() => setMode('screen-only')}
-                className={`flex flex-col items-center justify-center p-3 rounded-xl border text-center transition-all ${
+                className={`flex flex-col items-center justify-center p-2.5 rounded-xl border text-center transition-all ${
                   mode === 'screen-only'
                     ? 'bg-loom-primary/10 border-loom-primary text-white shadow-sm'
                     : 'bg-loom-card border-loom-border text-loom-muted hover:border-loom-hover hover:text-white'
                 }`}
               >
-                <Monitor className="w-5 h-5 mb-1.5 text-loom-secondary" />
-                <span className="text-xs font-medium">Só Tela</span>
+                <Monitor className="w-4 h-4 mb-1 text-loom-secondary" />
+                <span className="text-[11px] font-medium leading-tight">Só Tela</span>
               </button>
 
               <button
                 onClick={() => setMode('cam-only')}
-                className={`flex flex-col items-center justify-center p-3 rounded-xl border text-center transition-all ${
+                className={`flex flex-col items-center justify-center p-2.5 rounded-xl border text-center transition-all ${
                   mode === 'cam-only'
                     ? 'bg-loom-primary/10 border-loom-primary text-white shadow-sm'
                     : 'bg-loom-card border-loom-border text-loom-muted hover:border-loom-hover hover:text-white'
                 }`}
               >
-                <Camera className="w-5 h-5 mb-1.5 text-loom-coral" />
-                <span className="text-xs font-medium">Só Câmera</span>
+                <Camera className="w-4 h-4 mb-1 text-loom-coral" />
+                <span className="text-[11px] font-medium leading-tight">Só Câmera</span>
+              </button>
+
+              <button
+                onClick={() => {
+                  setMode('custom-area');
+                  if (!cropArea) window.electronAPI.startCropSelection();
+                }}
+                className={`flex flex-col items-center justify-center p-2.5 rounded-xl border text-center transition-all ${
+                  mode === 'custom-area'
+                    ? 'bg-loom-primary/10 border-loom-primary text-white shadow-sm'
+                    : 'bg-loom-card border-loom-border text-loom-muted hover:border-loom-hover hover:text-white'
+                }`}
+              >
+                <Crop className="w-4 h-4 mb-1 text-loom-accent" />
+                <span className="text-[11px] font-medium leading-tight">Área Recorte</span>
               </button>
             </div>
+
+            {/* Custom Area Details & Pick Button */}
+            {mode === 'custom-area' && (
+              <div className="mt-2.5 p-2.5 bg-loom-card border border-loom-border rounded-xl flex items-center justify-between">
+                <div className="text-xs">
+                  <span className="text-loom-muted">Área: </span>
+                  <span className="font-mono text-white font-semibold">
+                    {cropArea ? `${Math.round(cropArea.width)} × ${Math.round(cropArea.height)} px` : 'Nenhuma definida'}
+                  </span>
+                </div>
+                <button
+                  onClick={() => window.electronAPI.startCropSelection()}
+                  className="px-2.5 py-1 rounded-lg bg-loom-primary/20 hover:bg-loom-primary/30 text-loom-primary text-xs font-semibold transition-colors"
+                >
+                  {cropArea ? 'Alterar Área' : 'Selecionar na Tela'}
+                </button>
+              </div>
+            )}
           </div>
 
           {/* Screen / Window Source Picker */}
@@ -349,6 +400,32 @@ export const PreRecordingView: React.FC = () => {
                 type="checkbox"
                 checked={includeSystemAudio}
                 onChange={(e) => setIncludeSystemAudio(e.target.checked)}
+                className="w-4 h-4 accent-loom-primary rounded cursor-pointer"
+              />
+            </div>
+
+            <div className="flex items-center justify-between pt-1 border-t border-loom-border/60">
+              <div className="flex items-center space-x-2">
+                <FileText className="w-4 h-4 text-loom-primary" />
+                <span className="text-xs font-medium text-white">Teleprompter / Notas do Orador</span>
+              </div>
+              <input
+                type="checkbox"
+                checked={speakerNotesEnabled}
+                onChange={(e) => setSpeakerNotesEnabled(e.target.checked)}
+                className="w-4 h-4 accent-loom-primary rounded cursor-pointer"
+              />
+            </div>
+
+            <div className="flex items-center justify-between pt-1 border-t border-loom-border/60">
+              <div className="flex items-center space-x-2">
+                <MousePointer className="w-4 h-4 text-loom-warning" />
+                <span className="text-xs font-medium text-white">Destacar Cursor & Cliques</span>
+              </div>
+              <input
+                type="checkbox"
+                checked={highlightCursor}
+                onChange={(e) => setHighlightCursor(e.target.checked)}
                 className="w-4 h-4 accent-loom-primary rounded cursor-pointer"
               />
             </div>

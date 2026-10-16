@@ -26,8 +26,8 @@ export class RecorderService {
 
     const fps = options.fps || 60;
 
-    // 1. Capture screen or window
-    if (options.mode === 'screen-cam' || options.mode === 'screen-only') {
+    // 1. Capture screen, window, or camera
+    if (options.mode === 'screen-cam' || options.mode === 'screen-only' || options.mode === 'custom-area') {
       try {
         this.screenStream = await navigator.mediaDevices.getUserMedia({
           audio: options.includeSystemAudio
@@ -57,6 +57,49 @@ export class RecorderService {
           audio: options.includeSystemAudio
         });
       }
+
+      // If custom-area mode is active with defined crop coordinates
+      if (options.mode === 'custom-area' && options.cropArea && this.screenStream) {
+        try {
+          const crop = options.cropArea;
+          const rawStream = this.screenStream;
+          const hiddenVideo = document.createElement('video');
+          hiddenVideo.srcObject = rawStream;
+          hiddenVideo.muted = true;
+          await hiddenVideo.play();
+
+          const canvas = document.createElement('canvas');
+          canvas.width = crop.width;
+          canvas.height = crop.height;
+          const ctx = canvas.getContext('2d');
+
+          const renderCrop = () => {
+            if (this.mediaRecorder && this.mediaRecorder.state !== 'inactive') {
+              if (ctx && hiddenVideo.readyState >= 2) {
+                ctx.drawImage(
+                  hiddenVideo,
+                  crop.x,
+                  crop.y,
+                  crop.width,
+                  crop.height,
+                  0,
+                  0,
+                  crop.width,
+                  crop.height
+                );
+              }
+              requestAnimationFrame(renderCrop);
+            }
+          };
+          renderCrop();
+
+          const croppedStream = (canvas as any).captureStream(fps);
+          rawStream.getAudioTracks().forEach((t) => croppedStream.addTrack(t));
+          this.screenStream = croppedStream;
+        } catch (cropErr) {
+          console.warn('Error applying crop to stream:', cropErr);
+        }
+      }
     } else {
       // Cam only mode: capture camera stream directly as primary video
       this.screenStream = await navigator.mediaDevices.getUserMedia({
@@ -82,9 +125,11 @@ export class RecorderService {
 
     // 3. Audio mixing with AudioContext
     const tracks: MediaStreamTrack[] = [];
-    const videoTrack = this.screenStream.getVideoTracks()[0];
-    if (videoTrack) {
-      tracks.push(videoTrack);
+    if (this.screenStream) {
+      const videoTrack = this.screenStream.getVideoTracks()[0];
+      if (videoTrack) {
+        tracks.push(videoTrack);
+      }
     }
 
     this.audioContext = new (window.AudioContext || (window as any).webkitAudioContext)();
@@ -99,7 +144,7 @@ export class RecorderService {
     }
 
     // Add desktop audio to mixer if captured
-    if (this.screenStream.getAudioTracks().length > 0) {
+    if (this.screenStream && this.screenStream.getAudioTracks().length > 0) {
       const systemSource = this.audioContext.createMediaStreamSource(this.screenStream);
       systemSource.connect(destination);
       hasAudio = true;

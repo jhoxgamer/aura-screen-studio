@@ -1,5 +1,12 @@
-export type RecordingMode = 'screen-cam' | 'screen-only' | 'cam-only';
+export type RecordingMode = 'screen-cam' | 'screen-only' | 'cam-only' | 'custom-area';
 export type BubbleSize = 'small' | 'medium' | 'large' | 'fullscreen';
+
+export interface CropArea {
+  x: number;
+  y: number;
+  width: number;
+  height: number;
+}
 
 export interface CaptureSource {
   id: string;
@@ -17,6 +24,30 @@ export interface RecordingOptions {
   includeSystemAudio: boolean;
   resolution: '720p' | '1080p' | '4k';
   fps: number;
+  speakerNotesEnabled?: boolean;
+  highlightCursor?: boolean;
+  blurBackground?: boolean;
+  cropArea?: CropArea;
+}
+
+export interface VideoComment {
+  id: string;
+  author: string;
+  time: number;
+  text: string;
+  createdAt: number;
+}
+
+export interface VideoReaction {
+  id: string;
+  emoji: string;
+  time: number;
+  createdAt: number;
+}
+
+export interface TranscriptItem {
+  time: number;
+  text: string;
 }
 
 export interface RecordingMeta {
@@ -28,6 +59,14 @@ export interface RecordingMeta {
   fileSize: number;
   thumbnailUrl?: string;
   resolution: string;
+  shareUrl?: string;
+  viewsCount?: number;
+  aiTitle?: string;
+  aiSummary?: string;
+  transcript?: TranscriptItem[];
+  comments?: VideoComment[];
+  reactions?: VideoReaction[];
+  cropArea?: CropArea;
 }
 
 declare global {
@@ -50,6 +89,10 @@ declare global {
       getRecordings: () => Promise<RecordingMeta[]>;
       deleteRecording: (id: string) => Promise<boolean>;
       openFileFolder: (filePath: string) => void;
+      getShareUrl: (id: string) => Promise<string>;
+      openExternalUrl: (url: string) => void;
+      toggleSpeakerNotes: () => void;
+      startCropSelection: () => void;
       closeCurrentWindow: () => void;
       minimizeCurrentWindow: () => void;
       onRecordingStateChanged: (callback: (state: string) => void) => () => void;
@@ -59,6 +102,7 @@ declare global {
       onPlaySound: (callback: (sound: string) => void) => () => void;
       onOpenPreview: (callback: (meta: RecordingMeta) => void) => () => void;
       onRecordingOptions: (callback: (options: RecordingOptions) => void) => () => void;
+      onCropAreaSelected: (callback: (area: CropArea) => void) => () => void;
     };
   }
 }

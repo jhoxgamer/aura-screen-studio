@@ -23,6 +23,13 @@ interface PathStroke {
   timestamp: number;
 }
 
+interface ClickRipple {
+  x: number;
+  y: number;
+  radius: number;
+  alpha: number;
+}
+
 export const DrawingOverlayView: React.FC = () => {
   const [active, setActive] = useState(false);
   const [tool, setTool] = useState<'pen' | 'highlighter' | 'eraser'>('pen');
@@ -32,6 +39,7 @@ export const DrawingOverlayView: React.FC = () => {
 
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const strokesRef = useRef<PathStroke[]>([]);
+  const ripplesRef = useRef<ClickRipple[]>([]);
   const isDrawingRef = useRef(false);
   const currentPointsRef = useRef<StrokePoint[]>([]);
 
@@ -134,11 +142,28 @@ export const DrawingOverlayView: React.FC = () => {
       ctx.stroke();
       ctx.restore();
     });
+
+    // Draw active click ripples
+    ripplesRef.current.forEach((r) => {
+      ctx.save();
+      ctx.beginPath();
+      ctx.arc(r.x, r.y, r.radius, 0, Math.PI * 2);
+      ctx.strokeStyle = `rgba(255, 91, 79, ${r.alpha})`;
+      ctx.lineWidth = 2.5;
+      ctx.shadowColor = '#ff5b4f';
+      ctx.shadowBlur = 8;
+      ctx.stroke();
+      ctx.restore();
+      r.radius += 2.5;
+      r.alpha -= 0.04;
+    });
+    ripplesRef.current = ripplesRef.current.filter((r) => r.alpha > 0);
   };
 
   const handleMouseDown = (e: React.MouseEvent<HTMLCanvasElement>) => {
     isDrawingRef.current = true;
     currentPointsRef.current = [{ x: e.clientX, y: e.clientY }];
+    ripplesRef.current.push({ x: e.clientX, y: e.clientY, radius: 8, alpha: 0.9 });
   };
 
   const handleMouseMove = (e: React.MouseEvent<HTMLCanvasElement>) => {

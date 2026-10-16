@@ -20,6 +20,7 @@ export const CameraBubbleView: React.FC = () => {
   const [isMuted, setIsMuted] = useState(false);
   const [showControls, setShowControls] = useState(false);
   const [borderStyle, setBorderStyle] = useState<'default' | 'glow' | 'coral' | 'gradient'>('default');
+  const [cameraFilter, setCameraFilter] = useState<'none' | 'blur' | 'studio' | 'vibrant'>('none');
 
   const videoRef = useRef<HTMLVideoElement>(null);
   const streamRef = useRef<MediaStream | null>(null);
@@ -110,15 +111,29 @@ export const CameraBubbleView: React.FC = () => {
         >
           {/* Active Camera Stream */}
           {isCameraActive ? (
-            <video
-              ref={videoRef}
-              autoPlay
-              playsInline
-              muted
-              className={`w-full h-full object-cover transition-transform duration-200 ${
-                isMirrored ? 'scale-x-[-1]' : ''
-              }`}
-            />
+            <div className="relative w-full h-full">
+              {cameraFilter === 'blur' && (
+                <div className="absolute inset-0 bg-loom-primary/20 backdrop-blur-xl pointer-events-none rounded-full" />
+              )}
+              <video
+                ref={videoRef}
+                autoPlay
+                playsInline
+                muted
+                style={{
+                  filter: cameraFilter === 'blur'
+                    ? 'contrast(1.08) brightness(1.05) saturate(1.15)'
+                    : cameraFilter === 'studio'
+                    ? 'brightness(1.12) contrast(1.12)'
+                    : cameraFilter === 'vibrant'
+                    ? 'saturate(1.35) contrast(1.08)'
+                    : 'none'
+                }}
+                className={`w-full h-full object-cover transition-all duration-200 ${
+                  isMirrored ? 'scale-x-[-1]' : ''
+                }`}
+              />
+            </div>
           ) : (
             <div className="w-full h-full bg-gradient-to-br from-loom-dark via-loom-panel to-loom-card flex flex-col items-center justify-center text-loom-muted">
               <div className="w-20 h-20 rounded-full bg-loom-panel border border-loom-border flex items-center justify-center shadow-inner">
@@ -192,17 +207,19 @@ export const CameraBubbleView: React.FC = () => {
             {isCameraActive ? <Video className="w-3.5 h-3.5" /> : <VideoOff className="w-3.5 h-3.5 text-loom-coral" />}
           </button>
 
-          {/* Style picker */}
+          {/* Camera Filter / Blur toggle */}
           <button
             onClick={() => {
-              const styles: Array<'default' | 'glow' | 'coral' | 'gradient'> = ['default', 'glow', 'coral', 'gradient'];
-              const nextIndex = (styles.indexOf(borderStyle) + 1) % styles.length;
-              setBorderStyle(styles[nextIndex]);
+              const filters: Array<'none' | 'blur' | 'studio' | 'vibrant'> = ['none', 'blur', 'studio', 'vibrant'];
+              const next = filters[(filters.indexOf(cameraFilter) + 1) % filters.length];
+              setCameraFilter(next);
             }}
-            title="Mudar Borda"
-            className="p-1.5 rounded-full text-loom-muted hover:text-white transition-colors"
+            title={`Filtro: ${cameraFilter.toUpperCase()}`}
+            className={`p-1.5 rounded-full transition-colors ${
+              cameraFilter !== 'none' ? 'bg-loom-coral text-white font-bold' : 'text-loom-muted hover:text-white'
+            }`}
           >
-            <Sparkles className="w-3.5 h-3.5 text-loom-secondary" />
+            <Sparkles className="w-3.5 h-3.5" />
           </button>
         </div>
       </div>

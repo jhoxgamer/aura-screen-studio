@@ -5,6 +5,8 @@ import { ControlBarView } from './views/ControlBarView';
 import { DrawingOverlayView } from './views/DrawingOverlayView';
 import { CountdownView } from './views/CountdownView';
 import { PreviewView } from './views/PreviewView';
+import { SpeakerNotesView } from './views/SpeakerNotesView';
+import { CropSelectorView } from './views/CropSelectorView';
 import { audioService } from './services/audioService';
 
 export const App: React.FC = () => {
@@ -27,6 +29,10 @@ export const App: React.FC = () => {
       return <CountdownView />;
     case 'preview':
       return <PreviewView />;
+    case 'speaker-notes':
+      return <SpeakerNotesView />;
+    case 'crop-selector':
+      return <CropSelectorView />;
     case 'pre-recording':
     default:
       return <PreRecordingView />;

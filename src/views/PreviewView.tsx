@@ -13,7 +13,9 @@ import {
   Share2,
   Trash2,
   Sparkles,
-  ArrowLeft
+  ArrowLeft,
+  Globe,
+  ExternalLink
 } from 'lucide-react';
 import confetti from 'canvas-confetti';
 import { RecordingMeta } from '../types';
@@ -27,6 +29,7 @@ export const PreviewView: React.FC = () => {
   const [volume, setVolume] = useState(1);
   const [isMuted, setIsMuted] = useState(false);
   const [isCopied, setIsCopied] = useState(false);
+  const [isLinkCopied, setIsLinkCopied] = useState(false);
 
   // Trimming states
   const [trimStart, setTrimStart] = useState(0);
@@ -51,6 +54,20 @@ export const PreviewView: React.FC = () => {
 
     return cleanup;
   }, []);
+
+  const handleShareLink = async () => {
+    if (!meta) return;
+    const shareUrl = meta.shareUrl || await window.electronAPI.getShareUrl(meta.id);
+    navigator.clipboard.writeText(shareUrl);
+    setIsLinkCopied(true);
+    setTimeout(() => setIsLinkCopied(false), 2500);
+  };
+
+  const handleOpenInBrowser = async () => {
+    if (!meta) return;
+    const shareUrl = meta.shareUrl || await window.electronAPI.getShareUrl(meta.id);
+    window.electronAPI.openExternalUrl(shareUrl);
+  };
 
   const handleLoadedMetadata = () => {
     if (videoRef.current) {
@@ -152,30 +169,40 @@ export const PreviewView: React.FC = () => {
         </div>
 
         <div className="flex items-center space-x-2">
+          {/* Share Link Button */}
+          <button
+            onClick={handleShareLink}
+            className="flex items-center space-x-1.5 bg-loom-primary hover:bg-loom-primaryHover text-white px-3.5 py-1.5 rounded-xl text-xs font-semibold transition-all shadow-md shadow-indigo-600/30"
+          >
+            {isLinkCopied ? <Check className="w-3.5 h-3.5" /> : <Share2 className="w-3.5 h-3.5" />}
+            <span>{isLinkCopied ? 'Link Copiado!' : 'Compartilhar Link'}</span>
+          </button>
+
+          {/* Open in Browser */}
+          <button
+            onClick={handleOpenInBrowser}
+            className="flex items-center space-x-1.5 bg-loom-card hover:bg-loom-hover border border-loom-border px-3 py-1.5 rounded-xl text-xs font-medium text-white transition-all shadow-sm"
+            title="Abrir página pública no navegador"
+          >
+            <ExternalLink className="w-3.5 h-3.5 text-loom-secondary" />
+            <span>Ver no Navegador</span>
+          </button>
+
           {/* Open Folder */}
           <button
             onClick={handleOpenFolder}
-            className="flex items-center space-x-1.5 bg-loom-card hover:bg-loom-hover border border-loom-border px-3 py-1.5 rounded-xl text-xs font-medium text-white transition-all shadow-sm"
+            className="flex items-center space-x-1.5 bg-loom-card hover:bg-loom-hover border border-loom-border px-3 py-1.5 rounded-xl text-xs font-medium text-loom-muted hover:text-white transition-all shadow-sm"
           >
-            <FolderOpen className="w-3.5 h-3.5 text-loom-secondary" />
-            <span>Abrir Pasta</span>
-          </button>
-
-          {/* Copy path */}
-          <button
-            onClick={handleCopyPath}
-            className="flex items-center space-x-1.5 bg-loom-card hover:bg-loom-hover border border-loom-border px-3 py-1.5 rounded-xl text-xs font-medium text-white transition-all shadow-sm"
-          >
-            {isCopied ? <Check className="w-3.5 h-3.5 text-loom-accent" /> : <Copy className="w-3.5 h-3.5" />}
-            <span>{isCopied ? 'Copiado!' : 'Copiar Caminho'}</span>
+            <FolderOpen className="w-3.5 h-3.5" />
+            <span>Pasta</span>
           </button>
         </div>
       </div>
 
       {/* Main Content Area: Video Player & Editor */}
-      <div className="flex-1 flex flex-col p-6 items-center justify-center max-w-5xl mx-auto w-full">
+      <div className="flex-1 flex flex-col p-6 items-center justify-start max-w-5xl mx-auto w-full overflow-y-auto">
         {/* Video Player Container */}
-        <div className="relative w-full aspect-video bg-black rounded-2xl overflow-hidden border border-loom-border shadow-2xl flex items-center justify-center group">
+        <div className="relative w-full aspect-video bg-black rounded-2xl overflow-hidden border border-loom-border shadow-2xl flex items-center justify-center group shrink-0">
           {meta?.filePath ? (
             <video
               ref={videoRef}
@@ -267,7 +294,7 @@ export const PreviewView: React.FC = () => {
         </div>
 
         {/* Trimming & Video Editing Section */}
-        <div className="w-full mt-4 bg-loom-panel border border-loom-border rounded-xl p-4 flex items-center justify-between">
+        <div className="w-full mt-4 bg-loom-panel border border-loom-border rounded-xl p-4 flex items-center justify-between shrink-0">
           <div className="flex items-center space-x-2">
             <Scissors className="w-4 h-4 text-loom-primary" />
             <span className="text-xs font-semibold text-white">Ajustar e Cortar Vídeo (Trimming)</span>
@@ -319,6 +346,57 @@ export const PreviewView: React.FC = () => {
             >
               {isTrimming ? 'Modo Corte Ativo' : 'Ativar Prévia de Corte'}
             </button>
+          </div>
+        </div>
+
+        {/* AI Summary & Transcript Section */}
+        <div className="w-full mt-4 grid grid-cols-1 md:grid-cols-2 gap-4 pb-6 shrink-0">
+          {/* AI Summary Card */}
+          <div className="bg-loom-panel border border-loom-border rounded-xl p-4 space-y-2">
+            <div className="flex items-center space-x-2 text-loom-primary text-xs font-bold uppercase tracking-wider">
+              <Sparkles className="w-4 h-4" />
+              <span>Resumo Inteligente por IA</span>
+            </div>
+            <p className="text-xs text-gray-300 leading-relaxed whitespace-pre-line">
+              {meta?.aiSummary || 'Explicação gravada com sucesso. Nenhuma transcrição de voz foi gerada.'}
+            </p>
+          </div>
+
+          {/* Transcript / Spoken Timeline */}
+          <div className="bg-loom-panel border border-loom-border rounded-xl p-4 space-y-2 max-h-48 overflow-y-auto">
+            <div className="flex items-center justify-between text-loom-secondary text-xs font-bold uppercase tracking-wider">
+              <span>Transcrição com Timestamps</span>
+              <span className="text-[10px] text-loom-muted font-normal">
+                {meta?.transcript?.length || 0} frases
+              </span>
+            </div>
+
+            {meta?.transcript && meta.transcript.length > 0 ? (
+              <div className="space-y-1.5 pt-1">
+                {meta.transcript.map((item, idx) => (
+                  <div
+                    key={idx}
+                    onClick={() => {
+                      if (videoRef.current) {
+                        videoRef.current.currentTime = item.time;
+                        videoRef.current.play();
+                        setIsPlaying(true);
+                      }
+                    }}
+                    className="p-1.5 rounded-lg hover:bg-loom-card cursor-pointer transition-colors flex items-start space-x-2 text-xs"
+                  >
+                    <span className="font-mono text-loom-primary font-bold shrink-0">
+                      {formatTime(item.time)}
+                    </span>
+                    <span className="text-gray-300">{item.text}</span>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <p className="text-xs text-loom-muted italic pt-2">
+                Nenhuma fala capturada durante esta gravação.
+              </p>
+            )}
           </div>
         </div>
       </div>

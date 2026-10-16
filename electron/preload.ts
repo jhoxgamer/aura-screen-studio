@@ -64,6 +64,18 @@ export const electronAPI = {
   openFileFolder: (filePath: string) => {
     ipcRenderer.send('recordings:open-folder', filePath);
   },
+  getShareUrl: async (id: string): Promise<string> => {
+    return await ipcRenderer.invoke('recordings:get-share-url', id);
+  },
+  openExternalUrl: (url: string) => {
+    ipcRenderer.send('window:open-external', url);
+  },
+  toggleSpeakerNotes: () => {
+    ipcRenderer.send('speaker-notes:toggle');
+  },
+  startCropSelection: () => {
+    ipcRenderer.send('crop:start-selection');
+  },
 
   // Window Controls
   closeCurrentWindow: () => {
@@ -108,6 +120,11 @@ export const electronAPI = {
     const handler = (_: any, options: RecordingOptions) => callback(options);
     ipcRenderer.on('recording:options', handler);
     return () => ipcRenderer.removeListener('recording:options', handler);
+  },
+  onCropAreaSelected: (callback: (area: any) => void) => {
+    const handler = (_: any, area: any) => callback(area);
+    ipcRenderer.on('crop:area-selected', handler);
+    return () => ipcRenderer.removeListener('crop:area-selected', handler);
   }
 };
 

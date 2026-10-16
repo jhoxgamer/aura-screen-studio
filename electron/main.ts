@@ -1,7 +1,8 @@
 import { app, BrowserWindow, ipcMain, desktopCapturer, screen, globalShortcut, shell } from 'electron';
 import * as path from 'path';
 import * as fs from 'fs';
-import { BubbleSize, RecordingOptions, RecordingMeta } from './types';
+import { BubbleSize, RecordingOptions, RecordingMeta, CropArea } from './types';
+import { ShareServer } from './shareServer';
 
 let preRecordingWindow: BrowserWindow | null = null;
 let cameraBubbleWindow: BrowserWindow | null = null;
@@ -9,6 +10,9 @@ let controlBarWindow: BrowserWindow | null = null;
 let drawingOverlayWindow: BrowserWindow | null = null;
 let countdownWindow: BrowserWindow | null = null;
 let previewWindow: BrowserWindow | null = null;
+let speakerNotesWindow: BrowserWindow | null = null;
+let cropSelectorWindow: BrowserWindow | null = null;
+let shareServer: ShareServer | null = null;
 
 let isRecording = false;
 let isPaused = false;
@@ -313,6 +317,83 @@ function createPreviewWindow(meta: RecordingMeta) {
   });
 }
 
+// 7. Toggle Speaker Notes / Teleprompter Window
+function toggleSpeakerNotesWindow() {
+  if (speakerNotesWindow && !speakerNotesWindow.isDestroyed()) {
+    if (speakerNotesWindow.isVisible()) {
+      speakerNotesWindow.hide();
+    } else {
+      speakerNotesWindow.show();
+      speakerNotesWindow.focus();
+    }
+    return;
+  }
+
+  const primaryDisplay = screen.getPrimaryDisplay();
+  const { width } = primaryDisplay.workAreaSize;
+
+  speakerNotesWindow = new BrowserWindow({
+    width: 380,
+    height: 480,
+    x: Math.round(width / 2 - 190),
+    y: 50,
+    frame: false,
+    transparent: true,
+    alwaysOnTop: true,
+    resizable: true,
+    skipTaskbar: true,
+    webPreferences: {
+      preload: getPreloadPath(),
+      nodeIntegration: false,
+      contextIsolation: true
+    }
+  });
+
+  speakerNotesWindow.setAlwaysOnTop(true, 'screen-saver');
+  loadView(speakerNotesWindow, 'speaker-notes');
+
+  speakerNotesWindow.on('closed', () => {
+    speakerNotesWindow = null;
+  });
+}
+
+// 8. Create Crop Selection Overlay Window
+function createCropSelectorWindow() {
+  if (cropSelectorWindow && !cropSelectorWindow.isDestroyed()) {
+    cropSelectorWindow.show();
+    cropSelectorWindow.focus();
+    return;
+  }
+
+  const primaryDisplay = screen.getPrimaryDisplay();
+  const { width, height } = primaryDisplay.bounds;
+
+  cropSelectorWindow = new BrowserWindow({
+    x: 0,
+    y: 0,
+    width,
+    height,
+    frame: false,
+    transparent: true,
+    alwaysOnTop: true,
+    resizable: false,
+    skipTaskbar: true,
+    focusable: true,
+    webPreferences: {
+      preload: getPreloadPath(),
+      nodeIntegration: false,
+      contextIsolation: true
+    }
+  });
+
+  cropSelectorWindow.setAlwaysOnTop(true, 'screen-saver');
+  loadView(cropSelectorWindow, 'crop-selector');
+
+  cropSelectorWindow.on('closed', () => {
+    cropSelectorWindow = null;
+  });
+}
+
 // Helper: Broadcast sound to active windows
 function broadcastSound(soundName: string) {
   const windows = [preRecordingWindow, cameraBubbleWindow, controlBarWindow, previewWindow];
@@ -389,12 +470,17 @@ function setupIpcHandlers() {
       broadcastSound('start');
       broadcastState('recording');
 
-      // Create camera bubble if mode is screen-cam or cam-only
-      if (options.mode === 'screen-cam' || options.mode === 'cam-only') {
+      // Create camera bubble if mode is screen-cam, cam-only or custom-area
+      if (options.mode === 'screen-cam' || options.mode === 'cam-only' || (options.mode === 'custom-area' && options.videoDeviceId)) {
         createCameraBubbleWindow(options.mode === 'cam-only' ? 'large' : 'medium');
         cameraBubbleWindow?.webContents.once('did-finish-load', () => {
           cameraBubbleWindow?.webContents.send('recording:options', options);
         });
+      }
+
+      // Open Speaker Notes if enabled
+      if (options.speakerNotesEnabled) {
+        toggleSpeakerNotesWindow();
       }
 
       // Create floating control bar
@@ -452,6 +538,9 @@ function setupIpcHandlers() {
     if (drawingOverlayWindow && !drawingOverlayWindow.isDestroyed()) {
       drawingOverlayWindow.close();
     }
+    if (speakerNotesWindow && !speakerNotesWindow.isDestroyed()) {
+      speakerNotesWindow.close();
+    }
 
     if (preRecordingWindow && !preRecordingWindow.isDestroyed()) {
       preRecordingWindow.show();
@@ -503,7 +592,11 @@ function setupIpcHandlers() {
       ...meta,
       id,
       filePath,
-      fileSize: buffer.length
+      fileSize: buffer.length,
+      shareUrl: shareServer ? shareServer.getShareUrl(id) : '',
+      viewsCount: 0,
+      comments: [],
+      reactions: []
     };
 
     const currentList = readMetadata();
@@ -520,12 +613,43 @@ function setupIpcHandlers() {
     if (drawingOverlayWindow && !drawingOverlayWindow.isDestroyed()) {
       drawingOverlayWindow.close();
     }
+    if (speakerNotesWindow && !speakerNotesWindow.isDestroyed()) {
+      speakerNotesWindow.close();
+    }
 
     // Play complete sound and open preview
     broadcastSound('complete');
     createPreviewWindow(record);
 
     return record;
+  });
+
+  ipcMain.handle('recordings:get-share-url', async (_, id: string) => {
+    return shareServer ? shareServer.getShareUrl(id) : '';
+  });
+
+  ipcMain.on('window:open-external', (_, url: string) => {
+    if (url) shell.openExternal(url);
+  });
+
+  ipcMain.on('speaker-notes:toggle', () => {
+    toggleSpeakerNotesWindow();
+  });
+
+  ipcMain.on('crop:start-selection', () => {
+    createCropSelectorWindow();
+  });
+
+  ipcMain.on('crop:area-selected', (_, area: CropArea) => {
+    if (cropSelectorWindow && !cropSelectorWindow.isDestroyed()) {
+      cropSelectorWindow.close();
+      cropSelectorWindow = null;
+    }
+    if (preRecordingWindow && !preRecordingWindow.isDestroyed()) {
+      preRecordingWindow.webContents.send('crop:area-selected', area);
+      preRecordingWindow.show();
+      preRecordingWindow.focus();
+    }
   });
 
   ipcMain.handle('recordings:list', async () => {
@@ -569,6 +693,9 @@ function setupIpcHandlers() {
 
 // App lifecycle
 app.whenReady().then(() => {
+  shareServer = new ShareServer(readMetadata, writeMetadata);
+  shareServer.start();
+
   setupIpcHandlers();
 
   // Register Global Shortcuts

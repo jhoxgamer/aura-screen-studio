@@ -6,10 +6,12 @@ import {
   RotateCcw,
   Trash2,
   PenTool,
-  GripVertical
+  GripVertical,
+  FileText
 } from 'lucide-react';
 import { RecordingOptions } from '../types';
 import { recorderService } from '../services/recorderService';
+import { transcriptionService } from '../services/transcriptionService';
 
 export const ControlBarView: React.FC = () => {
   const [seconds, setSeconds] = useState(0);
@@ -23,6 +25,7 @@ export const ControlBarView: React.FC = () => {
     const cleanupOptions = window.electronAPI.onRecordingOptions(async (options: RecordingOptions) => {
       optionsRef.current = options;
       try {
+        transcriptionService.start();
         await recorderService.start(options, (ms) => {
           setSeconds(Math.floor(ms / 1000));
         });
@@ -54,14 +57,18 @@ export const ControlBarView: React.FC = () => {
 
     try {
       const { buffer, durationMs } = await recorderService.stop();
+      const { transcript, aiSummary, aiTitle } = transcriptionService.stop();
 
-      const title = `Gravação Loom ${new Date().toLocaleDateString('pt-BR')} ${new Date().toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })}`;
+      const title = aiTitle || `Gravação Loom ${new Date().toLocaleDateString('pt-BR')} ${new Date().toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })}`;
       
       await window.electronAPI.saveRecording(buffer, {
         title,
         createdAt: Date.now(),
         durationMs,
-        resolution: optionsRef.current?.resolution || '1080p'
+        resolution: optionsRef.current?.resolution || '1080p',
+        aiTitle,
+        aiSummary,
+        transcript
       });
     } catch (err) {
       console.error('Error saving recording:', err);
@@ -173,6 +180,17 @@ export const ControlBarView: React.FC = () => {
             }`}
           >
             <PenTool className="w-4 h-4" />
+          </button>
+        </div>
+
+        {/* Teleprompter / Speaker Notes Toggle */}
+        <div style={{ WebkitAppRegion: 'no-drag' } as any}>
+          <button
+            onClick={() => window.electronAPI.toggleSpeakerNotes()}
+            title="Teleprompter / Notas do Orador"
+            className="p-2 rounded-xl text-loom-muted hover:text-white hover:bg-loom-card transition-all"
+          >
+            <FileText className="w-4 h-4" />
           </button>
         </div>
 
