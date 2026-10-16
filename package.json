@@ -90,8 +90,9 @@
       "runAfterFinish": true
     },
     "publish": {
-      "provider": "generic",
-      "url": "https://releases.aurascreen.io/updates/"
+      "provider": "github",
+      "owner": "jhoxgamer",
+      "repo": "aura-screen-studio"
     }
   }
 }
