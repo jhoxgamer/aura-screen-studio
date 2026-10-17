@@ -43,7 +43,18 @@ export const ScreenshotStudioView: React.FC = () => {
   const [dataUrl, setDataUrl] = useState<string | null>(null);
   const [activeTool, setActiveTool] = useState<Tool>('arrow');
   const [activeColor, setActiveColor] = useState<string>('#f43f5e');
+  const activeColorRef = useRef(activeColor);
+
+  useEffect(() => {
+    activeColorRef.current = activeColor;
+  }, [activeColor]);
+
   const [annotations, setAnnotations] = useState<Annotation[]>([]);
+  const annotationsRef = useRef<Annotation[]>([]);
+  useEffect(() => {
+    annotationsRef.current = annotations;
+  }, [annotations]);
+
   const [stepCounter, setStepCounter] = useState(1);
   const [isCopied, setIsCopied] = useState(false);
   const [toastMessage, setToastMessage] = useState<string | null>(null);
@@ -57,6 +68,28 @@ export const ScreenshotStudioView: React.FC = () => {
   const showToast = (msg: string) => {
     setToastMessage(msg);
     setTimeout(() => setToastMessage(null), 2500);
+  };
+
+  const handleColorChange = (newColor: string, colorName?: string) => {
+    setActiveColor(newColor);
+    activeColorRef.current = newColor;
+
+    // If there is an existing annotation created recently, update its color
+    setAnnotations((prev) => {
+      if (prev.length === 0) return prev;
+      const updated = [...prev];
+      updated[updated.length - 1] = {
+        ...updated[updated.length - 1],
+        color: newColor
+      };
+      return updated;
+    });
+
+    const label =
+      colorName ||
+      COLORS.find((c) => c.hex.toLowerCase() === newColor.toLowerCase())?.name ||
+      newColor.toUpperCase();
+    showToast(`🎨 Cor: ${label}`);
   };
 
   useEffect(() => {
@@ -106,6 +139,16 @@ export const ScreenshotStudioView: React.FC = () => {
           showToast('Ferramenta: Recortar (Tecla C)');
         } else if (k === 'u') {
           handleUndo();
+        } else if (k === '1') {
+          handleColorChange(COLORS[0].hex, COLORS[0].name);
+        } else if (k === '2') {
+          handleColorChange(COLORS[1].hex, COLORS[1].name);
+        } else if (k === '3') {
+          handleColorChange(COLORS[2].hex, COLORS[2].name);
+        } else if (k === '4') {
+          handleColorChange(COLORS[3].hex, COLORS[3].name);
+        } else if (k === '5') {
+          handleColorChange(COLORS[4].hex, COLORS[4].name);
         }
       }
     };
@@ -494,17 +537,36 @@ export const ScreenshotStudioView: React.FC = () => {
 
         {/* Colors */}
         <div className="flex items-center space-x-1.5 border-r border-[#222838] pr-3">
-          {COLORS.map((c) => (
+          {COLORS.map((c, idx) => (
             <button
               key={c.id}
-              onClick={() => setActiveColor(c.hex)}
-              title={c.name}
+              onClick={() => handleColorChange(c.hex, c.name)}
+              title={`${c.name} (Tecla ${idx + 1})`}
               className={`w-5 h-5 rounded-full transition-transform ${
-                activeColor === c.hex ? 'scale-125 ring-2 ring-white ring-offset-2 ring-offset-black' : 'hover:scale-110'
+                activeColor.toLowerCase() === c.hex.toLowerCase()
+                  ? 'scale-125 ring-2 ring-white ring-offset-2 ring-offset-black'
+                  : 'hover:scale-110'
               }`}
               style={{ backgroundColor: c.hex }}
             />
           ))}
+
+          {/* Custom Color Spectrum Picker */}
+          <label
+            title="Escolher Cor Personalizada (Espectro Completo)"
+            className="relative w-5 h-5 rounded-full cursor-pointer overflow-hidden border border-slate-600 hover:border-white transition-all hover:scale-110 flex items-center justify-center shrink-0"
+            style={{
+              background:
+                'conic-gradient(from 0deg, #f43f5e, #f59e0b, #10b981, #0ea5e9, #6366f1, #ec4899, #f43f5e)'
+            }}
+          >
+            <input
+              type="color"
+              value={activeColor}
+              onChange={(e) => handleColorChange(e.target.value)}
+              className="absolute -top-4 -left-4 w-12 h-12 opacity-0 cursor-pointer"
+            />
+          </label>
         </div>
 
         {/* Undo */}

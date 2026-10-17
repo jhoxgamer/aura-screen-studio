@@ -72,6 +72,22 @@ interface LaserPoint {
   timestamp: number;
 }
 
+function hexToRgb(hex: string): { r: number; g: number; b: number } {
+  let clean = hex.replace('#', '').trim();
+  if (clean.length === 3) {
+    clean = clean.split('').map((c) => c + c).join('');
+  }
+  const num = parseInt(clean, 16);
+  if (isNaN(num)) {
+    return { r: 244, g: 63, b: 94 };
+  }
+  return {
+    r: (num >> 16) & 255,
+    g: (num >> 8) & 255,
+    b: num & 255
+  };
+}
+
 export const DrawingOverlayView: React.FC = () => {
   const [active, setActive] = useState(false);
   const [tool, setTool] = useState<DrawingTool>(() => {
@@ -102,24 +118,33 @@ export const DrawingOverlayView: React.FC = () => {
   const [activeTextPrompt, setActiveTextPrompt] = useState<{ x: number; y: number } | null>(null);
   const [textInputValue, setTextInputValue] = useState('');
 
+  const colorRef = useRef(color);
+  const toolRef = useRef(tool);
+  const fillModeRef = useRef(fillMode);
+  const strokeWidthRef = useRef(strokeWidth);
+
   const showToolToast = (msg: string) => {
     setToolToast(msg);
     setTimeout(() => setToolToast((prev) => (prev === msg ? null : prev)), 1400);
   };
 
   useEffect(() => {
+    toolRef.current = tool;
     localStorage.setItem('aura_draw_tool', tool);
   }, [tool]);
 
   useEffect(() => {
+    fillModeRef.current = fillMode;
     localStorage.setItem('aura_draw_fill', fillMode);
   }, [fillMode]);
 
   useEffect(() => {
+    colorRef.current = color;
     localStorage.setItem('aura_draw_color', color);
   }, [color]);
 
   useEffect(() => {
+    strokeWidthRef.current = strokeWidth;
     localStorage.setItem('aura_draw_width', String(strokeWidth));
   }, [strokeWidth]);
 
@@ -149,6 +174,31 @@ export const DrawingOverlayView: React.FC = () => {
   useEffect(() => {
     nextStampRef.current = nextStampNumber;
   }, [nextStampNumber]);
+
+  const handleColorChange = (newColor: string, colorName?: string) => {
+    setColor(newColor);
+    colorRef.current = newColor;
+    localStorage.setItem('aura_draw_color', newColor);
+
+    // Retroactively update last stroke if placed recently
+    if (strokesRef.current.length > 0) {
+      const lastStroke = strokesRef.current[strokesRef.current.length - 1];
+      if (Date.now() - lastStroke.timestamp < 15000) {
+        lastStroke.color = newColor;
+      }
+    }
+
+    if (canvasRef.current) {
+      redraw();
+    }
+
+    const label =
+      colorName ||
+      colors.find((c) => c.hex.toLowerCase() === newColor.toLowerCase())?.name ||
+      newColor.toUpperCase();
+    showToolToast(`🎨 Cor: ${label}`);
+    audioService.play('pop');
+  };
 
   useEffect(() => {
     const cleanupToggled = window.electronAPI.onDrawingToggled((isActive) => {
@@ -235,6 +285,18 @@ export const DrawingOverlayView: React.FC = () => {
         showToolToast('Borracha (E)');
       } else if (e.key === 'w' || e.key === 'W') {
         cycleWhiteboard();
+      } else if (e.key === '1') {
+        handleColorChange(colors[0].hex, colors[0].name);
+      } else if (e.key === '2') {
+        handleColorChange(colors[1].hex, colors[1].name);
+      } else if (e.key === '3') {
+        handleColorChange(colors[2].hex, colors[2].name);
+      } else if (e.key === '4') {
+        handleColorChange(colors[3].hex, colors[3].name);
+      } else if (e.key === '5') {
+        handleColorChange(colors[4].hex, colors[4].name);
+      } else if (e.key === '6') {
+        handleColorChange(colors[5].hex, colors[5].name);
       }
     };
 
@@ -528,26 +590,20 @@ export const DrawingOverlayView: React.FC = () => {
       ctx.textBaseline = 'middle';
       ctx.fillText(num.toString(), x, y + 0.5);
     } else {
-      let bg = color;
+      const bg = color || '#f43f5e';
       let symbol = '';
 
       if (type === 'check') {
-        bg = '#10b981';
         symbol = '✓';
       } else if (type === 'cross') {
-        bg = '#ef4444';
         symbol = '✕';
       } else if (type === 'star') {
-        bg = '#f59e0b';
         symbol = '★';
       } else if (type === 'heart') {
-        bg = '#ec4899';
         symbol = '♥';
       } else if (type === 'question') {
-        bg = '#06b6d4';
         symbol = '?';
       } else if (type === 'arrow') {
-        bg = '#6366f1';
         symbol = '➔';
       }
 
@@ -692,6 +748,7 @@ export const DrawingOverlayView: React.FC = () => {
     // 3. Zoom-style Glowing Laser Pointer with Fading Comet Tail
     if (tool === 'laser' && laserTrailRef.current.length > 1) {
       ctx.save();
+      const rgb = hexToRgb(colorRef.current);
       for (let i = 1; i < laserTrailRef.current.length; i++) {
         const p1 = laserTrailRef.current[i - 1];
         const p2 = laserTrailRef.current[i];
@@ -701,7 +758,7 @@ export const DrawingOverlayView: React.FC = () => {
         ctx.beginPath();
         ctx.moveTo(p1.x, p1.y);
         ctx.lineTo(p2.x, p2.y);
-        ctx.strokeStyle = `rgba(244, 63, 94, ${progress * 0.7})`;
+        ctx.strokeStyle = `rgba(${rgb.r}, ${rgb.g}, ${rgb.b}, ${progress * 0.75})`;
         ctx.lineWidth = Math.max(2, 6 * progress);
         ctx.lineCap = 'round';
         ctx.stroke();
@@ -712,15 +769,15 @@ export const DrawingOverlayView: React.FC = () => {
         const lx = mousePosRef.current.x;
         const ly = mousePosRef.current.y;
 
-        const laserHalo = ctx.createRadialGradient(lx, ly, 2, lx, ly, 20);
+        const laserHalo = ctx.createRadialGradient(lx, ly, 2, lx, ly, 22);
         laserHalo.addColorStop(0, 'rgba(255, 255, 255, 1)');
-        laserHalo.addColorStop(0.2, '#f43f5e');
-        laserHalo.addColorStop(0.6, 'rgba(244, 63, 94, 0.45)');
-        laserHalo.addColorStop(1, 'rgba(244, 63, 94, 0)');
+        laserHalo.addColorStop(0.2, colorRef.current);
+        laserHalo.addColorStop(0.6, `rgba(${rgb.r}, ${rgb.g}, ${rgb.b}, 0.45)`);
+        laserHalo.addColorStop(1, `rgba(${rgb.r}, ${rgb.g}, ${rgb.b}, 0)`);
 
         ctx.fillStyle = laserHalo;
         ctx.beginPath();
-        ctx.arc(lx, ly, 20, 0, Math.PI * 2);
+        ctx.arc(lx, ly, 22, 0, Math.PI * 2);
         ctx.fill();
       }
       ctx.restore();
@@ -805,8 +862,8 @@ export const DrawingOverlayView: React.FC = () => {
     if (isDrawingRef.current && currentPointsRef.current.length >= 2) {
       const pts = currentPointsRef.current;
       ctx.save();
-      ctx.strokeStyle = tool === 'eraser' ? '#ffffff' : color;
-      ctx.lineWidth = strokeWidth;
+      ctx.strokeStyle = tool === 'eraser' ? '#ffffff' : colorRef.current;
+      ctx.lineWidth = strokeWidthRef.current;
       ctx.lineCap = 'round';
       ctx.lineJoin = 'round';
 
@@ -824,22 +881,22 @@ export const DrawingOverlayView: React.FC = () => {
       if (tool === 'mosaic') {
         drawMosaicRedaction(ctx, pStart.x, pStart.y, pEnd.x, pEnd.y);
       } else if (tool === 'arrow') {
-        drawArrowShape(ctx, pStart.x, pStart.y, pEnd.x, pEnd.y, strokeWidth, false);
+        drawArrowShape(ctx, pStart.x, pStart.y, pEnd.x, pEnd.y, strokeWidthRef.current, false);
       } else if (tool === 'darrow') {
-        drawArrowShape(ctx, pStart.x, pStart.y, pEnd.x, pEnd.y, strokeWidth, true);
+        drawArrowShape(ctx, pStart.x, pStart.y, pEnd.x, pEnd.y, strokeWidthRef.current, true);
       } else if (tool === 'line') {
         ctx.beginPath();
         ctx.moveTo(pStart.x, pStart.y);
         ctx.lineTo(pEnd.x, pEnd.y);
         ctx.stroke();
       } else if (tool === 'rectangle') {
-        drawBoxShape(ctx, pStart.x, pStart.y, pEnd.x, pEnd.y, color, fillMode);
+        drawBoxShape(ctx, pStart.x, pStart.y, pEnd.x, pEnd.y, colorRef.current, fillModeRef.current);
       } else if (tool === 'ellipse') {
-        drawEllipseShape(ctx, pStart.x, pStart.y, pEnd.x, pEnd.y, color, fillMode);
+        drawEllipseShape(ctx, pStart.x, pStart.y, pEnd.x, pEnd.y, colorRef.current, fillModeRef.current);
       } else if (tool === 'diamond') {
-        drawDiamondShape(ctx, pStart.x, pStart.y, pEnd.x, pEnd.y, color, fillMode);
+        drawDiamondShape(ctx, pStart.x, pStart.y, pEnd.x, pEnd.y, colorRef.current, fillModeRef.current);
       } else if (tool === 'triangle') {
-        drawTriangleShape(ctx, pStart.x, pStart.y, pEnd.x, pEnd.y, color, fillMode);
+        drawTriangleShape(ctx, pStart.x, pStart.y, pEnd.x, pEnd.y, colorRef.current, fillModeRef.current);
       } else {
         ctx.beginPath();
         ctx.moveTo(pts[0].x, pts[0].y);
@@ -895,8 +952,8 @@ export const DrawingOverlayView: React.FC = () => {
       const stampNum = nextStampRef.current;
       strokesRef.current.push({
         points: [{ x, y }],
-        color,
-        width: strokeWidth,
+        color: colorRef.current,
+        width: strokeWidthRef.current,
         tool: 'stamp',
         stampType,
         stampNumber: stampNum,
@@ -965,10 +1022,10 @@ export const DrawingOverlayView: React.FC = () => {
 
           strokesRef.current.push({
             points: detected.points,
-            color,
-            width: strokeWidth,
+            color: colorRef.current,
+            width: strokeWidthRef.current,
             tool: (detected.type === 'circle' ? 'ellipse' : detected.type) as DrawingTool,
-            fillMode,
+            fillMode: fillModeRef.current,
             vanishing: vanishingInk,
             timestamp: Date.now()
           });
@@ -976,8 +1033,8 @@ export const DrawingOverlayView: React.FC = () => {
           // Freehand fallback
           strokesRef.current.push({
             points: [...currentPointsRef.current],
-            color,
-            width: strokeWidth,
+            color: colorRef.current,
+            width: strokeWidthRef.current,
             tool: 'pen',
             vanishing: vanishingInk,
             timestamp: Date.now()
@@ -986,10 +1043,10 @@ export const DrawingOverlayView: React.FC = () => {
       } else {
         strokesRef.current.push({
           points: [...currentPointsRef.current],
-          color,
-          width: strokeWidth,
+          color: colorRef.current,
+          width: strokeWidthRef.current,
           tool,
-          fillMode,
+          fillMode: fillModeRef.current,
           vanishing: vanishingInk,
           timestamp: Date.now()
         });
@@ -1005,8 +1062,8 @@ export const DrawingOverlayView: React.FC = () => {
     if (activeTextPrompt && textInputValue.trim()) {
       strokesRef.current.push({
         points: [{ x: activeTextPrompt.x, y: activeTextPrompt.y }],
-        color,
-        width: strokeWidth,
+        color: colorRef.current,
+        width: strokeWidthRef.current,
         tool: 'text',
         text: textInputValue.trim(),
         vanishing: vanishingInk,
@@ -1399,17 +1456,36 @@ export const DrawingOverlayView: React.FC = () => {
           {/* Color Palette */}
           {tool !== 'eraser' && tool !== 'mosaic' && (
             <div className="flex items-center space-x-1.5 border-r border-[#232838] pr-1.5">
-              {colors.map((c) => (
+              {colors.map((c, idx) => (
                 <button
                   key={c.hex}
-                  onClick={() => setColor(c.hex)}
-                  title={c.name}
+                  onClick={() => handleColorChange(c.hex, c.name)}
+                  title={`${c.name} (Tecla ${idx + 1})`}
                   className={`w-4 h-4 rounded-full transition-transform ${
-                    color === c.hex ? 'scale-125 ring-2 ring-white ring-offset-1 ring-offset-black' : 'hover:scale-110 opacity-80 hover:opacity-100'
+                    color.toLowerCase() === c.hex.toLowerCase()
+                      ? 'scale-125 ring-2 ring-white ring-offset-1 ring-offset-black'
+                      : 'hover:scale-110 opacity-80 hover:opacity-100'
                   }`}
                   style={{ backgroundColor: c.hex }}
                 />
               ))}
+
+              {/* Custom Color Spectrum Picker */}
+              <label
+                title="Escolher Cor Personalizada (Espectro Completo)"
+                className="relative w-4 h-4 rounded-full cursor-pointer overflow-hidden border border-slate-600 hover:border-white transition-all hover:scale-110 flex items-center justify-center shrink-0"
+                style={{
+                  background:
+                    'conic-gradient(from 0deg, #f43f5e, #f59e0b, #10b981, #38bdf8, #6366f1, #ec4899, #f43f5e)'
+                }}
+              >
+                <input
+                  type="color"
+                  value={color}
+                  onChange={(e) => handleColorChange(e.target.value)}
+                  className="absolute -top-4 -left-4 w-12 h-12 opacity-0 cursor-pointer"
+                />
+              </label>
             </div>
           )}
 

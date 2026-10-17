@@ -160,6 +160,18 @@ declare global {
       onOpenPreview: (callback: (meta: RecordingMeta) => void) => () => void;
       onRecordingOptions: (callback: (options: RecordingOptions) => void) => () => void;
       onCropAreaSelected: (callback: (area: CropArea) => void) => () => void;
+
+      // Zoom-Style Live Screen Sharing
+      startLiveShare: (title?: string) => Promise<{ success: boolean; isLive: boolean; isPaused: boolean; viewers: number; title: string; url: string; urls: { networkUrl: string; localUrl: string; publicUrl: string | null } }>;
+      stopLiveShare: () => Promise<{ success: boolean }>;
+      togglePauseLiveShare: () => Promise<{ isPaused: boolean }>;
+      getLiveStatus: () => Promise<{ isLive: boolean; isPaused: boolean; viewers: number; title: string; uptime: number; url: string; urls: { networkUrl: string; localUrl: string; publicUrl: string | null } }>;
+      getLiveUrls: () => Promise<{ networkUrl: string; localUrl: string; publicUrl: string | null }>;
+      sendLiveFrame: (buffer: ArrayBuffer) => void;
+      onLiveViewersChanged: (callback: (count: number) => void) => () => void;
+      onLiveReactionReceived: (callback: (reaction: { emoji: string; author?: string; time: number }) => void) => () => void;
+      onLiveQuestionReceived: (callback: (question: { text: string; author?: string; time: number }) => void) => () => void;
+      onLiveStatusChanged: (callback: (status: any) => void) => () => void;
     };
   }
 }

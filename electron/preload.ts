@@ -217,6 +217,46 @@ export const electronAPI = {
     const handler = (_: any, area: any) => callback(area);
     ipcRenderer.on('crop:area-selected', handler);
     return () => ipcRenderer.removeListener('crop:area-selected', handler);
+  },
+
+  // Zoom-Style Live Screen Sharing
+  startLiveShare: async (title?: string) => {
+    return await ipcRenderer.invoke('live-share:start', title);
+  },
+  stopLiveShare: async () => {
+    return await ipcRenderer.invoke('live-share:stop');
+  },
+  togglePauseLiveShare: async () => {
+    return await ipcRenderer.invoke('live-share:toggle-pause');
+  },
+  getLiveStatus: async () => {
+    return await ipcRenderer.invoke('live-share:get-status');
+  },
+  getLiveUrls: async () => {
+    return await ipcRenderer.invoke('live-share:get-urls');
+  },
+  sendLiveFrame: (buffer: ArrayBuffer) => {
+    ipcRenderer.send('live-share:broadcast-frame', buffer);
+  },
+  onLiveViewersChanged: (callback: (count: number) => void) => {
+    const handler = (_: any, count: number) => callback(count);
+    ipcRenderer.on('live-share:viewers-changed', handler);
+    return () => ipcRenderer.removeListener('live-share:viewers-changed', handler);
+  },
+  onLiveReactionReceived: (callback: (reaction: { emoji: string; author?: string; time: number }) => void) => {
+    const handler = (_: any, r: any) => callback(r);
+    ipcRenderer.on('live-share:reaction-received', handler);
+    return () => ipcRenderer.removeListener('live-share:reaction-received', handler);
+  },
+  onLiveQuestionReceived: (callback: (q: { text: string; author?: string; time: number }) => void) => {
+    const handler = (_: any, q: any) => callback(q);
+    ipcRenderer.on('live-share:question-received', handler);
+    return () => ipcRenderer.removeListener('live-share:question-received', handler);
+  },
+  onLiveStatusChanged: (callback: (status: any) => void) => {
+    const handler = (_: any, status: any) => callback(status);
+    ipcRenderer.on('live-share:status-changed', handler);
+    return () => ipcRenderer.removeListener('live-share:status-changed', handler);
   }
 };
 

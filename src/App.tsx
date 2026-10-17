@@ -8,6 +8,8 @@ import { PreviewView } from './views/PreviewView';
 import { SpeakerNotesView } from './views/SpeakerNotesView';
 import { CropSelectorView } from './views/CropSelectorView';
 import { ScreenshotStudioView } from './views/ScreenshotStudioView';
+import { ZoomShareBarView } from './views/ZoomShareBarView';
+import { ZoomShareBorderView } from './views/ZoomShareBorderView';
 import { audioService } from './services/audioService';
 
 export const App: React.FC = () => {
@@ -36,6 +38,10 @@ export const App: React.FC = () => {
       return <CropSelectorView />;
     case 'screenshot-studio':
       return <ScreenshotStudioView />;
+    case 'zoom-share-bar':
+      return <ZoomShareBarView />;
+    case 'zoom-share-border':
+      return <ZoomShareBorderView />;
     case 'pre-recording':
     default:
       return <PreRecordingView />;

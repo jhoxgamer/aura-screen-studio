@@ -14,6 +14,8 @@ let previewWindow: BrowserWindow | null = null;
 let speakerNotesWindow: BrowserWindow | null = null;
 let cropSelectorWindow: BrowserWindow | null = null;
 let screenshotStudioWindow: BrowserWindow | null = null;
+let zoomShareBarWindow: BrowserWindow | null = null;
+let zoomShareBorderWindow: BrowserWindow | null = null;
 let shareServer: ShareServer | null = null;
 let tray: Tray | null = null;
 
@@ -507,6 +509,94 @@ function createScreenshotStudioWindow(dataUrl: string) {
   });
 }
 
+// 10. Create Floating Zoom Screen Share Bar Window
+function createZoomShareBarWindow() {
+  if (zoomShareBarWindow && !zoomShareBarWindow.isDestroyed()) {
+    zoomShareBarWindow.show();
+    zoomShareBarWindow.focus();
+    return;
+  }
+
+  const primaryDisplay = screen.getPrimaryDisplay();
+  const { width } = primaryDisplay.workAreaSize;
+  const barWidth = 720;
+  const barHeight = 68;
+
+  zoomShareBarWindow = new BrowserWindow({
+    width: barWidth,
+    height: barHeight,
+    x: Math.round((width - barWidth) / 2),
+    y: 12,
+    frame: false,
+    transparent: true,
+    alwaysOnTop: true,
+    hasShadow: false,
+    resizable: false,
+    skipTaskbar: true,
+    focusable: true,
+    webPreferences: {
+      preload: getPreloadPath(),
+      nodeIntegration: false,
+      contextIsolation: true
+    }
+  });
+
+  zoomShareBarWindow.setAlwaysOnTop(true, 'screen-saver');
+  loadView(zoomShareBarWindow, 'zoom-share-bar');
+
+  zoomShareBarWindow.on('closed', () => {
+    zoomShareBarWindow = null;
+  });
+}
+
+// 11. Create Fullscreen Zoom Screen Share Border Window
+function createZoomShareBorderWindow() {
+  if (zoomShareBorderWindow && !zoomShareBorderWindow.isDestroyed()) {
+    return;
+  }
+
+  const primaryDisplay = screen.getPrimaryDisplay();
+  const { width, height } = primaryDisplay.bounds;
+
+  zoomShareBorderWindow = new BrowserWindow({
+    x: 0,
+    y: 0,
+    width,
+    height,
+    frame: false,
+    transparent: true,
+    alwaysOnTop: true,
+    hasShadow: false,
+    resizable: false,
+    skipTaskbar: true,
+    focusable: false,
+    webPreferences: {
+      preload: getPreloadPath(),
+      nodeIntegration: false,
+      contextIsolation: true
+    }
+  });
+
+  zoomShareBorderWindow.setAlwaysOnTop(true, 'screen-saver');
+  zoomShareBorderWindow.setIgnoreMouseEvents(true, { forward: true });
+  loadView(zoomShareBorderWindow, 'zoom-share-border');
+
+  zoomShareBorderWindow.on('closed', () => {
+    zoomShareBorderWindow = null;
+  });
+}
+
+function closeZoomShareWindows() {
+  if (zoomShareBarWindow && !zoomShareBarWindow.isDestroyed()) {
+    zoomShareBarWindow.close();
+    zoomShareBarWindow = null;
+  }
+  if (zoomShareBorderWindow && !zoomShareBorderWindow.isDestroyed()) {
+    zoomShareBorderWindow.close();
+    zoomShareBorderWindow = null;
+  }
+}
+
 async function captureAndOpenScreenshotStudio() {
   try {
     const primaryDisplay = screen.getPrimaryDisplay();
@@ -966,6 +1056,52 @@ function setupIpcHandlers() {
     return shareServer ? shareServer.getPort() : 4545;
   });
 
+  // Zoom Live Screen Sharing IPC
+  ipcMain.handle('live-share:start', async (_, title?: string) => {
+    if (!shareServer) return { success: false, error: 'Share server not available' };
+    const urls = shareServer.startLive(title || 'Apresentação ao Vivo');
+    createZoomShareBorderWindow();
+    createZoomShareBarWindow();
+    broadcastSound('complete');
+    return {
+      success: true,
+      ...shareServer.getLiveStatus()
+    };
+  });
+
+  ipcMain.handle('live-share:stop', async () => {
+    if (shareServer) {
+      shareServer.stopLive();
+    }
+    closeZoomShareWindows();
+    broadcastSound('stop');
+    return { success: true };
+  });
+
+  ipcMain.handle('live-share:toggle-pause', async () => {
+    if (!shareServer) return { isPaused: false };
+    const nextPaused = !shareServer.isPaused();
+    shareServer.setLivePaused(nextPaused);
+    broadcastSound('pause');
+    return { isPaused: nextPaused };
+  });
+
+  ipcMain.handle('live-share:get-status', async () => {
+    if (!shareServer) return { isLive: false, isPaused: false, viewers: 0 };
+    return shareServer.getLiveStatus();
+  });
+
+  ipcMain.handle('live-share:get-urls', async () => {
+    if (!shareServer) return { networkUrl: '', localUrl: '', publicUrl: null };
+    return shareServer.getLiveUrls();
+  });
+
+  ipcMain.on('live-share:broadcast-frame', (_, arrayBuffer: ArrayBuffer) => {
+    if (shareServer && shareServer.isLiveActive()) {
+      shareServer.broadcastLiveFrame(Buffer.from(arrayBuffer));
+    }
+  });
+
   ipcMain.on('window:open-pre-recording', () => {
     if (preRecordingWindow && !preRecordingWindow.isDestroyed()) {
       preRecordingWindow.show();
@@ -1010,6 +1146,20 @@ function setupIpcHandlers() {
   ipcMain.on('updater:install-now', () => {
     autoUpdater.quitAndInstall();
   });
+}
+
+function toggleLiveShare() {
+  if (!shareServer) return;
+  if (shareServer.isLiveActive()) {
+    shareServer.stopLive();
+    closeZoomShareWindows();
+    broadcastSound('stop');
+  } else {
+    shareServer.startLive('Apresentação ao Vivo');
+    createZoomShareBorderWindow();
+    createZoomShareBarWindow();
+    broadcastSound('complete');
+  }
 }
 
 // 9. System Tray Integration
@@ -1066,6 +1216,12 @@ function createSystemTray() {
           }
         },
         { type: 'separator' },
+        {
+          label: '📡 Compartilhar Tela ao Vivo (Modo Zoom)',
+          click: () => {
+            toggleLiveShare();
+          }
+        },
         {
           label: '📸 Capturar Screenshot Instantâneo (Alt+Shift+S)',
           click: () => {
@@ -1206,6 +1362,27 @@ app.whenReady().then(() => {
   shareServer = new ShareServer(readMetadata, writeMetadata);
   shareServer.start();
 
+  shareServer.onLiveViewersChanged = (count) => {
+    if (zoomShareBarWindow && !zoomShareBarWindow.isDestroyed()) {
+      zoomShareBarWindow.webContents.send('live-share:viewers-changed', count);
+    }
+    if (preRecordingWindow && !preRecordingWindow.isDestroyed()) {
+      preRecordingWindow.webContents.send('live-share:viewers-changed', count);
+    }
+  };
+
+  shareServer.onLiveReaction = (reaction) => {
+    if (zoomShareBarWindow && !zoomShareBarWindow.isDestroyed()) {
+      zoomShareBarWindow.webContents.send('live-share:reaction-received', reaction);
+    }
+  };
+
+  shareServer.onLiveQuestion = (question) => {
+    if (zoomShareBarWindow && !zoomShareBarWindow.isDestroyed()) {
+      zoomShareBarWindow.webContents.send('live-share:question-received', question);
+    }
+  };
+
   setupIpcHandlers();
   createSystemTray();
   setupAutoUpdater();
@@ -1274,6 +1451,10 @@ app.whenReady().then(() => {
 
   safeRegisterShortcuts(['CommandOrControl+Shift+S', 'Alt+Shift+S'], () => {
     captureAndOpenScreenshotStudio();
+  });
+
+  safeRegisterShortcuts(['CommandOrControl+Shift+Z', 'Alt+Shift+Z'], () => {
+    toggleLiveShare();
   });
 
   createPreRecordingWindow();

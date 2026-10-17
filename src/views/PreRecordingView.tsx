@@ -21,7 +21,8 @@ import {
   Sparkles,
   Info,
   Check,
-  Clock
+  Clock,
+  Radio
 } from 'lucide-react';
 import { CaptureSource, RecordingMode, RecordingOptions, CropArea } from '../types';
 import { LibraryView } from './LibraryView';
@@ -652,6 +653,14 @@ export const PreRecordingView: React.FC = () => {
         </div>
 
         <div className="flex items-center space-x-1" style={{ WebkitAppRegion: 'no-drag' } as any}>
+          <button
+            onClick={() => window.electronAPI.startLiveShare()}
+            title="Compartilhar Tela ao Vivo no Estilo Zoom (Alt+Shift+Z)"
+            className="flex items-center space-x-1.5 px-2.5 py-1 rounded-md bg-emerald-950/50 hover:bg-emerald-900/60 text-emerald-300 hover:text-emerald-100 text-[11px] font-medium transition-colors border border-emerald-500/40"
+          >
+            <Radio className="w-3.5 h-3.5 text-emerald-400 animate-pulse" />
+            <span>Ao Vivo</span>
+          </button>
           <button
             onClick={() => window.electronAPI.takeScreenshot()}
             title={`Capturar Screenshot com Anotações (${getShortcutLabel('s')})`}
@@ -1306,13 +1315,22 @@ export const PreRecordingView: React.FC = () => {
           </div>
 
           {/* Start Recording CTA Button */}
-          <div className="pt-1">
+          <div className="pt-1 flex flex-col gap-2">
             <button
               onClick={handleStart}
               className="w-full bg-rose-600 hover:bg-rose-500 active:scale-[0.99] text-white font-bold py-3.5 px-4 rounded-xl shadow-lg flex items-center justify-center space-x-2.5 transition-all"
             >
               <div className="w-2.5 h-2.5 rounded-full bg-white" />
               <span className="tracking-wide">INICIAR GRAVAÇÃO</span>
+            </button>
+
+            <button
+              onClick={() => window.electronAPI.startLiveShare()}
+              title="Iniciar transmissão ao vivo no estilo Zoom para qualquer dispositivo via link ou QR Code"
+              className="w-full bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 active:scale-[0.99] text-white font-bold py-2.5 px-4 rounded-xl shadow-md flex items-center justify-center space-x-2 transition-all border border-emerald-400/30"
+            >
+              <Radio className="w-4 h-4 text-emerald-200 animate-pulse" />
+              <span className="text-xs tracking-wide">COMPARTILHAR TELA AO VIVO (MODO ZOOM)</span>
             </button>
             <div className="text-center mt-2.5 mb-1.5 flex items-center justify-center space-x-2 text-[10px] text-slate-400 font-mono">
               <span title="Pressione 1 a 4 para alternar modos">[1-4] Modos</span>

@@ -14,6 +14,19 @@ export class ShareServer {
   private tunnelProcess: ChildProcess | null = null;
   private publicTunnelUrl: string | null = null;
 
+  // Zoom-Style Live Screen Sharing State
+  private isLive: boolean = false;
+  private isLivePaused: boolean = false;
+  private liveTitle: string = 'Apresentação ao Vivo';
+  private liveStartTime: number = 0;
+  private activeLiveClients: Set<http.ServerResponse> = new Set();
+  private liveEventClients: Set<http.ServerResponse> = new Set();
+  private latestLiveJpeg: Buffer | null = null;
+  private latestLiveTimestamp: number = 0;
+  public onLiveReaction?: (reaction: { emoji: string; author?: string; time: number }) => void;
+  public onLiveViewersChanged?: (count: number) => void;
+  public onLiveQuestion?: (question: { text: string; author?: string; time: number }) => void;
+
   constructor(getMetadata: () => RecordingMeta[], saveMetadata: (list: RecordingMeta[]) => void) {
     this.getMetadata = getMetadata;
     this.saveMetadata = saveMetadata;
@@ -49,6 +62,114 @@ export class ShareServer {
 
   public getPort(): number {
     return this.port;
+  }
+
+  // Live Screen Sharing Management
+  public startLive(title: string = 'Apresentação ao Vivo') {
+    this.isLive = true;
+    this.isLivePaused = false;
+    this.liveTitle = title;
+    this.liveStartTime = Date.now();
+    this.broadcastLiveEvent({ type: 'status', status: this.getLiveStatus() });
+    return this.getLiveUrls();
+  }
+
+  public stopLive() {
+    this.isLive = false;
+    this.isLivePaused = false;
+    this.broadcastLiveEvent({ type: 'status', status: this.getLiveStatus() });
+    for (const client of this.activeLiveClients) {
+      try {
+        client.end();
+      } catch (e) {}
+    }
+    this.activeLiveClients.clear();
+    this.notifyViewersChanged();
+  }
+
+  public setLivePaused(paused: boolean) {
+    this.isLivePaused = paused;
+    this.broadcastLiveEvent({ type: 'status', status: this.getLiveStatus() });
+  }
+
+  public isLiveActive(): boolean {
+    return this.isLive;
+  }
+
+  public isPaused(): boolean {
+    return this.isLivePaused;
+  }
+
+  public getLiveViewersCount(): number {
+    return this.activeLiveClients.size;
+  }
+
+  public getLiveUrl(): string {
+    if (this.publicTunnelUrl) {
+      return `${this.publicTunnelUrl}/live`;
+    }
+    return `http://${this.localIp}:${this.port}/live`;
+  }
+
+  public getLiveUrls() {
+    return {
+      networkUrl: `http://${this.localIp}:${this.port}/live`,
+      localUrl: `http://localhost:${this.port}/live`,
+      publicUrl: this.publicTunnelUrl ? `${this.publicTunnelUrl}/live` : null
+    };
+  }
+
+  public getLiveStatus() {
+    return {
+      isLive: this.isLive,
+      isPaused: this.isLivePaused,
+      viewers: this.activeLiveClients.size,
+      title: this.liveTitle,
+      uptime: this.isLive ? Math.floor((Date.now() - this.liveStartTime) / 1000) : 0,
+      url: this.getLiveUrl(),
+      urls: this.getLiveUrls()
+    };
+  }
+
+  public broadcastLiveFrame(jpegBuffer: Buffer) {
+    if (!this.isLive) return;
+    this.latestLiveJpeg = jpegBuffer;
+    this.latestLiveTimestamp = Date.now();
+
+    if (this.isLivePaused) return;
+
+    for (const client of this.activeLiveClients) {
+      try {
+        this.writeFrameToClient(client, jpegBuffer);
+      } catch (err) {
+        this.activeLiveClients.delete(client);
+      }
+    }
+  }
+
+  private writeFrameToClient(res: http.ServerResponse, buffer: Buffer) {
+    res.write(`--frame\r\nContent-Type: image/jpeg\r\nContent-Length: ${buffer.length}\r\n\r\n`);
+    res.write(buffer);
+    res.write('\r\n');
+  }
+
+  private notifyViewersChanged() {
+    const count = this.activeLiveClients.size;
+    this.broadcastLiveEvent({ type: 'viewers', count });
+    if (this.onLiveViewersChanged) {
+      this.onLiveViewersChanged(count);
+    }
+  }
+
+  private broadcastLiveEvent(event: any) {
+    const payload = `data: ${JSON.stringify(event)}\n\n`;
+    for (const client of this.liveEventClients) {
+      try {
+        client.write(payload);
+      } catch (e) {
+        this.liveEventClients.delete(client);
+      }
+    }
   }
 
   public start(): Promise<number> {
@@ -160,6 +281,38 @@ export class ShareServer {
 
     const url = new URL(req.url || '/', `http://${req.headers.host}`);
     const pathname = url.pathname;
+
+    // LIVE STREAMING & SCREEN SHARE ENDPOINTS
+    if (pathname === '/live' || pathname === '/live/') {
+      this.renderLiveViewer(req, res);
+      return;
+    }
+
+    if (pathname === '/live/stream') {
+      this.handleLiveStream(req, res);
+      return;
+    }
+
+    if (pathname === '/api/live/events') {
+      this.handleLiveEvents(req, res);
+      return;
+    }
+
+    if (pathname === '/api/live/status') {
+      res.writeHead(200, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify(this.getLiveStatus()));
+      return;
+    }
+
+    if (req.method === 'POST' && pathname === '/api/live/reaction') {
+      this.handleLiveReactionPost(req, res);
+      return;
+    }
+
+    if (req.method === 'POST' && pathname === '/api/live/question') {
+      this.handleLiveQuestionPost(req, res);
+      return;
+    }
 
     // 1. Video streaming endpoint: /video/:id
     if (pathname.startsWith('/video/')) {
@@ -892,6 +1045,334 @@ export class ShareServer {
       ${itemsHtml || '<div class="col-span-full py-16 text-center text-slate-500 text-sm">Nenhum vídeo gravado ainda. Inicie sua primeira gravação com o Aura Screen Studio!</div>'}
     </div>
   </div>
+</body>
+</html>`;
+
+    res.writeHead(200, { 'Content-Type': 'text/html; charset=utf-8' });
+    res.end(html);
+  }
+
+  private handleLiveStream(req: http.IncomingMessage, res: http.ServerResponse) {
+    res.writeHead(200, {
+      'Content-Type': 'multipart/x-mixed-replace; boundary=--frame',
+      'Cache-Control': 'no-cache, no-store, must-revalidate',
+      'Connection': 'keep-alive',
+      'Pragma': 'no-cache',
+      'Expires': '0'
+    });
+
+    this.activeLiveClients.add(res);
+    this.notifyViewersChanged();
+
+    if (this.latestLiveJpeg && !this.isLivePaused) {
+      try {
+        this.writeFrameToClient(res, this.latestLiveJpeg);
+      } catch (e) {}
+    }
+
+    const cleanup = () => {
+      this.activeLiveClients.delete(res);
+      this.notifyViewersChanged();
+    };
+
+    req.on('close', cleanup);
+    req.on('end', cleanup);
+    res.on('error', cleanup);
+  }
+
+  private handleLiveEvents(req: http.IncomingMessage, res: http.ServerResponse) {
+    res.writeHead(200, {
+      'Content-Type': 'text/event-stream',
+      'Cache-Control': 'no-cache',
+      'Connection': 'keep-alive'
+    });
+
+    res.write(`data: ${JSON.stringify({ type: 'init', status: this.getLiveStatus() })}\n\n`);
+
+    this.liveEventClients.add(res);
+
+    const cleanup = () => {
+      this.liveEventClients.delete(res);
+    };
+
+    req.on('close', cleanup);
+    res.on('error', cleanup);
+  }
+
+  private handleLiveReactionPost(req: http.IncomingMessage, res: http.ServerResponse) {
+    let body = '';
+    req.on('data', (chunk) => (body += chunk));
+    req.on('end', () => {
+      try {
+        const data = JSON.parse(body);
+        const emoji = data.emoji || '👍';
+        const author = data.author || 'Espectador';
+        const item = { emoji, author, time: Date.now() };
+
+        this.broadcastLiveEvent({ type: 'reaction', ...item });
+        if (this.onLiveReaction) {
+          this.onLiveReaction(item);
+        }
+
+        res.writeHead(200, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify({ success: true }));
+        return;
+      } catch (e) {}
+      res.writeHead(400);
+      res.end(JSON.stringify({ error: 'Invalid reaction' }));
+    });
+  }
+
+  private handleLiveQuestionPost(req: http.IncomingMessage, res: http.ServerResponse) {
+    let body = '';
+    req.on('data', (chunk) => (body += chunk));
+    req.on('end', () => {
+      try {
+        const data = JSON.parse(body);
+        const text = data.text?.trim() || '';
+        const author = data.author || 'Espectador';
+        if (text) {
+          const item = { text, author, time: Date.now() };
+          this.broadcastLiveEvent({ type: 'question', ...item });
+          if (this.onLiveQuestion) {
+            this.onLiveQuestion(item);
+          }
+          res.writeHead(200, { 'Content-Type': 'application/json' });
+          res.end(JSON.stringify({ success: true }));
+          return;
+        }
+      } catch (e) {}
+      res.writeHead(400);
+      res.end(JSON.stringify({ error: 'Invalid question' }));
+    });
+  }
+
+  private renderLiveViewer(req: http.IncomingMessage, res: http.ServerResponse) {
+    const html = `<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Aura Screen Studio — Transmissão ao Vivo (Zoom Pro Suite)</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    @keyframes floatUp {
+      0% { transform: translateY(0) scale(0.7); opacity: 1; }
+      100% { transform: translateY(-160px) scale(1.4); opacity: 0; }
+    }
+    .floating-reaction {
+      position: absolute;
+      pointer-events: none;
+      font-size: 2.2rem;
+      animation: floatUp 2.4s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+      z-index: 50;
+    }
+  </style>
+</head>
+<body class="bg-[#07090e] text-slate-100 min-h-screen flex flex-col font-['Plus_Jakarta_Sans',sans-serif] selection:bg-indigo-500 selection:text-white">
+  <header class="border-b border-[#181d2a] bg-[#0c101a]/80 backdrop-blur-md px-4 sm:px-6 py-3 flex items-center justify-between sticky top-0 z-30">
+    <div class="flex items-center space-x-3">
+      <div class="w-8 h-8 rounded-xl bg-gradient-to-tr from-indigo-600 via-indigo-500 to-rose-500 flex items-center justify-center shadow-lg shadow-indigo-500/20">
+        <svg class="w-4 h-4 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="2" />
+          <circle cx="12" cy="12" r="3.5" fill="currentColor" />
+        </svg>
+      </div>
+      <div>
+        <div class="flex items-center space-x-2">
+          <h1 class="text-sm font-bold text-white tracking-tight" id="liveTitle">${this.escapeHtml(this.liveTitle)}</h1>
+          <span id="liveBadge" class="inline-flex items-center space-x-1.5 px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider ${this.isLive ? (this.isLivePaused ? 'bg-amber-500/20 text-amber-400 border border-amber-500/40' : 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/40') : 'bg-slate-800 text-slate-400 border border-slate-700'}">
+            <span class="w-1.5 h-1.5 rounded-full ${this.isLive ? (this.isLivePaused ? 'bg-amber-400' : 'bg-emerald-400 animate-ping') : 'bg-slate-500'}"></span>
+            <span>${this.isLive ? (this.isLivePaused ? 'PAUSADO' : 'AO VIVO') : 'OFFLINE'}</span>
+          </span>
+        </div>
+        <p class="text-[11px] text-slate-400">Transmissão em tempo real via Aura Screen Studio (Zoom Pro Suite)</p>
+      </div>
+    </div>
+
+    <div class="flex items-center space-x-3">
+      <div class="flex items-center space-x-1.5 bg-[#141926] border border-[#23293a] px-2.5 py-1 rounded-lg text-xs text-slate-300">
+        <svg class="w-3.5 h-3.5 text-indigo-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
+        </svg>
+        <span id="viewerCount" class="font-bold text-white">${this.activeLiveClients.size}</span>
+        <span class="hidden sm:inline text-slate-400">assistindo</span>
+      </div>
+
+      <div class="hidden sm:flex items-center space-x-1.5 bg-[#141926] border border-[#23293a] px-2.5 py-1 rounded-lg text-xs text-slate-300 font-mono">
+        <span class="text-slate-400">Duração:</span>
+        <span id="uptimeDisplay" class="font-bold text-indigo-300">00:00</span>
+      </div>
+
+      <button id="fullscreenBtn" class="p-1.5 rounded-lg bg-[#141926] hover:bg-[#1e2538] border border-[#23293a] text-slate-300 hover:text-white transition-colors" title="Tela Cheia (F)">
+        <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4" />
+        </svg>
+      </button>
+    </div>
+  </header>
+
+  <main class="flex-1 flex flex-col items-center justify-center p-3 sm:p-6 relative overflow-hidden">
+    <div id="videoContainer" class="relative w-full max-w-6xl aspect-video bg-[#030508] rounded-2xl overflow-hidden border border-[#1e2538] shadow-2xl flex items-center justify-center group">
+      
+      <img id="streamImg" src="/live/stream" alt="Compartilhamento de Tela" class="w-full h-full object-contain select-none" />
+
+      <div id="pausedOverlay" class="${this.isLive && this.isLivePaused ? '' : 'hidden'} absolute inset-0 bg-[#07090e]/90 backdrop-blur-md flex flex-col items-center justify-center z-20 text-center p-6 transition-all duration-300">
+        <div class="w-16 h-16 rounded-2xl bg-amber-500/20 border border-amber-500/40 flex items-center justify-center text-amber-400 mb-4 animate-pulse shadow-lg shadow-amber-500/10">
+          <svg class="w-8 h-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 9v6m4-6v6m7-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+          </svg>
+        </div>
+        <h2 class="text-xl font-bold text-white mb-1.5">Compartilhamento de Tela Pausado</h2>
+        <p class="text-slate-400 text-sm max-w-sm">O apresentador pausou temporariamente a exibição da tela. A transmissão continuará em instantes.</p>
+      </div>
+
+      <div id="offlineOverlay" class="${this.isLive ? 'hidden' : ''} absolute inset-0 bg-[#07090e]/95 backdrop-blur-md flex flex-col items-center justify-center z-20 text-center p-6 transition-all duration-300">
+        <div class="w-16 h-16 rounded-2xl bg-indigo-500/20 border border-indigo-500/40 flex items-center justify-center text-indigo-400 mb-4 shadow-lg shadow-indigo-500/10">
+          <svg class="w-8 h-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z" />
+          </svg>
+        </div>
+        <h2 class="text-xl font-bold text-white mb-1.5">Aguardando Início da Transmissão</h2>
+        <p class="text-slate-400 text-sm max-w-sm">O apresentador ainda não iniciou a transmissão. Esta tela se conectará automaticamente assim que a live começar.</p>
+      </div>
+
+      <div id="reactionsLayer" class="absolute inset-0 pointer-events-none overflow-hidden z-30"></div>
+    </div>
+  </main>
+
+  <footer class="border-t border-[#181d2a] bg-[#0c101a]/90 backdrop-blur-md px-4 py-3 sticky bottom-0 z-30 flex flex-wrap items-center justify-between gap-3">
+    <div class="flex items-center space-x-2">
+      <span class="text-xs text-slate-400 hidden sm:inline">Reações ao vivo:</span>
+      <div class="flex items-center space-x-1.5 bg-[#141926] p-1 rounded-xl border border-[#23293a]">
+        <button onclick="sendReaction('👏')" class="px-2.5 py-1 rounded-lg hover:bg-slate-700/60 active:scale-95 transition-all text-base" title="Aplaudir">👏</button>
+        <button onclick="sendReaction('❤️')" class="px-2.5 py-1 rounded-lg hover:bg-slate-700/60 active:scale-95 transition-all text-base" title="Amei">❤️</button>
+        <button onclick="sendReaction('👍')" class="px-2.5 py-1 rounded-lg hover:bg-slate-700/60 active:scale-95 transition-all text-base" title="Gostei">👍</button>
+        <button onclick="sendReaction('🔥')" class="px-2.5 py-1 rounded-lg hover:bg-slate-700/60 active:scale-95 transition-all text-base" title="Incrível">🔥</button>
+        <button onclick="sendReaction('💡')" class="px-2.5 py-1 rounded-lg hover:bg-slate-700/60 active:scale-95 transition-all text-base" title="Ideia">💡</button>
+        <button onclick="sendReaction('❓')" class="px-2.5 py-1 rounded-lg hover:bg-slate-700/60 active:scale-95 transition-all text-base" title="Dúvida">❓</button>
+      </div>
+    </div>
+
+    <form id="questionForm" onsubmit="submitQuestion(event)" class="flex items-center space-x-2 w-full sm:w-auto">
+      <input
+        type="text"
+        id="questionInput"
+        placeholder="Fazer pergunta ao apresentador..."
+        class="bg-[#141926] border border-[#23293a] focus:border-indigo-500 rounded-xl px-3 py-1.5 text-xs text-white placeholder-slate-500 outline-none w-full sm:w-72 transition-colors"
+      />
+      <button type="submit" class="bg-indigo-600 hover:bg-indigo-500 active:scale-95 text-white font-medium px-3 py-1.5 rounded-xl text-xs transition-all shrink-0">
+        Enviar
+      </button>
+    </form>
+  </footer>
+
+  <script>
+    let uptimeSeconds = 0;
+    setInterval(() => {
+      uptimeSeconds++;
+      const m = Math.floor(uptimeSeconds / 60).toString().padStart(2, '0');
+      const s = (uptimeSeconds % 60).toString().padStart(2, '0');
+      document.getElementById('uptimeDisplay').textContent = m + ':' + s;
+    }, 1000);
+
+    document.getElementById('fullscreenBtn').addEventListener('click', () => {
+      const el = document.getElementById('videoContainer');
+      if (!document.fullscreenElement) {
+        el.requestFullscreen().catch(() => {});
+      } else {
+        document.exitFullscreen().catch(() => {});
+      }
+    });
+
+    const streamImg = document.getElementById('streamImg');
+    streamImg.onerror = () => {
+      setTimeout(() => {
+        streamImg.src = '/live/stream?t=' + Date.now();
+      }, 2000);
+    };
+
+    function spawnParticle(emoji) {
+      const layer = document.getElementById('reactionsLayer');
+      if (!layer) return;
+      const el = document.createElement('div');
+      el.className = 'floating-reaction';
+      el.textContent = emoji;
+      el.style.left = (Math.random() * 70 + 15) + '%';
+      el.style.bottom = '20px';
+      layer.appendChild(el);
+      setTimeout(() => el.remove(), 2500);
+    }
+
+    function sendReaction(emoji) {
+      spawnParticle(emoji);
+      fetch('/api/live/reaction', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ emoji })
+      }).catch(() => {});
+    }
+
+    function submitQuestion(e) {
+      e.preventDefault();
+      const input = document.getElementById('questionInput');
+      const val = input.value.trim();
+      if (!val) return;
+      fetch('/api/live/question', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ text: val })
+      }).then(() => {
+        input.value = '';
+        input.placeholder = 'Pergunta enviada!';
+        setTimeout(() => { input.placeholder = 'Fazer pergunta ao apresentador...'; }, 3000);
+      }).catch(() => {});
+    }
+
+    function connectEvents() {
+      const evtSource = new EventSource('/api/live/events');
+      evtSource.onmessage = (e) => {
+        try {
+          const data = JSON.parse(e.data);
+          if (data.type === 'init' || data.type === 'status') {
+            const status = data.status || data;
+            const pausedOverlay = document.getElementById('pausedOverlay');
+            const offlineOverlay = document.getElementById('offlineOverlay');
+            const liveBadge = document.getElementById('liveBadge');
+
+            if (!status.isLive) {
+              offlineOverlay.classList.remove('hidden');
+              pausedOverlay.classList.add('hidden');
+              liveBadge.innerHTML = '<span>OFFLINE</span>';
+              liveBadge.className = 'inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider bg-slate-800 text-slate-400 border border-slate-700';
+            } else if (status.isPaused) {
+              pausedOverlay.classList.remove('hidden');
+              offlineOverlay.classList.add('hidden');
+              liveBadge.innerHTML = '<span>PAUSADO</span>';
+              liveBadge.className = 'inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider bg-amber-500/20 text-amber-400 border border-amber-500/40';
+            } else {
+              pausedOverlay.classList.add('hidden');
+              offlineOverlay.classList.add('hidden');
+              liveBadge.innerHTML = '<span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-ping mr-1"></span><span>AO VIVO</span>';
+              liveBadge.className = 'inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider bg-emerald-500/20 text-emerald-400 border border-emerald-500/40';
+            }
+          } else if (data.type === 'viewers') {
+            document.getElementById('viewerCount').textContent = data.count;
+          } else if (data.type === 'reaction') {
+            spawnParticle(data.emoji);
+          }
+        } catch (err) {}
+      };
+      evtSource.onerror = () => {
+        evtSource.close();
+        setTimeout(connectEvents, 3000);
+      };
+    }
+    connectEvents();
+  </script>
 </body>
 </html>`;
 
