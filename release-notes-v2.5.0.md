@@ -50,10 +50,19 @@ Bem-vindo ao **Aura Screen Studio v2.5.0**! Esta versão eleva o produto para o 
 
 ---
 
-### 4. 📸 Captura Instantânea de Frame PNG em Resolução Nativa
-- **Exportação com 1 Clique**: Capture o segundo exato do vídeo em resolução nativa (`1080p`, `4K`, etc.).
+### 4. 📸 Captura Instantânea de Frame PNG & Mockup Screen Studio
+- **Exportação Inteligente com 1 Clique**:
+  - Na aba **Assistir & Capítulos**: captura o frame puro do vídeo em resolução nativa (`1080p`, `4K`).
+  - Na aba **Moldura & Canvas Studio**: gera e renderiza o mockup completo com o wallpaper de estúdio selecionado, sombra 3D, bordas arredondadas e cabeçalho macOS com traffic lights (🔴 🟡 🟢).
 - **Cópia Automática para o Clipboard**: Pronto para colar diretamente no Slack, GitHub Pull Requests, WhatsApp ou Figma com feedback de confetes.
 - **Atalho Rápido Tecla P**: Pressione `P` a qualquer momento para capturar o frame.
+
+---
+
+### 5. ⌨️ Modal Interativo de Atalhos de Teclado (Cheat-Sheet)
+- **Acesso Rápido Tecla `?` ou Botão na Barra Superior**:
+  - Modal suspenso moderno com todos os atalhos organizados por categoria: Reprodução & Linha do Tempo, Estúdio de Corte, Canvas & Zoom Cinematográfico e Compartilhamento.
+  - Fechamento instantâneo via tecla `Esc`.
 
 ---
 

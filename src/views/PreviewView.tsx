@@ -35,7 +35,9 @@ import {
   Monitor,
   Smartphone,
   Square,
-  LayoutTemplate
+  LayoutTemplate,
+  Keyboard,
+  HelpCircle
 } from 'lucide-react';
 import { RecordingMeta, ChapterItem } from '../types';
 import confetti from 'canvas-confetti';
@@ -85,6 +87,7 @@ export const PreviewView: React.FC = () => {
   const [isLinkCopied, setIsLinkCopied] = useState(false);
   const [isPathCopied, setIsPathCopied] = useState(false);
   const [showMoreMenu, setShowMoreMenu] = useState(false);
+  const [isShortcutsModalOpen, setIsShortcutsModalOpen] = useState(false);
 
   // Title editing state
   const [isEditingTitle, setIsEditingTitle] = useState(false);
@@ -267,6 +270,12 @@ export const PreviewView: React.FC = () => {
         }
       }
 
+      if (isShortcutsModalOpen && (e.key === 'Escape' || e.key === 'Enter')) {
+        e.preventDefault();
+        setIsShortcutsModalOpen(false);
+        return;
+      }
+
       if (showMoreMenu && e.key === 'Escape') {
         e.preventDefault();
         setShowMoreMenu(false);
@@ -275,6 +284,12 @@ export const PreviewView: React.FC = () => {
 
       const target = e.target as HTMLElement;
       if (target && (target.tagName === 'INPUT' || target.tagName === 'TEXTAREA')) return;
+
+      if (e.key === '?' || (e.shiftKey && e.key === '/')) {
+        e.preventDefault();
+        setIsShortcutsModalOpen(prev => !prev);
+        return;
+      }
 
       if (e.code === 'Space') {
         e.preventDefault();
@@ -506,11 +521,168 @@ export const PreviewView: React.FC = () => {
     try {
       const video = videoRef.current;
       const canvas = document.createElement('canvas');
-      canvas.width = video.videoWidth;
-      canvas.height = video.videoHeight;
-      const ctx = canvas.getContext('2d');
-      if (!ctx) return;
-      ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+
+      if (studioTab === 'canvas') {
+        // Render Full Screen Studio Framed Presentation Canvas!
+        let outW = 1920;
+        let outH = 1080;
+        if (aspectRatio === '9-16') {
+          outW = 1080;
+          outH = 1920;
+        } else if (aspectRatio === '1-1') {
+          outW = 1440;
+          outH = 1440;
+        } else if (aspectRatio === '4-3') {
+          outW = 1600;
+          outH = 1200;
+        }
+
+        canvas.width = outW;
+        canvas.height = outH;
+        const ctx = canvas.getContext('2d');
+        if (!ctx) return;
+
+        // 1. Draw Backdrop Gradient
+        const grad = ctx.createLinearGradient(0, 0, outW, outH);
+        if (canvasBackdrop === 'nocturne') {
+          grad.addColorStop(0, '#0B0E14');
+          grad.addColorStop(0.5, '#121722');
+          grad.addColorStop(1, '#1A2A47');
+        } else if (canvasBackdrop === 'sunset') {
+          grad.addColorStop(0, '#2B0E13');
+          grad.addColorStop(0.5, '#4A1525');
+          grad.addColorStop(1, '#1A2A47');
+        } else if (canvasBackdrop === 'cyberpunk') {
+          grad.addColorStop(0, '#0B1426');
+          grad.addColorStop(0.5, '#1E1B4B');
+          grad.addColorStop(1, '#3B0764');
+        } else if (canvasBackdrop === 'emerald') {
+          grad.addColorStop(0, '#062419');
+          grad.addColorStop(0.5, '#0F382C');
+          grad.addColorStop(1, '#0B0E14');
+        } else if (canvasBackdrop === 'frosted') {
+          grad.addColorStop(0, '#191F2B');
+          grad.addColorStop(1, '#121722');
+        } else {
+          grad.addColorStop(0, '#000000');
+          grad.addColorStop(1, '#000000');
+        }
+        ctx.fillStyle = grad;
+        ctx.fillRect(0, 0, outW, outH);
+
+        // 2. Compute Inset Window Rect
+        const padRatio = (canvasPadding * 2) / 100;
+        const padX = Math.round(outW * padRatio);
+        const padY = Math.round(outH * padRatio);
+        const winX = padX;
+        const winY = padY;
+        const winW = outW - 2 * padX;
+        const winH = outH - 2 * padY;
+        const rad = Math.min(frameRadius * 2, 48);
+
+        // 3. Draw Shadow
+        if (frameShadow !== 'none') {
+          ctx.save();
+          if (frameShadow === 'glow') {
+            ctx.shadowColor = 'rgba(120, 165, 255, 0.5)';
+            ctx.shadowBlur = 60;
+            ctx.shadowOffsetY = 15;
+          } else if (frameShadow === 'cinematic') {
+            ctx.shadowColor = 'rgba(0, 0, 0, 0.85)';
+            ctx.shadowBlur = 50;
+            ctx.shadowOffsetY = 25;
+          } else {
+            ctx.shadowColor = 'rgba(0, 0, 0, 0.5)';
+            ctx.shadowBlur = 30;
+            ctx.shadowOffsetY = 10;
+          }
+          ctx.fillStyle = '#000000';
+          ctx.beginPath();
+          ctx.roundRect(winX, winY, winW, winH, rad);
+          ctx.fill();
+          ctx.restore();
+        }
+
+        // 4. Clip Window Container
+        ctx.save();
+        ctx.beginPath();
+        ctx.roundRect(winX, winY, winW, winH, rad);
+        ctx.clip();
+
+        // Background of window
+        ctx.fillStyle = '#0B0E14';
+        ctx.fillRect(winX, winY, winW, winH);
+
+        let videoAreaY = winY;
+        let videoAreaH = winH;
+
+        // 5. Header / macOS Titlebar
+        if (hasWindowHeader) {
+          const headerH = 46;
+          ctx.fillStyle = '#121722';
+          ctx.fillRect(winX, winY, winW, headerH);
+          ctx.strokeStyle = '#303A4B';
+          ctx.lineWidth = 1;
+          ctx.beginPath();
+          ctx.moveTo(winX, winY + headerH);
+          ctx.lineTo(winX + winW, winY + headerH);
+          ctx.stroke();
+
+          // Traffic light dots
+          const dotY = winY + headerH / 2;
+          ctx.fillStyle = '#FF5F56';
+          ctx.beginPath();
+          ctx.arc(winX + 24, dotY, 6, 0, Math.PI * 2);
+          ctx.fill();
+          ctx.fillStyle = '#FFBD2E';
+          ctx.beginPath();
+          ctx.arc(winX + 44, dotY, 6, 0, Math.PI * 2);
+          ctx.fill();
+          ctx.fillStyle = '#27C93F';
+          ctx.beginPath();
+          ctx.arc(winX + 64, dotY, 6, 0, Math.PI * 2);
+          ctx.fill();
+
+          // Title text
+          ctx.fillStyle = '#B7C0CE';
+          ctx.font = 'bold 15px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif';
+          ctx.textAlign = 'center';
+          ctx.textBaseline = 'middle';
+          const titleStr = meta?.title || 'Aura Screen Studio';
+          ctx.fillText(titleStr, winX + winW / 2, dotY);
+
+          videoAreaY += headerH;
+          videoAreaH -= headerH;
+        }
+
+        // 6. Draw video frame centered inside videoArea
+        const videoRatio = video.videoWidth / video.videoHeight;
+        const areaRatio = winW / videoAreaH;
+        let drawW = winW;
+        let drawH = videoAreaH;
+        let drawX = winX;
+        let drawY = videoAreaY;
+
+        if (videoRatio > areaRatio) {
+          drawW = winW;
+          drawH = winW / videoRatio;
+          drawY = videoAreaY + (videoAreaH - drawH) / 2;
+        } else {
+          drawH = videoAreaH;
+          drawW = videoAreaH * videoRatio;
+          drawX = winX + (winW - drawW) / 2;
+        }
+
+        ctx.drawImage(video, drawX, drawY, drawW, drawH);
+        ctx.restore();
+      } else {
+        // Raw native video frame
+        canvas.width = video.videoWidth;
+        canvas.height = video.videoHeight;
+        const ctx = canvas.getContext('2d');
+        if (!ctx) return;
+        ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+      }
 
       canvas.toBlob(async (blob) => {
         if (!blob) return;
@@ -518,13 +690,18 @@ export const PreviewView: React.FC = () => {
           await navigator.clipboard.write([
             new ClipboardItem({ 'image/png': blob })
           ]);
-          showToast(`📸 Frame ${formatTime(currentTime)} copiado (${canvas.width}x${canvas.height})!`, 'success');
-          confetti({ particleCount: 30, spread: 45, origin: { y: 0.8 } });
+          showToast(
+            studioTab === 'canvas'
+              ? `🎨 Mockup Screen Studio copiado (${canvas.width}x${canvas.height})!`
+              : `📸 Frame copiado em resolução nativa (${canvas.width}x${canvas.height})!`,
+            'success'
+          );
+          confetti({ particleCount: 35, spread: 50, origin: { y: 0.8 } });
         } catch (clipErr) {
           const url = URL.createObjectURL(blob);
           const a = document.createElement('a');
           a.href = url;
-          a.download = `Aura_Frame_${formatTime(currentTime).replace(':', '_')}.png`;
+          a.download = `Aura_Studio_${studioTab === 'canvas' ? 'Mockup_' : 'Frame_'}${formatTime(currentTime).replace(':', '_')}.png`;
           a.click();
           URL.revokeObjectURL(url);
           showToast('📸 Frame salvo em arquivo PNG!', 'success');
@@ -1017,6 +1194,15 @@ export const PreviewView: React.FC = () => {
           >
             <PlusCircle className="w-3.5 h-3.5 text-[#78A5FF]" />
             <span className="hidden sm:inline">Nova Gravação</span>
+          </button>
+
+          {/* Shortcuts Help Guide */}
+          <button
+            onClick={() => setIsShortcutsModalOpen(true)}
+            className="p-2 rounded-xl bg-[#191F2B] hover:bg-[#222B39] border border-[#303A4B] text-[#B7C0CE] hover:text-[#78A5FF] transition-all shadow-sm"
+            title="Guia de Atalhos do Studio (Tecla ?)"
+          >
+            <Keyboard className="w-3.5 h-3.5" />
           </button>
 
           {/* More Actions Dropdown Menu */}
@@ -2045,6 +2231,138 @@ export const PreviewView: React.FC = () => {
           </div>
         </div>
       </div>
+
+      {/* Interactive Studio Shortcuts Cheat-Sheet Modal */}
+      {isShortcutsModalOpen && (
+        <div className="fixed inset-0 z-50 bg-black/75 backdrop-blur-md flex items-center justify-center p-4 animate-in fade-in">
+          <div className="bg-[#121722] border border-[#78A5FF]/40 rounded-2xl p-6 max-w-xl w-full space-y-4 shadow-2xl">
+            <div className="flex items-center justify-between pb-3 border-b border-[#303A4B]">
+              <div className="flex items-center space-x-2.5">
+                <div className="w-8 h-8 rounded-xl bg-[#191F2B] border border-[#303A4B] flex items-center justify-center text-[#78A5FF]">
+                  <Keyboard className="w-4 h-4" />
+                </div>
+                <div>
+                  <h3 className="text-sm font-bold text-[#F3F5F9]">Atalhos de Teclado do Studio</h3>
+                  <p className="text-[11px] text-[#929CAF]">Domine o player e os recursos avançados sem tirar as mãos do teclado</p>
+                </div>
+              </div>
+              <button
+                onClick={() => setIsShortcutsModalOpen(false)}
+                className="text-[#929CAF] hover:text-[#F3F5F9] p-1.5 rounded-lg hover:bg-[#191F2B] transition-colors text-xs font-mono"
+              >
+                ESC
+              </button>
+            </div>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs max-h-[60vh] overflow-y-auto pr-1">
+              {/* Reprodução */}
+              <div className="bg-[#191F2B] border border-[#303A4B] rounded-xl p-3 space-y-2">
+                <span className="font-bold text-[#78A5FF] uppercase tracking-wider text-[10px] block">
+                  ▶ Reprodução & Linha do Tempo
+                </span>
+                <div className="space-y-1.5 text-[11px]">
+                  <div className="flex items-center justify-between">
+                    <span className="text-[#B7C0CE]">Play / Pause</span>
+                    <kbd className="px-1.5 py-0.5 rounded bg-[#0B0E14] border border-[#303A4B] font-mono text-[10px] text-[#F3F5F9]">Espaço</kbd>
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <span className="text-[#B7C0CE]">Silenciar / Ativar Áudio</span>
+                    <kbd className="px-1.5 py-0.5 rounded bg-[#0B0E14] border border-[#303A4B] font-mono text-[10px] text-[#F3F5F9]">M</kbd>
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <span className="text-[#B7C0CE]">Buscar -5s / +5s</span>
+                    <kbd className="px-1.5 py-0.5 rounded bg-[#0B0E14] border border-[#303A4B] font-mono text-[10px] text-[#F3F5F9]">← / →</kbd>
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <span className="text-[#B7C0CE]">Ajustar Volume</span>
+                    <kbd className="px-1.5 py-0.5 rounded bg-[#0B0E14] border border-[#303A4B] font-mono text-[10px] text-[#F3F5F9]">↑ / ↓</kbd>
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <span className="text-[#B7C0CE]">Velocidades (1x, 1.25x, 1.5x, 2x)</span>
+                    <kbd className="px-1.5 py-0.5 rounded bg-[#0B0E14] border border-[#303A4B] font-mono text-[10px] text-[#F3F5F9]">1, 2, 3, 4</kbd>
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <span className="text-[#B7C0CE]">Tela Cheia</span>
+                    <kbd className="px-1.5 py-0.5 rounded bg-[#0B0E14] border border-[#303A4B] font-mono text-[10px] text-[#F3F5F9]">F</kbd>
+                  </div>
+                </div>
+              </div>
+
+              {/* Corte & Precisão */}
+              <div className="bg-[#191F2B] border border-[#303A4B] rounded-xl p-3 space-y-2">
+                <span className="font-bold text-[#FF647C] uppercase tracking-wider text-[10px] block">
+                  ✂ Estúdio de Corte
+                </span>
+                <div className="space-y-1.5 text-[11px]">
+                  <div className="flex items-center justify-between">
+                    <span className="text-[#B7C0CE]">Marcar Ponto Inicial</span>
+                    <kbd className="px-1.5 py-0.5 rounded bg-[#0B0E14] border border-[#303A4B] font-mono text-[10px] text-[#F3F5F9]">I</kbd>
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <span className="text-[#B7C0CE]">Marcar Ponto Final</span>
+                    <kbd className="px-1.5 py-0.5 rounded bg-[#0B0E14] border border-[#303A4B] font-mono text-[10px] text-[#F3F5F9]">O</kbd>
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <span className="text-[#B7C0CE]">Voltar / Avançar 1 Frame</span>
+                    <kbd className="px-1.5 py-0.5 rounded bg-[#0B0E14] border border-[#303A4B] font-mono text-[10px] text-[#F3F5F9]">, e .</kbd>
+                  </div>
+                </div>
+              </div>
+
+              {/* Canvas & Studio */}
+              <div className="bg-[#191F2B] border border-[#303A4B] rounded-xl p-3 space-y-2">
+                <span className="font-bold text-[#83B8FF] uppercase tracking-wider text-[10px] block">
+                  🎨 Canvas & Zoom Cinematográfico
+                </span>
+                <div className="space-y-1.5 text-[11px]">
+                  <div className="flex items-center justify-between">
+                    <span className="text-[#B7C0CE]">Alternar Zoom (1x a 2.2x)</span>
+                    <kbd className="px-1.5 py-0.5 rounded bg-[#0B0E14] border border-[#303A4B] font-mono text-[10px] text-[#F3F5F9]">Z</kbd>
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <span className="text-[#B7C0CE]">Capturar Frame PNG</span>
+                    <kbd className="px-1.5 py-0.5 rounded bg-[#0B0E14] border border-[#303A4B] font-mono text-[10px] text-[#F3F5F9]">P</kbd>
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <span className="text-[#B7C0CE]">Voz de Estúdio DSP</span>
+                    <kbd className="px-1.5 py-0.5 rounded bg-[#0B0E14] border border-[#303A4B] font-mono text-[10px] text-[#F3F5F9]">Ctrl + E</kbd>
+                  </div>
+                </div>
+              </div>
+
+              {/* Compartilhamento & Ações */}
+              <div className="bg-[#191F2B] border border-[#303A4B] rounded-xl p-3 space-y-2">
+                <span className="font-bold text-[#F2B66D] uppercase tracking-wider text-[10px] block">
+                  ⚡ Compartilhamento & Atalhos
+                </span>
+                <div className="space-y-1.5 text-[11px]">
+                  <div className="flex items-center justify-between">
+                    <span className="text-[#B7C0CE]">Copiar Link Público</span>
+                    <kbd className="px-1.5 py-0.5 rounded bg-[#0B0E14] border border-[#303A4B] font-mono text-[10px] text-[#F3F5F9]">Ctrl + L</kbd>
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <span className="text-[#B7C0CE]">Abrir Este Guia</span>
+                    <kbd className="px-1.5 py-0.5 rounded bg-[#0B0E14] border border-[#303A4B] font-mono text-[10px] text-[#F3F5F9]">?</kbd>
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <span className="text-[#B7C0CE]">Fechar Diálogo</span>
+                    <kbd className="px-1.5 py-0.5 rounded bg-[#0B0E14] border border-[#303A4B] font-mono text-[10px] text-[#F3F5F9]">Esc</kbd>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div className="pt-2 flex justify-end">
+              <button
+                onClick={() => setIsShortcutsModalOpen(false)}
+                className="py-1.5 px-4 bg-[#78A5FF] hover:bg-[#9AB9FF] text-[#101A32] text-xs font-bold rounded-xl transition-colors shadow-sm"
+              >
+                Entendido
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Non-blocking Delete Confirmation Modal */}
       {isConfirmingDelete && (
