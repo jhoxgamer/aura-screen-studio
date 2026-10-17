@@ -435,29 +435,29 @@ export const SpeakerNotesView: React.FC = () => {
 
       {/* Top Header & Draggable Titlebar */}
       <div
-        className="flex items-center justify-between px-3.5 py-2 bg-[#121722] border-b border-[#303A4B] cursor-grab active:cursor-grabbing"
+        className="flex items-center justify-between px-3 py-1.5 bg-[#121722] border-b border-[#303A4B] cursor-grab active:cursor-grabbing shrink-0"
         style={{ WebkitAppRegion: 'drag' } as any}
       >
         {/* Left Title and Status */}
-        <div className="flex items-center space-x-2">
-          <div className="w-2 h-2 rounded-full bg-[#78A5FF] shadow-sm shadow-[#78A5FF]/50 animate-pulse" />
-          <span className="text-xs font-semibold tracking-tight text-[#F3F5F9] flex items-center gap-1.5 font-mono">
+        <div className="flex items-center space-x-1.5 min-w-0 truncate pr-1">
+          <div className="w-2 h-2 rounded-full bg-[#78A5FF] shadow-sm shadow-[#78A5FF]/50 animate-pulse shrink-0" />
+          <span className="text-xs font-semibold tracking-tight text-[#F3F5F9] font-mono shrink-0">
             Aura Prompter
           </span>
           {mode === 'prompt' && (
-            <span className="text-[10px] text-[#78A5FF] bg-[#1A2A47] px-1.5 py-0.5 rounded border border-[#78A5FF]/30 font-mono font-medium">
+            <span className="text-[10px] text-[#78A5FF] bg-[#1A2A47] px-1.5 py-0.5 rounded border border-[#78A5FF]/30 font-mono font-medium truncate">
               {approximateWpm} WPM ({speed.toFixed(2)}x)
             </span>
           )}
           {mode === 'notes' && (
-            <span className="text-[10px] text-[#83B8FF] bg-[#1A2A47] px-1.5 py-0.5 rounded border border-[#83B8FF]/30 font-mono font-medium">
-              {completedBullets}/{bulletNotes.length} Feito ({bulletProgressPct}%)
+            <span className="text-[10px] text-[#83B8FF] bg-[#1A2A47] px-1.5 py-0.5 rounded border border-[#83B8FF]/30 font-mono font-medium truncate">
+              {completedBullets}/{bulletNotes.length} Feito
             </span>
           )}
         </div>
 
         {/* Right Action Icons */}
-        <div className="flex items-center space-x-1" style={{ WebkitAppRegion: 'no-drag' } as any}>
+        <div className="flex items-center space-x-1 shrink-0" style={{ WebkitAppRegion: 'no-drag' } as any}>
           {/* Quick Dock to Camera Center */}
           <button
             onClick={() => handleDock('top-center')}
@@ -470,14 +470,14 @@ export const SpeakerNotesView: React.FC = () => {
           {/* Preset Window Sizes */}
           <div className="flex items-center bg-[#191F2B] rounded-lg p-0.5 space-x-0.5 text-[9px] font-mono font-bold text-[#929CAF] border border-[#303A4B]">
             <button
-              onClick={() => handleSetSize(360, 320)}
+              onClick={() => handleSetSize(380, 340)}
               className="px-1.5 py-0.5 hover:text-[#78A5FF] hover:bg-[#222B39] rounded transition-colors"
               title="Tamanho Compacto (P)"
             >
               P
             </button>
             <button
-              onClick={() => handleSetSize(440, 520)}
+              onClick={() => handleSetSize(460, 540)}
               className="px-1.5 py-0.5 hover:text-[#78A5FF] hover:bg-[#222B39] rounded transition-colors"
               title="Tamanho Padrão (M)"
             >

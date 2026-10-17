@@ -881,7 +881,7 @@ export const PreviewView: React.FC = () => {
         </div>
 
         {/* Video Player Container */}
-        <div className="relative w-full aspect-video bg-black rounded-2xl overflow-hidden border border-[#303A4B] shadow-2xl flex items-center justify-center group shrink-0">
+        <div className="relative w-full aspect-video max-h-[50vh] bg-black rounded-2xl overflow-hidden border border-[#303A4B] shadow-2xl flex items-center justify-center group shrink-0">
           {meta?.filePath ? (
             <video
               ref={videoRef}

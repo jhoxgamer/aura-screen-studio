@@ -156,9 +156,9 @@ export const LibraryView: React.FC<LibraryViewProps> = ({ onNavigateToRecord, is
           )}
         </div>
 
-        <div className="flex items-center justify-between text-[11px] text-[#B7C0CE] px-1 gap-2 flex-wrap">
-          <div className="flex items-center space-x-1">
-            <span className="text-[#929CAF] text-[10px] uppercase font-bold tracking-wider mr-0.5">Ordenar:</span>
+        <div className="flex items-center justify-between text-[11px] text-[#B7C0CE] px-0.5 gap-2 flex-nowrap overflow-x-auto scrollbar-none">
+          <div className="flex items-center space-x-1 shrink-0">
+            <span className="text-[#929CAF] text-[10px] uppercase font-bold tracking-wider mr-0.5">Ordem:</span>
             {(
               [
                 { id: 'newest', label: 'Recentes' },
@@ -170,7 +170,7 @@ export const LibraryView: React.FC<LibraryViewProps> = ({ onNavigateToRecord, is
               <button
                 key={item.id}
                 onClick={() => setSortCriteria(item.id)}
-                className={`px-2 py-0.5 rounded-lg text-[10px] font-medium transition-all ${
+                className={`px-1.5 py-0.5 rounded-lg text-[10px] font-medium transition-all ${
                   sortCriteria === item.id
                     ? 'bg-[#1A2A47] text-[#78A5FF] border border-[#78A5FF]/40'
                     : 'text-[#929CAF] hover:text-[#F3F5F9] hover:bg-[#191F2B]'

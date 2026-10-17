@@ -102,14 +102,21 @@ function createPreRecordingWindow(initialTab?: string) {
   const primaryDisplay = screen.getPrimaryDisplay();
   const { width, height } = primaryDisplay.workAreaSize;
 
+  const winWidth = 470;
+  const winHeight = Math.min(840, Math.max(600, height - 50));
+
   preRecordingWindow = new BrowserWindow({
-    width: 460,
-    height: Math.min(730, Math.max(580, height - 30)),
-    x: Math.round(width - 490),
-    y: Math.max(10, Math.round(height - 760)),
+    width: winWidth,
+    height: winHeight,
+    minWidth: 440,
+    minHeight: 560,
+    maxWidth: 620,
+    maxHeight: 1000,
+    x: Math.round(width - winWidth - 25),
+    y: Math.max(15, Math.round((height - winHeight) / 2)),
     frame: false,
     transparent: true,
-    resizable: false,
+    resizable: true,
     alwaysOnTop: true,
     skipTaskbar: false,
     icon: path.join(__dirname, '../public/assets/application-icons/app-icon-tray.ico'),
@@ -175,11 +182,11 @@ function createCameraBubbleWindow(size: BubbleSize = 'medium') {
 function getBubbleDimensions(size: BubbleSize) {
   switch (size) {
     case 'small':
-      return { width: 170, height: 170 };
+      return { width: 190, height: 190 };
     case 'medium':
-      return { width: 250, height: 250 };
+      return { width: 260, height: 260 };
     case 'large':
-      return { width: 340, height: 340 };
+      return { width: 350, height: 350 };
     case 'fullscreen': {
       const primary = screen.getPrimaryDisplay();
       return { width: primary.bounds.width, height: primary.bounds.height };
@@ -217,12 +224,13 @@ function createControlBarWindow() {
   }
 
   const primaryDisplay = screen.getPrimaryDisplay();
-  const { height } = primaryDisplay.workAreaSize;
+  const { width, height } = primaryDisplay.workAreaSize;
+  const barWidth = 600;
 
   controlBarWindow = new BrowserWindow({
-    width: 540,
+    width: barWidth,
     height: 74,
-    x: 300,
+    x: Math.round((width - barWidth) / 2),
     y: Math.round(height - 110),
     frame: false,
     transparent: true,
@@ -405,11 +413,11 @@ function toggleSpeakerNotesWindow() {
   const { width } = primaryDisplay.workAreaSize;
 
   speakerNotesWindow = new BrowserWindow({
-    width: 440,
-    height: 520,
-    minWidth: 300,
-    minHeight: 46,
-    x: Math.round(width / 2 - 220),
+    width: 460,
+    height: 540,
+    minWidth: 380,
+    minHeight: 120,
+    x: Math.round(width / 2 - 230),
     y: 35,
     frame: false,
     transparent: true,
@@ -530,7 +538,7 @@ function createZoomShareBarWindow() {
 
   const primaryDisplay = screen.getPrimaryDisplay();
   const { width } = primaryDisplay.workAreaSize;
-  const barWidth = 860;
+  const barWidth = Math.min(990, width - 40);
   const barHeight = 72;
 
   zoomShareBarWindow = new BrowserWindow({

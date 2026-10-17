@@ -656,7 +656,7 @@ export const PreRecordingView: React.FC<PreRecordingViewProps> = ({ initialTab =
           <div className="flex items-center space-x-2">
             <span className="font-semibold text-sm tracking-tight text-[#F3F5F9]">Aura Screen Studio</span>
             <span className="text-[10px] text-[#B7C0CE] bg-[#191F2B] border border-[#303A4B] px-1.5 py-0.5 rounded font-mono">
-              v{appVersion || '2.4.0'}
+              v{appVersion || '2.4.1'}
             </span>
           </div>
         </div>
@@ -720,7 +720,9 @@ export const PreRecordingView: React.FC<PreRecordingViewProps> = ({ initialTab =
       {activeTab === 'library' ? (
         <LibraryView onNavigateToRecord={() => setActiveTab('record')} />
       ) : (
-        <div className="flex-1 p-4 overflow-y-auto space-y-4" role="tabpanel" aria-label="Nova Gravação">
+        <div className="flex-1 min-h-0 flex flex-col overflow-hidden" role="tabpanel" aria-label="Nova Gravação">
+          {/* Scrollable Configuration Body */}
+          <div className="flex-1 min-h-0 overflow-y-auto p-4 space-y-3 pr-2">
           {/* In-App Auto-Update Notification Banner */}
           {updaterStatus.state === 'downloading' && (
             <div className="p-3 bg-[#191F2B] border border-[#78A5FF]/40 rounded-xl space-y-1.5">
@@ -1175,113 +1177,102 @@ export const PreRecordingView: React.FC<PreRecordingViewProps> = ({ initialTab =
           </div>
 
           {/* Advanced Recording Settings (Resolution, FPS, System Audio) */}
-          <div className="space-y-2">
+          <div className="space-y-1.5">
             <h2 className="text-[11px] font-bold text-[#929CAF] uppercase tracking-wider block">
               Preferências de Gravação & Saída
             </h2>
-            <div className="bg-[#121722] border border-[#303A4B] rounded-xl p-3 space-y-2.5">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center space-x-2">
-                <Volume2 className="w-4 h-4 text-[#78A5FF]" />
-                <span className="text-xs font-medium text-[#F3F5F9]">Gravar Som do Sistema</span>
-              </div>
-              <input
-                type="checkbox"
-                checked={includeSystemAudio}
-                onChange={(e) => setIncludeSystemAudio(e.target.checked)}
-                className="w-4 h-4 accent-[#78A5FF] rounded cursor-pointer"
-              />
-            </div>
-
-            <div className="flex items-center justify-between pt-1.5 border-t border-[#303A4B]">
-              <div className="flex items-center space-x-2">
-                <FileText className="w-4 h-4 text-[#929CAF]" />
-                <span className="text-xs font-medium text-[#F3F5F9]">Teleprompter & Roteiro</span>
-              </div>
-              <div className="flex items-center space-x-2">
-                <button
-                  type="button"
-                  onClick={() => window.electronAPI.toggleSpeakerNotes()}
-                  className={`text-[10px] px-2 py-0.5 rounded font-medium transition-all ${
-                    isSpeakerNotesOpen
-                      ? 'bg-[#78A5FF] text-[#101A32] font-semibold'
-                      : 'bg-[#191F2B] text-[#B7C0CE] hover:text-[#F3F5F9] hover:bg-[#222B39] border border-[#303A4B]'
-                  }`}
-                >
-                  {isSpeakerNotesOpen ? 'Prompter Aberto' : 'Abrir / Editar'}
-                </button>
-                <input
-                  type="checkbox"
-                  checked={speakerNotesEnabled}
-                  onChange={(e) => setSpeakerNotesEnabled(e.target.checked)}
-                  className="w-4 h-4 accent-[#78A5FF] rounded cursor-pointer"
-                  title="Abrir automaticamente ao gravar"
-                />
-              </div>
-            </div>
-
-            <div className="flex items-center justify-between pt-1.5 border-t border-[#303A4B]">
-              <div className="flex items-center space-x-2">
-                <MousePointer className="w-4 h-4 text-[#929CAF]" />
-                <span className="text-xs font-medium text-[#F3F5F9]">Destacar Cursor & Cliques</span>
-              </div>
-              <input
-                type="checkbox"
-                checked={highlightCursor}
-                onChange={(e) => setHighlightCursor(e.target.checked)}
-                className="w-4 h-4 accent-[#78A5FF] rounded cursor-pointer"
-              />
-            </div>
-
-            <div className="flex items-center justify-between pt-1.5 border-t border-[#303A4B]">
-              <span className="text-xs font-medium text-[#F3F5F9]">Qualidade & Taxa</span>
-              <div className="flex items-center space-x-2">
-                <select
-                  value={resolution}
-                  onChange={(e) => setResolution(e.target.value as any)}
-                  className="bg-[#0B0E14] border border-[#303A4B] rounded px-2 py-1 text-[11px] text-[#F3F5F9] focus:outline-none"
-                >
-                  <option value="720p">720p (HD)</option>
-                  <option value="1080p">1080p (FHD)</option>
-                  <option value="4k">4K (Ultra)</option>
-                </select>
-
-                <select
-                  value={fps}
-                  onChange={(e) => setFps(Number(e.target.value))}
-                  className="bg-[#0B0E14] border border-[#303A4B] rounded px-2 py-1 text-[11px] text-[#F3F5F9] focus:outline-none"
-                >
-                  <option value={30}>30 fps</option>
-                  <option value={60}>60 fps</option>
-                </select>
-              </div>
-            </div>
-
-            {/* Countdown Duration Selector */}
-            <div className="flex items-center justify-between pt-1.5 border-t border-[#303A4B]">
-              <div className="flex items-center space-x-2">
-                <Clock className="w-4 h-4 text-[#78A5FF]" />
-                <span className="text-xs font-medium text-[#F3F5F9]">Contagem Regressiva</span>
-              </div>
-              <div className="flex items-center space-x-1 bg-[#0B0E14] p-0.5 rounded-lg border border-[#303A4B]">
-                {([0, 3, 5] as const).map((secs) => (
-                  <button
-                    key={secs}
-                    type="button"
-                    onClick={() => setCountdownSeconds(secs)}
-                    className={`px-2 py-0.5 rounded text-[10px] font-semibold transition-all ${
-                      countdownSeconds === secs
-                        ? 'bg-[#78A5FF] text-[#101A32] shadow-sm'
-                        : 'text-[#929CAF] hover:text-[#F3F5F9]'
-                    }`}
-                    title={secs === 0 ? 'Iniciar gravação imediatamente sem contagem' : `Contagem regressiva de ${secs} segundos`}
+            <div className="bg-[#121722] border border-[#303A4B] rounded-xl p-2.5 space-y-2">
+              {/* Row 1: Qualidade & FPS + Contagem */}
+              <div className="flex items-center justify-between text-xs flex-wrap gap-2">
+                <div className="flex items-center space-x-1.5">
+                  <span className="text-[#929CAF] font-medium text-[11px]">Qualidade & Taxa:</span>
+                  <select
+                    value={resolution}
+                    onChange={(e) => setResolution(e.target.value as any)}
+                    className="bg-[#0B0E14] border border-[#303A4B] rounded px-1.5 py-0.5 text-[11px] text-[#F3F5F9] focus:outline-none"
                   >
-                    {secs === 0 ? '0s (Direto)' : `${secs}s`}
+                    <option value="720p">720p (HD)</option>
+                    <option value="1080p">1080p (FHD)</option>
+                    <option value="4k">4K (Ultra)</option>
+                  </select>
+
+                  <select
+                    value={fps}
+                    onChange={(e) => setFps(Number(e.target.value))}
+                    className="bg-[#0B0E14] border border-[#303A4B] rounded px-1.5 py-0.5 text-[11px] text-[#F3F5F9] focus:outline-none"
+                  >
+                    <option value={30}>30 fps</option>
+                    <option value={60}>60 fps</option>
+                  </select>
+                </div>
+
+                <div className="flex items-center space-x-1">
+                  <Clock className="w-3.5 h-3.5 text-[#78A5FF]" />
+                  <div className="flex items-center space-x-0.5 bg-[#0B0E14] p-0.5 rounded-lg border border-[#303A4B]">
+                    {([0, 3, 5] as const).map((secs) => (
+                      <button
+                        key={secs}
+                        type="button"
+                        onClick={() => setCountdownSeconds(secs)}
+                        className={`px-1.5 py-0.5 rounded text-[10px] font-semibold transition-all ${
+                          countdownSeconds === secs
+                            ? 'bg-[#78A5FF] text-[#101A32] shadow-sm'
+                            : 'text-[#929CAF] hover:text-[#F3F5F9]'
+                        }`}
+                        title={secs === 0 ? 'Iniciar gravação imediatamente sem contagem' : `Contagem regressiva de ${secs} segundos`}
+                      >
+                        {secs === 0 ? '0s (Direto)' : `${secs}s`}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              </div>
+
+              {/* Row 2: Som do Sistema, Prompter, Cursor */}
+              <div className="grid grid-cols-3 gap-2 pt-1.5 border-t border-[#303A4B] text-[11px]">
+                <label className="flex items-center space-x-1.5 cursor-pointer">
+                  <input
+                    type="checkbox"
+                    checked={includeSystemAudio}
+                    onChange={(e) => setIncludeSystemAudio(e.target.checked)}
+                    className="w-3.5 h-3.5 accent-[#78A5FF] rounded cursor-pointer"
+                  />
+                  <span className="text-[#B7C0CE] truncate" title="Gravar Som do Sistema">Som Sistema</span>
+                </label>
+
+                <label className="flex items-center space-x-1.5 cursor-pointer">
+                  <input
+                    type="checkbox"
+                    checked={highlightCursor}
+                    onChange={(e) => setHighlightCursor(e.target.checked)}
+                    className="w-3.5 h-3.5 accent-[#78A5FF] rounded cursor-pointer"
+                  />
+                  <span className="text-[#B7C0CE] truncate" title="Destacar Cursor & Cliques">Cursor Ativo</span>
+                </label>
+
+                <div className="flex items-center space-x-1 justify-end">
+                  <button
+                    type="button"
+                    onClick={() => window.electronAPI.toggleSpeakerNotes()}
+                    className={`text-[10px] px-1.5 py-0.5 rounded font-medium transition-all ${
+                      isSpeakerNotesOpen
+                        ? 'bg-[#78A5FF] text-[#101A32] font-semibold'
+                        : 'bg-[#191F2B] text-[#B7C0CE] hover:text-[#F3F5F9] border border-[#303A4B]'
+                    }`}
+                    title="Abrir / Editar Teleprompter"
+                  >
+                    {isSpeakerNotesOpen ? 'Prompter' : 'Prompter'}
                   </button>
-                ))}
+                  <input
+                    type="checkbox"
+                    checked={speakerNotesEnabled}
+                    onChange={(e) => setSpeakerNotesEnabled(e.target.checked)}
+                    className="w-3.5 h-3.5 accent-[#78A5FF] rounded cursor-pointer"
+                    title="Abrir teleprompter automaticamente ao iniciar gravação"
+                  />
+                </div>
               </div>
             </div>
-          </div>
           </div>
 
           {/* Global Share Link Status Pill */}
@@ -1318,70 +1309,73 @@ export const PreRecordingView: React.FC<PreRecordingViewProps> = ({ initialTab =
               )
             )}
           </div>
+        </div>
 
-          {/* Start Recording CTA Button */}
-          <div className="pt-1 flex flex-col gap-2">
-            <button
-              onClick={handleStart}
-              className="w-full bg-[#FF647C] hover:bg-[#FF647C]/90 active:scale-[0.99] text-[#2B0E13] font-black py-3.5 px-4 rounded-xl shadow-lg shadow-[#FF647C]/20 flex items-center justify-center space-x-2.5 transition-all"
-            >
-              <div className="w-2.5 h-2.5 rounded-full bg-[#2B0E13]" />
-              <span className="tracking-wide">INICIAR GRAVAÇÃO</span>
-            </button>
+        {/* ========================================================================= */}
+        {/* STICKY BOTTOM ACTIONS BAR - GUARANTEED NEVER CUT OFF OR HIDDEN */}
+        {/* ========================================================================= */}
+        <div className="shrink-0 bg-[#0E121A] border-t border-[#303A4B] px-4 py-3 space-y-2 shadow-[0_-10px_25px_rgba(0,0,0,0.6)]">
+          <button
+            onClick={handleStart}
+            className="w-full bg-[#FF647C] hover:bg-[#FF647C]/90 active:scale-[0.99] text-[#2B0E13] font-black py-3 px-4 rounded-xl shadow-lg shadow-[#FF647C]/20 flex items-center justify-center space-x-2.5 transition-all cursor-pointer"
+          >
+            <div className="w-2.5 h-2.5 rounded-full bg-[#2B0E13]" />
+            <span className="tracking-wide">INICIAR GRAVAÇÃO</span>
+          </button>
 
-            <button
-              onClick={() => window.electronAPI.startLiveShare()}
-              title="Transmitir tela ao vivo com qualidade ultra fluida de até 60 FPS para qualquer dispositivo via link ou QR Code"
-              className="w-full bg-[#1A2A47] hover:bg-[#191F2B] active:scale-[0.99] text-[#78A5FF] hover:text-[#9AB9FF] font-bold py-2.5 px-4 rounded-xl shadow-md flex items-center justify-center space-x-2 transition-all border border-[#78A5FF]/50"
-            >
-              <Radio className="w-4 h-4 text-[#78A5FF] animate-pulse" />
-              <span className="text-xs tracking-wide">COMPARTILHAR TELA AO VIVO (60 FPS)</span>
-            </button>
-            <div className="text-center mt-2.5 mb-1.5 flex items-center justify-center space-x-2 text-[10px] text-[#929CAF] font-mono">
+          <button
+            onClick={() => window.electronAPI.startLiveShare()}
+            title="Transmitir tela ao vivo com qualidade ultra fluida de até 60 FPS para qualquer dispositivo via link ou QR Code"
+            className="w-full bg-[#1A2A47] hover:bg-[#191F2B] active:scale-[0.99] text-[#78A5FF] hover:text-[#9AB9FF] font-bold py-2 px-4 rounded-xl shadow-md flex items-center justify-center space-x-2 transition-all border border-[#78A5FF]/50 cursor-pointer"
+          >
+            <Radio className="w-3.5 h-3.5 text-[#78A5FF] animate-pulse" />
+            <span className="text-xs tracking-wide">COMPARTILHAR TELA AO VIVO (60 FPS)</span>
+          </button>
+
+          {/* Quick Shortcuts & App Version / Update Check */}
+          <div className="flex items-center justify-between pt-1 border-t border-[#303A4B]/60 text-[10px] text-[#929CAF]">
+            <span className="font-mono flex items-center gap-1.5">
+              <span>v{appVersion || '2.4.1'}</span>
+              {updateFeedback && (
+                <span className="text-[#83B8FF] font-sans font-medium text-[10px] bg-[#1A2A47] border border-[#83B8FF]/40 px-1 py-0.2 rounded">
+                  {updateFeedback}
+                </span>
+              )}
+            </span>
+
+            <div className="flex items-center space-x-1.5 font-mono text-[10px]">
               <span title="Pressione 1 a 4 para alternar modos">[1-4] Modos</span>
               <span>•</span>
-              <span title="Pressione M para testar retorno de áudio">[M] Teste Áudio</span>
-              <span>•</span>
-              <span title="Pressione Enter para iniciar gravação">[Enter] Gravar</span>
+              <span title="Pressione Enter para gravar">[Enter] Gravar</span>
               <span>•</span>
               <span title="Atalho global do sistema" className="text-[#B7C0CE] font-semibold">{getShortcutLabel('a')}</span>
             </div>
 
-            {/* App Version & Manual Update Check */}
-            <div className="flex items-center justify-between pt-2 border-t border-[#303A4B] text-[11px] text-[#929CAF]">
-              <span className="font-mono flex items-center gap-1.5">
-                <span>v{appVersion || '2.4.0'}</span>
-                {updateFeedback && (
-                  <span className="text-[#83B8FF] font-sans font-medium text-[10px] bg-[#1A2A47] border border-[#83B8FF]/40 px-1.5 py-0.5 rounded">
-                    {updateFeedback}
-                  </span>
-                )}
-              </span>
-              <button
-                onClick={async () => {
-                  setIsCheckingUpdate(true);
-                  setUpdateFeedback(null);
-                  try {
-                    const res = await window.electronAPI?.checkForUpdates?.();
-                    setIsCheckingUpdate(false);
-                    if (res?.isLatest) {
-                      setUpdateFeedback('Versão mais recente!');
-                      setTimeout(() => setUpdateFeedback(null), 3500);
-                    }
-                  } catch (e) {
-                    setIsCheckingUpdate(false);
+            <button
+              onClick={async () => {
+                setIsCheckingUpdate(true);
+                setUpdateFeedback(null);
+                try {
+                  const res = await window.electronAPI?.checkForUpdates?.();
+                  setIsCheckingUpdate(false);
+                  if (res?.isLatest) {
+                    setUpdateFeedback('Versão mais recente!');
+                    setTimeout(() => setUpdateFeedback(null), 3500);
                   }
-                }}
-                disabled={isCheckingUpdate}
-                className="flex items-center space-x-1.5 hover:text-[#78A5FF] text-[#B7C0CE] transition-colors"
-                title="Checar se há novas versões"
-              >
-                <RefreshCw className={`w-3 h-3 ${isCheckingUpdate ? 'animate-spin text-[#78A5FF]' : ''}`} />
-                <span>{isCheckingUpdate ? 'Verificando...' : 'Buscar Atualizações'}</span>
-              </button>
-            </div>
+                } catch (e) {
+                  setIsCheckingUpdate(false);
+                }
+              }}
+              disabled={isCheckingUpdate}
+              className="flex items-center space-x-1 hover:text-[#78A5FF] text-[#B7C0CE] transition-colors cursor-pointer"
+              title="Checar se há novas versões"
+            >
+              <RefreshCw className={`w-2.5 h-2.5 ${isCheckingUpdate ? 'animate-spin text-[#78A5FF]' : ''}`} />
+              <span>{isCheckingUpdate ? '...' : 'Atualizações'}</span>
+            </button>
           </div>
         </div>
+      </div>
       )}
     </div>
   );
