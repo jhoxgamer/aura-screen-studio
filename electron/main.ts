@@ -102,18 +102,18 @@ function createPreRecordingWindow(initialTab?: string) {
   const primaryDisplay = screen.getPrimaryDisplay();
   const { width, height } = primaryDisplay.workAreaSize;
 
-  const winWidth = 470;
-  const winHeight = Math.min(840, Math.max(600, height - 50));
+  const winWidth = 480;
+  const winHeight = Math.min(840, Math.max(620, height - 40));
 
   preRecordingWindow = new BrowserWindow({
     width: winWidth,
     height: winHeight,
     minWidth: 440,
     minHeight: 560,
-    maxWidth: 620,
-    maxHeight: 1000,
+    maxWidth: 640,
+    maxHeight: 1020,
     x: Math.round(width - winWidth - 25),
-    y: Math.max(15, Math.round((height - winHeight) / 2)),
+    y: Math.max(12, Math.round((height - winHeight) / 2)),
     frame: false,
     transparent: true,
     resizable: true,

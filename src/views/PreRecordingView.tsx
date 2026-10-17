@@ -643,20 +643,20 @@ export const PreRecordingView: React.FC<PreRecordingViewProps> = ({ initialTab =
     <div className="w-full h-full min-h-0 bg-[#0B0E14] text-[#F3F5F9] rounded-2xl border border-[#303A4B] shadow-2xl flex flex-col overflow-hidden select-none font-sans">
       {/* Title Bar / Drag Handle */}
       <div
-        className="h-12 bg-[#121722] px-4 flex items-center justify-between border-b border-[#303A4B] shrink-0"
+        className="h-11 bg-[#121722] px-3.5 flex items-center justify-between border-b border-[#303A4B] shrink-0"
         style={{ WebkitAppRegion: 'drag' } as any}
       >
-        <div className="flex items-center space-x-2.5">
+        <div className="flex items-center space-x-2">
           {/* Authentic Studio Emblem */}
-          <div className="w-7 h-7 rounded-lg bg-[#191F2B] border border-[#303A4B] flex items-center justify-center">
-            <div className="w-3.5 h-3.5 rounded-full border-2 border-[#78A5FF] flex items-center justify-center">
-              <div className="w-1.5 h-1.5 rounded-full bg-[#FF647C]" />
+          <div className="w-6 h-6 rounded-lg bg-[#191F2B] border border-[#303A4B] flex items-center justify-center">
+            <div className="w-3 h-3 rounded-full border-2 border-[#78A5FF] flex items-center justify-center">
+              <div className="w-1 h-1 rounded-full bg-[#FF647C]" />
             </div>
           </div>
-          <div className="flex items-center space-x-2">
-            <span className="font-semibold text-sm tracking-tight text-[#F3F5F9]">Aura Screen Studio</span>
-            <span className="text-[10px] text-[#B7C0CE] bg-[#191F2B] border border-[#303A4B] px-1.5 py-0.5 rounded font-mono">
-              v{appVersion || '2.5.0'}
+          <div className="flex items-center space-x-1.5">
+            <span className="font-semibold text-xs tracking-tight text-[#F3F5F9]">Aura Screen Studio</span>
+            <span className="text-[9px] text-[#B7C0CE] bg-[#191F2B] border border-[#303A4B] px-1 py-0.2 rounded font-mono">
+              v{appVersion || '2.5.1'}
             </span>
           </div>
         </div>
@@ -665,35 +665,35 @@ export const PreRecordingView: React.FC<PreRecordingViewProps> = ({ initialTab =
           <button
             onClick={() => window.electronAPI.takeScreenshot()}
             title={`Capturar Screenshot com Anotações (${getShortcutLabel('s')})`}
-            className="flex items-center space-x-1 px-2.5 py-1 rounded-md bg-[#191F2B] hover:bg-[#222B39] text-[#B7C0CE] hover:text-[#78A5FF] text-[11px] font-medium transition-colors border border-[#303A4B]"
+            className="flex items-center space-x-1 px-2 py-0.5 rounded-md bg-[#191F2B] hover:bg-[#222B39] text-[#B7C0CE] hover:text-[#78A5FF] text-[10px] font-medium transition-colors border border-[#303A4B]"
           >
-            <Camera className="w-3.5 h-3.5 text-[#78A5FF]" />
+            <Camera className="w-3 h-3 text-[#78A5FF]" />
             <span>Screenshot</span>
           </button>
           <button
             onClick={() => window.electronAPI.minimizeCurrentWindow()}
-            className="p-1.5 hover:bg-[#222B39] rounded-md text-[#929CAF] hover:text-[#F3F5F9] transition-colors"
+            className="p-1 hover:bg-[#222B39] rounded-md text-[#929CAF] hover:text-[#F3F5F9] transition-colors"
             title="Minimizar janela"
           >
-            <Minus className="w-3.5 h-3.5" />
+            <Minus className="w-3 h-3" />
           </button>
           <button
             onClick={() => window.electronAPI.closeCurrentWindow()}
-            className="p-1.5 hover:bg-[#B83A48]/20 hover:text-[#FF647C] rounded-md text-[#929CAF] transition-colors"
+            className="p-1 hover:bg-[#B83A48]/20 hover:text-[#FF647C] rounded-md text-[#929CAF] transition-colors"
             title="Fechar aplicativo"
           >
-            <X className="w-3.5 h-3.5" />
+            <X className="w-3 h-3" />
           </button>
         </div>
       </div>
 
       {/* Navigation Tabs */}
-      <div className="flex border-b border-[#303A4B] px-4 bg-[#121722] pt-2 shrink-0" role="tablist" aria-label="Navegação Principal Aura">
+      <div className="flex border-b border-[#303A4B] px-3.5 bg-[#121722] pt-1.5 shrink-0" role="tablist" aria-label="Navegação Principal Aura">
         <button
           role="tab"
           aria-selected={activeTab === 'record'}
           onClick={() => setActiveTab('record')}
-          className={`flex items-center space-x-2 px-4 py-2 font-semibold text-xs rounded-t-lg transition-all ${
+          className={`flex items-center space-x-1.5 px-3.5 py-1.5 font-semibold text-xs rounded-t-lg transition-all ${
             activeTab === 'record'
               ? 'text-[#F3F5F9] border-b-2 border-[#78A5FF] bg-[#191F2B]'
               : 'text-[#929CAF] hover:text-[#F3F5F9]'
@@ -706,7 +706,7 @@ export const PreRecordingView: React.FC<PreRecordingViewProps> = ({ initialTab =
           role="tab"
           aria-selected={activeTab === 'library'}
           onClick={() => setActiveTab('library')}
-          className={`flex items-center space-x-2 px-4 py-2 font-semibold text-xs rounded-t-lg transition-all ${
+          className={`flex items-center space-x-1.5 px-3.5 py-1.5 font-semibold text-xs rounded-t-lg transition-all ${
             activeTab === 'library'
               ? 'text-[#F3F5F9] border-b-2 border-[#78A5FF] bg-[#191F2B]'
               : 'text-[#929CAF] hover:text-[#F3F5F9]'
@@ -722,660 +722,660 @@ export const PreRecordingView: React.FC<PreRecordingViewProps> = ({ initialTab =
       ) : (
         <div className="flex-1 min-h-0 flex flex-col overflow-hidden" role="tabpanel" aria-label="Nova Gravação">
           {/* Scrollable Configuration Body */}
-          <div className="flex-1 min-h-0 overflow-y-auto p-4 space-y-3 pr-2">
-          {/* In-App Auto-Update Notification Banner */}
-          {updaterStatus.state === 'downloading' && (
-            <div className="p-3 bg-[#191F2B] border border-[#78A5FF]/40 rounded-xl space-y-1.5">
-              <div className="flex items-center justify-between text-xs font-semibold text-[#78A5FF]">
-                <span className="flex items-center space-x-1.5">
-                  <RefreshCw className="w-3.5 h-3.5 animate-spin text-[#78A5FF]" />
-                  <span>Baixando atualização v{updaterStatus.version || ''}...</span>
-                </span>
-                <span className="font-mono text-[#F3F5F9]">{updaterStatus.percent || 0}%</span>
-              </div>
-              <div className="w-full bg-[#121722] rounded-full h-1.5 overflow-hidden">
-                <div
-                  className="bg-[#78A5FF] h-full rounded-full transition-all duration-300"
-                  style={{ width: `${updaterStatus.percent || 0}%` }}
-                />
-              </div>
-            </div>
-          )}
-
-          {updaterStatus.state === 'downloaded' && (
-            <div className="p-3 bg-[#1A2A47] border border-[#83B8FF]/50 rounded-xl flex items-center justify-between">
-              <div className="text-xs">
-                <span className="font-bold text-[#83B8FF] flex items-center gap-1.5">
-                  <ShieldCheck className="w-4 h-4 text-[#83B8FF]" />
-                  Atualização v{updaterStatus.version || ''} Pronta
-                </span>
-                <span className="text-[11px] text-[#B7C0CE] block">
-                  Reinicie para aplicar as melhorias no app.
-                </span>
-              </div>
-              <button
-                onClick={() => window.electronAPI?.installUpdateNow?.()}
-                className="px-3 py-1.5 bg-[#83B8FF] hover:bg-[#9AB9FF] text-[#101A32] text-xs font-bold rounded-lg transition-colors whitespace-nowrap"
-              >
-                Reiniciar Agora
-              </button>
-            </div>
-          )}
-
-          {/* Mode Selector */}
-          <div>
-            <h2 className="text-[11px] font-bold text-[#929CAF] uppercase tracking-wider block mb-2">
-              Modo de Gravação
-            </h2>
-            <div className="grid grid-cols-4 gap-1.5">
-              <button
-                onClick={() => setMode('screen-cam')}
-                className={`flex flex-col items-center justify-center p-2.5 rounded-xl border text-center transition-all ${
-                  mode === 'screen-cam'
-                    ? 'bg-[#1A2A47] border-2 border-[#78A5FF] text-[#78A5FF] font-bold shadow-sm'
-                    : 'bg-[#121722] border border-[#303A4B] text-[#B7C0CE] hover:border-[#78A5FF]/40 hover:text-[#F3F5F9]'
-                }`}
-              >
-                <div className="relative mb-1">
-                  <Monitor className="w-4 h-4 text-[#78A5FF]" />
-                  <span className="absolute -bottom-0.5 -right-0.5 w-2 h-2 rounded-full bg-[#FF647C] border border-[#121722]" />
-                </div>
-                <span className="text-[11px] leading-tight font-medium">Tela + Cam</span>
-              </button>
-
-              <button
-                onClick={() => setMode('screen-only')}
-                className={`flex flex-col items-center justify-center p-2.5 rounded-xl border text-center transition-all ${
-                  mode === 'screen-only'
-                    ? 'bg-[#1A2A47] border-2 border-[#78A5FF] text-[#78A5FF] font-bold shadow-sm'
-                    : 'bg-[#121722] border border-[#303A4B] text-[#B7C0CE] hover:border-[#78A5FF]/40 hover:text-[#F3F5F9]'
-                }`}
-              >
-                <Monitor className="w-4 h-4 mb-1 text-[#B7C0CE]" />
-                <span className="text-[11px] leading-tight font-medium">Só Tela</span>
-              </button>
-
-              <button
-                onClick={() => setMode('cam-only')}
-                className={`flex flex-col items-center justify-center p-2.5 rounded-xl border text-center transition-all ${
-                  mode === 'cam-only'
-                    ? 'bg-[#1A2A47] border-2 border-[#78A5FF] text-[#78A5FF] font-bold shadow-sm'
-                    : 'bg-[#121722] border border-[#303A4B] text-[#B7C0CE] hover:border-[#78A5FF]/40 hover:text-[#F3F5F9]'
-                }`}
-              >
-                <Camera className="w-4 h-4 mb-1 text-[#FF647C]" />
-                <span className="text-[11px] leading-tight font-medium">Só Câmera</span>
-              </button>
-
-              <button
-                onClick={() => {
-                  setMode('custom-area');
-                  if (!cropArea) window.electronAPI.startCropSelection();
-                }}
-                className={`flex flex-col items-center justify-center p-2.5 rounded-xl border text-center transition-all ${
-                  mode === 'custom-area'
-                    ? 'bg-[#1A2A47] border-2 border-[#78A5FF] text-[#78A5FF] font-bold shadow-sm'
-                    : 'bg-[#121722] border border-[#303A4B] text-[#B7C0CE] hover:border-[#78A5FF]/40 hover:text-[#F3F5F9]'
-                }`}
-              >
-                <Crop className="w-4 h-4 mb-1 text-[#83B8FF]" />
-                <span className="text-[11px] leading-tight font-medium">Área Recorte</span>
-              </button>
-            </div>
-
-            {/* Custom Area Details & Pick Button */}
-            {mode === 'custom-area' && (
-              <div className="mt-2 p-2.5 bg-[#121722] border border-[#303A4B] rounded-xl flex items-center justify-between">
-                <div className="text-xs">
-                  <span className="text-[#929CAF]">Região: </span>
-                  <span className="font-mono text-[#78A5FF] font-bold">
-                    {cropArea ? `${Math.round(cropArea.width)} × ${Math.round(cropArea.height)} px` : 'Nenhuma definida'}
+          <div className="flex-1 min-h-0 overflow-y-auto px-4 py-3 space-y-2.5 pr-2">
+            {/* In-App Auto-Update Notification Banner */}
+            {updaterStatus.state === 'downloading' && (
+              <div className="p-2.5 bg-[#191F2B] border border-[#78A5FF]/40 rounded-xl space-y-1">
+                <div className="flex items-center justify-between text-xs font-semibold text-[#78A5FF]">
+                  <span className="flex items-center space-x-1.5">
+                    <RefreshCw className="w-3.5 h-3.5 animate-spin text-[#78A5FF]" />
+                    <span>Baixando atualização v{updaterStatus.version || ''}...</span>
                   </span>
+                  <span className="font-mono text-[#F3F5F9]">{updaterStatus.percent || 0}%</span>
                 </div>
-                <div className="flex items-center space-x-1.5">
-                  {cropArea && (
-                    <button
-                      onClick={() => setCropArea(null)}
-                      className="px-2 py-1 rounded-lg bg-[#191F2B] hover:bg-[#222B39] text-[#929CAF] hover:text-[#FF647C] text-xs transition-colors"
-                      title="Redefinir para tela inteira"
-                    >
-                      Redefinir
-                    </button>
-                  )}
-                  <button
-                    onClick={() => window.electronAPI.startCropSelection()}
-                    className="px-2.5 py-1 rounded-lg bg-[#1A2A47] hover:bg-[#191F2B] text-[#78A5FF] border border-[#78A5FF]/40 text-xs font-bold transition-colors"
-                  >
-                    {cropArea ? 'Alterar Área' : 'Selecionar na Tela'}
-                  </button>
+                <div className="w-full bg-[#121722] rounded-full h-1.5 overflow-hidden">
+                  <div
+                    className="bg-[#78A5FF] h-full rounded-full transition-all duration-300"
+                    style={{ width: `${updaterStatus.percent || 0}%` }}
+                  />
                 </div>
               </div>
             )}
-          </div>
 
-          {/* Screen / Window Source Picker */}
-          {mode !== 'cam-only' && (
-            <div>
-              <div className="flex items-center justify-between mb-2">
-                <h2 className="text-[11px] font-bold text-[#929CAF] uppercase tracking-wider block">
-                  Fonte de Vídeo
-                </h2>
+            {updaterStatus.state === 'downloaded' && (
+              <div className="p-2.5 bg-[#1A2A47] border border-[#83B8FF]/50 rounded-xl flex items-center justify-between">
+                <div className="text-xs">
+                  <span className="font-bold text-[#83B8FF] flex items-center gap-1.5">
+                    <ShieldCheck className="w-3.5 h-3.5 text-[#83B8FF]" />
+                    Atualização v{updaterStatus.version || ''} Pronta
+                  </span>
+                  <span className="text-[10px] text-[#B7C0CE] block">
+                    Reinicie para aplicar as melhorias no app.
+                  </span>
+                </div>
                 <button
-                  type="button"
-                  onClick={refreshSources}
-                  title="Atualizar lista de janelas e telas"
-                  className="text-[10px] text-[#78A5FF] hover:text-[#9AB9FF] font-medium flex items-center space-x-1"
+                  onClick={() => window.electronAPI?.installUpdateNow?.()}
+                  className="px-2.5 py-1 bg-[#83B8FF] hover:bg-[#9AB9FF] text-[#101A32] text-xs font-bold rounded-lg transition-colors whitespace-nowrap"
                 >
-                  <RefreshCw className={`w-3 h-3 ${isRefreshingSources ? 'animate-spin' : ''}`} />
-                  <span>Atualizar Janelas</span>
+                  Reiniciar Agora
                 </button>
               </div>
-              <div className="bg-[#121722] border border-[#303A4B] rounded-xl p-2.5 flex items-center space-x-3">
-                {selectedSource?.thumbnail ? (
-                  <img
-                    src={selectedSource.thumbnail}
-                    alt="preview"
-                    className="w-16 h-10 object-cover rounded border border-[#303A4B]"
-                  />
-                ) : (
-                  <div className="w-16 h-10 bg-[#0B0E14] rounded flex items-center justify-center border border-[#303A4B]">
-                    <Monitor className="w-5 h-5 text-[#929CAF]" />
-                  </div>
-                )}
+            )}
 
-                <div className="flex-1 min-w-0">
-                  <select
-                    value={selectedSourceId}
-                    onChange={(e) => setSelectedSourceId(e.target.value)}
-                    className="w-full bg-[#0B0E14] border border-[#303A4B] rounded-lg text-xs text-[#F3F5F9] p-2 font-medium focus:outline-none focus:border-[#78A5FF] truncate"
+            {/* Mode Selector */}
+            <div>
+              <div className="flex items-center justify-between mb-1.5">
+                <h2 className="text-[10px] font-bold text-[#929CAF] uppercase tracking-wider block">
+                  Modo de Gravação
+                </h2>
+                <span className="text-[9px] text-[#929CAF] font-mono">Teclas [1-4]</span>
+              </div>
+              <div className="grid grid-cols-4 gap-1.5">
+                <button
+                  onClick={() => setMode('screen-cam')}
+                  className={`flex flex-col items-center justify-center py-2 px-1 rounded-xl border text-center transition-all ${
+                    mode === 'screen-cam'
+                      ? 'bg-[#1A2A47] border-2 border-[#78A5FF] text-[#78A5FF] font-bold shadow-sm'
+                      : 'bg-[#121722] border border-[#303A4B] text-[#B7C0CE] hover:border-[#78A5FF]/40 hover:text-[#F3F5F9]'
+                  }`}
+                >
+                  <div className="relative mb-1">
+                    <Monitor className="w-4 h-4 text-[#78A5FF]" />
+                    <span className="absolute -bottom-0.5 -right-0.5 w-1.5 h-1.5 rounded-full bg-[#FF647C] border border-[#121722]" />
+                  </div>
+                  <span className="text-[10px] leading-tight font-medium">Tela + Cam</span>
+                </button>
+
+                <button
+                  onClick={() => setMode('screen-only')}
+                  className={`flex flex-col items-center justify-center py-2 px-1 rounded-xl border text-center transition-all ${
+                    mode === 'screen-only'
+                      ? 'bg-[#1A2A47] border-2 border-[#78A5FF] text-[#78A5FF] font-bold shadow-sm'
+                      : 'bg-[#121722] border border-[#303A4B] text-[#B7C0CE] hover:border-[#78A5FF]/40 hover:text-[#F3F5F9]'
+                  }`}
+                >
+                  <Monitor className="w-4 h-4 mb-1 text-[#B7C0CE]" />
+                  <span className="text-[10px] leading-tight font-medium">Só Tela</span>
+                </button>
+
+                <button
+                  onClick={() => setMode('cam-only')}
+                  className={`flex flex-col items-center justify-center py-2 px-1 rounded-xl border text-center transition-all ${
+                    mode === 'cam-only'
+                      ? 'bg-[#1A2A47] border-2 border-[#78A5FF] text-[#78A5FF] font-bold shadow-sm'
+                      : 'bg-[#121722] border border-[#303A4B] text-[#B7C0CE] hover:border-[#78A5FF]/40 hover:text-[#F3F5F9]'
+                  }`}
+                >
+                  <Camera className="w-4 h-4 mb-1 text-[#FF647C]" />
+                  <span className="text-[10px] leading-tight font-medium">Só Câmera</span>
+                </button>
+
+                <button
+                  onClick={() => {
+                    setMode('custom-area');
+                    if (!cropArea) window.electronAPI.startCropSelection();
+                  }}
+                  className={`flex flex-col items-center justify-center py-2 px-1 rounded-xl border text-center transition-all ${
+                    mode === 'custom-area'
+                      ? 'bg-[#1A2A47] border-2 border-[#78A5FF] text-[#78A5FF] font-bold shadow-sm'
+                      : 'bg-[#121722] border border-[#303A4B] text-[#B7C0CE] hover:border-[#78A5FF]/40 hover:text-[#F3F5F9]'
+                  }`}
+                >
+                  <Crop className="w-4 h-4 mb-1 text-[#83B8FF]" />
+                  <span className="text-[10px] leading-tight font-medium">Área Recorte</span>
+                </button>
+              </div>
+
+              {/* Custom Area Details & Pick Button */}
+              {mode === 'custom-area' && (
+                <div className="mt-1.5 p-2 bg-[#121722] border border-[#303A4B] rounded-xl flex items-center justify-between">
+                  <div className="text-xs">
+                    <span className="text-[#929CAF]">Região: </span>
+                    <span className="font-mono text-[#78A5FF] font-bold text-xs">
+                      {cropArea ? `${Math.round(cropArea.width)} × ${Math.round(cropArea.height)} px` : 'Nenhuma definida'}
+                    </span>
+                  </div>
+                  <div className="flex items-center space-x-1.5">
+                    {cropArea && (
+                      <button
+                        onClick={() => setCropArea(null)}
+                        className="px-2 py-0.5 rounded-lg bg-[#191F2B] hover:bg-[#222B39] text-[#929CAF] hover:text-[#FF647C] text-[11px] transition-colors"
+                        title="Redefinir para tela inteira"
+                      >
+                        Redefinir
+                      </button>
+                    )}
+                    <button
+                      onClick={() => window.electronAPI.startCropSelection()}
+                      className="px-2.5 py-0.5 rounded-lg bg-[#1A2A47] hover:bg-[#191F2B] text-[#78A5FF] border border-[#78A5FF]/40 text-[11px] font-bold transition-colors"
+                    >
+                      {cropArea ? 'Alterar Área' : 'Selecionar na Tela'}
+                    </button>
+                  </div>
+                </div>
+              )}
+            </div>
+
+            {/* Screen / Window Source Picker */}
+            {mode !== 'cam-only' && (
+              <div className="space-y-1">
+                <div className="flex items-center justify-between">
+                  <h2 className="text-[10px] font-bold text-[#929CAF] uppercase tracking-wider block">
+                    Fonte de Vídeo
+                  </h2>
+                  <button
+                    type="button"
+                    onClick={refreshSources}
+                    title="Atualizar lista de janelas e telas"
+                    className="text-[10px] text-[#78A5FF] hover:text-[#9AB9FF] font-medium flex items-center space-x-1"
                   >
-                    {sources.length === 0 ? (
-                      <option value="" className="bg-[#121722]">Nenhuma tela ou janela encontrada</option>
+                    <RefreshCw className={`w-2.5 h-2.5 ${isRefreshingSources ? 'animate-spin' : ''}`} />
+                    <span>Atualizar Janelas</span>
+                  </button>
+                </div>
+                <div className="bg-[#121722] border border-[#303A4B] rounded-xl p-2 flex items-center space-x-2.5">
+                  {selectedSource?.thumbnail ? (
+                    <img
+                      src={selectedSource.thumbnail}
+                      alt="preview"
+                      className="w-14 h-9 object-cover rounded border border-[#303A4B] shrink-0"
+                    />
+                  ) : (
+                    <div className="w-14 h-9 bg-[#0B0E14] rounded flex items-center justify-center border border-[#303A4B] shrink-0">
+                      <Monitor className="w-4 h-4 text-[#929CAF]" />
+                    </div>
+                  )}
+
+                  <div className="flex-1 min-w-0">
+                    <select
+                      value={selectedSourceId}
+                      onChange={(e) => setSelectedSourceId(e.target.value)}
+                      className="w-full bg-[#0B0E14] border border-[#303A4B] rounded-lg text-xs text-[#F3F5F9] p-1.5 font-medium focus:outline-none focus:border-[#78A5FF] truncate"
+                    >
+                      {sources.length === 0 ? (
+                        <option value="" className="bg-[#121722]">Nenhuma tela ou janela encontrada</option>
+                      ) : (
+                        sources.map((s) => (
+                          <option key={s.id} value={s.id} className="bg-[#121722]">
+                            {s.name}
+                          </option>
+                        ))
+                      )}
+                    </select>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* Camera Selector & Live Framing Preview */}
+            {mode !== 'screen-only' && (
+              <div className="space-y-1">
+                <div className="flex items-center justify-between">
+                  <h2 className="text-[10px] font-bold text-[#929CAF] uppercase tracking-wider block">
+                    Câmera / Webcam
+                  </h2>
+                  <button
+                    type="button"
+                    onClick={() => setShowLiveCamPreview(!showLiveCamPreview)}
+                    className="text-[10px] text-[#78A5FF] hover:text-[#9AB9FF] font-medium"
+                  >
+                    {showLiveCamPreview ? 'Ocultar Preview' : 'Exibir Preview'}
+                  </button>
+                </div>
+
+                <div className="bg-[#121722] border border-[#303A4B] rounded-xl p-2 flex items-center space-x-2">
+                  <Camera className="w-4 h-4 text-[#78A5FF] shrink-0" />
+                  <select
+                    value={selectedVideoId}
+                    onChange={(e) => setSelectedVideoId(e.target.value)}
+                    className="w-full bg-transparent text-xs text-[#F3F5F9] focus:outline-none font-medium truncate"
+                  >
+                    {videoDevices.length === 0 ? (
+                      <option value="" className="bg-[#121722]">Nenhuma câmera conectada</option>
                     ) : (
-                      sources.map((s) => (
-                        <option key={s.id} value={s.id} className="bg-[#121722]">
-                          {s.name}
+                      videoDevices.map((d) => (
+                        <option key={d.deviceId} value={d.deviceId} className="bg-[#121722]">
+                          {d.label || `Câmera (${d.deviceId.slice(0, 5)}...)`}
                         </option>
                       ))
                     )}
                   </select>
                 </div>
-              </div>
-            </div>
-          )}
 
-          {/* Camera Selector & Live Framing Preview */}
-          {mode !== 'screen-only' && (
-            <div className="space-y-2">
-              <div className="flex items-center justify-between">
-                <h2 className="text-[11px] font-bold text-[#929CAF] uppercase tracking-wider block">
-                  Câmera / Webcam
-                </h2>
-                <button
-                  type="button"
-                  onClick={() => setShowLiveCamPreview(!showLiveCamPreview)}
-                  className="text-[10px] text-[#78A5FF] hover:text-[#9AB9FF] font-medium"
-                >
-                  {showLiveCamPreview ? 'Ocultar Preview' : 'Exibir Preview'}
-                </button>
-              </div>
-
-              <div className="bg-[#121722] border border-[#303A4B] rounded-xl p-2.5 flex items-center space-x-2">
-                <Camera className="w-4 h-4 text-[#78A5FF] shrink-0" />
-                <select
-                  value={selectedVideoId}
-                  onChange={(e) => setSelectedVideoId(e.target.value)}
-                  className="w-full bg-transparent text-xs text-[#F3F5F9] focus:outline-none font-medium truncate"
-                >
-                  {videoDevices.length === 0 ? (
-                    <option value="" className="bg-[#121722]">Nenhuma câmera conectada</option>
-                  ) : (
-                    videoDevices.map((d) => (
-                      <option key={d.deviceId} value={d.deviceId} className="bg-[#121722]">
-                        {d.label || `Câmera (${d.deviceId.slice(0, 5)}...)`}
-                      </option>
-                    ))
-                  )}
-                </select>
-              </div>
-
-              {/* Live Webcam Framing Box */}
-              {showLiveCamPreview && (
-                <div className="relative w-full h-28 bg-[#0B0E14] rounded-xl overflow-hidden border border-[#303A4B] flex items-center justify-center">
-                  {camError ? (
-                    <div className="flex flex-col items-center justify-center p-3 text-center space-y-1">
-                      <Camera className="w-5 h-5 text-[#F2B66D] opacity-60" />
-                      <span className="text-[11px] text-[#F2B66D] font-medium">{camError}</span>
-                      <span className="text-[10px] text-[#929CAF]">Selecione outro dispositivo ou verifique permissões</span>
-                    </div>
-                  ) : (
-                    <>
-                      <video
-                        ref={camVideoRef}
-                        autoPlay
-                        playsInline
-                        muted
-                        className="w-full h-full object-cover -scale-x-100"
-                      />
-                      <div className="absolute inset-0 border border-dashed border-[#78A5FF]/30 rounded-xl pointer-events-none" />
-                      <div className="absolute top-2 left-2 px-2 py-0.5 rounded bg-black/70 backdrop-blur-sm text-[10px] text-[#B7C0CE] font-medium flex items-center space-x-1.5 border border-[#303A4B]">
-                        <span className="w-1.5 h-1.5 rounded-full bg-[#83B8FF] inline-block" />
-                        <span>Enquadramento ao Vivo</span>
+                {/* Live Webcam Framing Box */}
+                {showLiveCamPreview && (
+                  <div className="relative w-full h-24 bg-[#0B0E14] rounded-xl overflow-hidden border border-[#303A4B] flex items-center justify-center">
+                    {camError ? (
+                      <div className="flex flex-col items-center justify-center p-2 text-center space-y-0.5">
+                        <Camera className="w-4 h-4 text-[#F2B66D] opacity-60" />
+                        <span className="text-[10px] text-[#F2B66D] font-medium">{camError}</span>
+                        <span className="text-[9px] text-[#929CAF]">Selecione outro dispositivo ou verifique permissões</span>
                       </div>
-                    </>
-                  )}
-                </div>
-              )}
-            </div>
-          )}
-
-          {/* ========================================================================= */}
-          {/* PROFESSIONAL STUDIO MICROPHONE & AUDIO PROCESSING SECTION */}
-          {/* ========================================================================= */}
-          <div className="space-y-2">
-            <div className="flex items-center justify-between">
-              <h2 className="text-[11px] font-bold text-[#929CAF] uppercase tracking-wider block">
-                Microfone & Áudio de Estúdio
-              </h2>
-              {isClipping ? (
-                <span className="text-[10px] text-[#FF647C] font-bold bg-[#FF647C]/20 border border-[#FF647C]/40 px-1.5 py-0.5 rounded flex items-center gap-1 animate-pulse">
-                  <AlertTriangle className="w-3 h-3 text-[#FF647C]" />
-                  <span>CLIP / SATURAÇÃO</span>
-                </span>
-              ) : (
-                <span className="text-[10px] text-[#83B8FF] font-medium flex items-center gap-1">
-                  <span className="w-1.5 h-1.5 rounded-full bg-[#83B8FF] inline-block" />
-                  <span>Nível: {audioLevel}%</span>
-                </span>
-              )}
-            </div>
-
-            <div className="bg-[#121722] border border-[#303A4B] rounded-xl p-3 space-y-3">
-              {micError && (
-                <div className="flex items-center space-x-2 p-2 bg-[#F2B66D]/10 border border-[#F2B66D]/30 rounded-lg text-[#F2B66D] text-xs">
-                  <AlertTriangle className="w-4 h-4 shrink-0 text-[#F2B66D]" />
-                  <span className="text-[11px]">{micError}</span>
-                </div>
-              )}
-
-              {/* Microphone Device Dropdown */}
-              <div className="flex items-center space-x-2">
-                <Mic className="w-4 h-4 text-[#78A5FF] shrink-0" />
-                <select
-                  value={selectedAudioId}
-                  onChange={(e) => setSelectedAudioId(e.target.value)}
-                  className="w-full bg-[#0B0E14] border border-[#303A4B] rounded-lg text-xs text-[#F3F5F9] p-2 font-medium focus:outline-none focus:border-[#78A5FF] truncate"
-                >
-                  {audioDevices.length === 0 ? (
-                    <option value="" className="bg-[#121722]">Nenhum microfone detectado</option>
-                  ) : (
-                    audioDevices.map((d) => (
-                      <option key={d.deviceId} value={d.deviceId} className="bg-[#121722]">
-                        {d.label || `Microfone (${d.deviceId.slice(0, 5)}...)`}
-                      </option>
-                    ))
-                  )}
-                </select>
-              </div>
-
-              {/* 16-Segment Calibrated LED VU Meter with Clipping Warning */}
-              <div className="space-y-1">
-                <div className="flex items-center justify-between text-[10px] text-[#929CAF] font-mono">
-                  <span>-40 dB</span>
-                  <span>-18 dB</span>
-                  <span>-6 dB</span>
-                  <span className={isClipping ? 'text-[#FF647C] font-bold' : 'text-[#929CAF]'}>0 dB</span>
-                </div>
-                <div className="flex items-center space-x-1 h-3 w-full bg-[#0B0E14] p-0.5 rounded-lg border border-[#303A4B]">
-                  {Array.from({ length: 16 }).map((_, idx) => {
-                    const activeThreshold = ((idx + 1) / 16) * 100;
-                    const isLit = audioLevel >= activeThreshold;
-                    const isRed = idx >= 14;
-                    const isYellow = idx >= 10 && idx < 14;
-                    const barColor = isLit
-                      ? isRed
-                        ? 'bg-[#FF647C]'
-                        : isYellow
-                        ? 'bg-[#F2B66D]'
-                        : 'bg-[#83B8FF]'
-                      : 'bg-[#191F2B]';
-                    return (
-                      <div
-                        key={idx}
-                        className={`flex-1 h-full rounded-sm transition-all duration-75 ${barColor}`}
-                      />
-                    );
-                  })}
-                </div>
-              </div>
-
-              {/* Volume & Gain Booster Slider (0% to 200%) */}
-              <div className="space-y-1.5 pt-1 border-t border-[#303A4B]">
-                <div className="flex items-center justify-between text-xs">
-                  <span className="text-[#B7C0CE] font-medium flex items-center gap-1.5">
-                    <Sliders className="w-3.5 h-3.5 text-[#78A5FF]" />
-                    <span>Ganho de Entrada:</span>
-                  </span>
-                  <div className="flex items-center space-x-2">
-                    <span className="font-mono text-xs font-semibold text-[#9AB9FF]">
-                      {micVolume}% ({formatGainDb(micVolume)})
-                    </span>
-                    {micVolume !== 100 && (
-                      <button
-                        type="button"
-                        onClick={() => setMicVolume(100)}
-                        title="Restaurar nível padrão (100%)"
-                        className="text-[10px] px-1.5 py-0.5 rounded bg-[#191F2B] hover:bg-[#222B39] text-[#B7C0CE] hover:text-[#F3F5F9] flex items-center gap-1 transition-colors"
-                      >
-                        <RotateCcw className="w-2.5 h-2.5" />
-                        <span>100%</span>
-                      </button>
+                    ) : (
+                      <>
+                        <video
+                          ref={camVideoRef}
+                          autoPlay
+                          playsInline
+                          muted
+                          className="w-full h-full object-cover -scale-x-100"
+                        />
+                        <div className="absolute inset-0 border border-dashed border-[#78A5FF]/30 rounded-xl pointer-events-none" />
+                        <div className="absolute top-1.5 left-1.5 px-1.5 py-0.5 rounded bg-black/70 backdrop-blur-sm text-[9px] text-[#B7C0CE] font-medium flex items-center space-x-1 border border-[#303A4B]">
+                          <span className="w-1.5 h-1.5 rounded-full bg-[#83B8FF] inline-block" />
+                          <span>Enquadramento ao Vivo</span>
+                        </div>
+                      </>
                     )}
                   </div>
-                </div>
-
-                <div className="flex items-center space-x-3">
-                  <input
-                    type="range"
-                    min="0"
-                    max="200"
-                    step="5"
-                    value={micVolume}
-                    onChange={(e) => setMicVolume(Number(e.target.value))}
-                    className="w-full h-1.5 bg-[#0B0E14] rounded-lg appearance-none cursor-pointer accent-[#78A5FF]"
-                  />
-                </div>
-                <div className="flex justify-between text-[10px] text-[#929CAF]">
-                  <span>0% (Mudo)</span>
-                  <span>100% (Padrão)</span>
-                  <span>200% (+6 dB Boost)</span>
-                </div>
+                )}
               </div>
+            )}
 
-              {/* Noise Reduction (Redução de Ruído) - 4 Real DSP Levels */}
-              <div className="space-y-1.5 pt-1 border-t border-[#303A4B]">
-                <div className="flex items-center justify-between text-xs">
-                  <span className="text-[#B7C0CE] font-medium flex items-center gap-1.5">
-                    <ShieldCheck className="w-3.5 h-3.5 text-[#83B8FF]" />
-                    <span>Redução de Ruído:</span>
+            {/* ========================================================================= */}
+            {/* PROFESSIONAL STUDIO MICROPHONE & AUDIO PROCESSING SECTION */}
+            {/* ========================================================================= */}
+            <div className="space-y-1">
+              <div className="flex items-center justify-between">
+                <h2 className="text-[10px] font-bold text-[#929CAF] uppercase tracking-wider block">
+                  Microfone & Áudio de Estúdio
+                </h2>
+                {isClipping ? (
+                  <span className="text-[9px] text-[#FF647C] font-bold bg-[#FF647C]/20 border border-[#FF647C]/40 px-1.5 py-0.2 rounded flex items-center gap-1 animate-pulse">
+                    <AlertTriangle className="w-2.5 h-2.5 text-[#FF647C]" />
+                    <span>CLIP / SATURAÇÃO</span>
                   </span>
-                  <span className="text-[10px] font-mono text-[#83B8FF] capitalize">
-                    {noiseSuppressionLevel === 'off' && 'Desativado'}
-                    {noiseSuppressionLevel === 'low' && 'Leve (80Hz)'}
-                    {noiseSuppressionLevel === 'medium' && 'Moderado (Recomendado)'}
-                    {noiseSuppressionLevel === 'high' && 'Agressivo (Estrito)'}
-                  </span>
-                </div>
-
-                {/* 4-Level Segmented Controls */}
-                <div className="grid grid-cols-4 gap-1 p-0.5 bg-[#0B0E14] rounded-lg border border-[#303A4B]">
-                  {(['off', 'low', 'medium', 'high'] as const).map((lvl) => {
-                    const labels = {
-                      off: 'Desativado',
-                      low: 'Leve',
-                      medium: 'Moderado',
-                      high: 'Agressivo'
-                    };
-                    const isActive = noiseSuppressionLevel === lvl;
-                    return (
-                      <button
-                        key={lvl}
-                        type="button"
-                        onClick={() => setNoiseSuppressionLevel(lvl)}
-                        className={`py-1 text-[11px] font-medium rounded transition-all text-center ${
-                          isActive
-                            ? 'bg-[#78A5FF] text-[#101A32] font-semibold shadow-sm'
-                            : 'text-[#929CAF] hover:text-[#F3F5F9] hover:bg-[#191F2B]'
-                        }`}
-                      >
-                        {labels[lvl]}
-                      </button>
-                    );
-                  })}
-                </div>
-
-                <p className="text-[10px] text-[#929CAF] leading-tight">
-                  {noiseSuppressionLevel === 'off' && 'Sinal original puro sem filtros adicionais.'}
-                  {noiseSuppressionLevel === 'low' && 'Filtro passa-alta 80Hz: remove zumbidos de rede elétrica e batidas na mesa.'}
-                  {noiseSuppressionLevel === 'medium' && 'Passa-alta 120Hz + Notch 3.5kHz: elimina ruído de ventoinhas, computadores e ar condicionado.'}
-                  {noiseSuppressionLevel === 'high' && 'Isolamento estrito: corta ruídos e foca na frequência central da voz humana.'}
-                </p>
-              </div>
-
-              {/* Listen to Test (Ouvir para Testar / Audio Monitoring) */}
-              <div className="pt-2 border-t border-[#303A4B] space-y-2">
-                <button
-                  type="button"
-                  onClick={() => setIsMonitoringAudio(!isMonitoringAudio)}
-                  className={`w-full py-2 px-3 rounded-lg text-xs font-semibold flex items-center justify-center space-x-2 transition-all ${
-                    isMonitoringAudio
-                      ? 'bg-[#F2B66D]/20 text-[#F2B66D] border border-[#F2B66D]/40 hover:bg-[#F2B66D]/30'
-                      : 'bg-[#191F2B] hover:bg-[#222B39] text-[#B7C0CE] hover:text-[#F3F5F9] border border-[#303A4B]'
-                  }`}
-                >
-                  <Headphones className="w-3.5 h-3.5 text-[#78A5FF]" />
-                  <span>
-                    {isMonitoringAudio ? 'Desligar Monitoração de Áudio' : 'Ouvir para Testar (Retorno ao Vivo)'}
-                  </span>
-                </button>
-
-                {isMonitoringAudio ? (
-                  <div className="p-2 bg-[#191F2B] border border-[#F2B66D]/30 rounded-lg text-[11px] text-[#F2B66D] flex items-start space-x-2">
-                    <Info className="w-4 h-4 text-[#F2B66D] shrink-0 mt-0.5" />
-                    <div>
-                      <span className="font-semibold block">Monitoração ativa em tempo real</span>
-                      <span>Você está ouvindo o áudio exatamente como será gravado (com ganho e filtros). Use fones de ouvido para evitar microfonia.</span>
-                    </div>
-                  </div>
                 ) : (
-                  <span className="text-[10px] text-[#929CAF] block text-center">
-                    Dica: use fones de ouvido antes de ligar a monitoração para evitar eco com as caixas de som.
+                  <span className="text-[10px] text-[#83B8FF] font-medium flex items-center gap-1">
+                    <span className="w-1.5 h-1.5 rounded-full bg-[#83B8FF] inline-block" />
+                    <span>Nível: {audioLevel}%</span>
                   </span>
                 )}
               </div>
-            </div>
-          </div>
 
-          {/* Advanced Recording Settings (Resolution, FPS, System Audio) */}
-          <div className="space-y-1.5">
-            <h2 className="text-[11px] font-bold text-[#929CAF] uppercase tracking-wider block">
-              Preferências de Gravação & Saída
-            </h2>
-            <div className="bg-[#121722] border border-[#303A4B] rounded-xl p-2.5 space-y-2">
-              {/* Row 1: Qualidade & FPS + Contagem */}
-              <div className="flex items-center justify-between text-xs flex-wrap gap-2">
-                <div className="flex items-center space-x-1.5">
-                  <span className="text-[#929CAF] font-medium text-[11px]">Qualidade & Taxa:</span>
-                  <select
-                    value={resolution}
-                    onChange={(e) => setResolution(e.target.value as any)}
-                    className="bg-[#0B0E14] border border-[#303A4B] rounded px-1.5 py-0.5 text-[11px] text-[#F3F5F9] focus:outline-none"
-                  >
-                    <option value="720p">720p (HD)</option>
-                    <option value="1080p">1080p (FHD)</option>
-                    <option value="4k">4K (Ultra)</option>
-                  </select>
+              <div className="bg-[#121722] border border-[#303A4B] rounded-xl p-2.5 space-y-2">
+                {micError && (
+                  <div className="flex items-center space-x-2 p-1.5 bg-[#F2B66D]/10 border border-[#F2B66D]/30 rounded-lg text-[#F2B66D] text-xs">
+                    <AlertTriangle className="w-3.5 h-3.5 shrink-0 text-[#F2B66D]" />
+                    <span className="text-[10px]">{micError}</span>
+                  </div>
+                )}
 
+                {/* Microphone Device Dropdown */}
+                <div className="flex items-center space-x-2">
+                  <Mic className="w-4 h-4 text-[#78A5FF] shrink-0" />
                   <select
-                    value={fps}
-                    onChange={(e) => setFps(Number(e.target.value))}
-                    className="bg-[#0B0E14] border border-[#303A4B] rounded px-1.5 py-0.5 text-[11px] text-[#F3F5F9] focus:outline-none"
+                    value={selectedAudioId}
+                    onChange={(e) => setSelectedAudioId(e.target.value)}
+                    className="w-full bg-[#0B0E14] border border-[#303A4B] rounded-lg text-xs text-[#F3F5F9] p-1.5 font-medium focus:outline-none focus:border-[#78A5FF] truncate"
                   >
-                    <option value={30}>30 fps</option>
-                    <option value={60}>60 fps</option>
+                    {audioDevices.length === 0 ? (
+                      <option value="" className="bg-[#121722]">Nenhum microfone detectado</option>
+                    ) : (
+                      audioDevices.map((d) => (
+                        <option key={d.deviceId} value={d.deviceId} className="bg-[#121722]">
+                          {d.label || `Microfone (${d.deviceId.slice(0, 5)}...)`}
+                        </option>
+                      ))
+                    )}
                   </select>
                 </div>
 
-                <div className="flex items-center space-x-1">
-                  <Clock className="w-3.5 h-3.5 text-[#78A5FF]" />
-                  <div className="flex items-center space-x-0.5 bg-[#0B0E14] p-0.5 rounded-lg border border-[#303A4B]">
-                    {([0, 3, 5] as const).map((secs) => (
-                      <button
-                        key={secs}
-                        type="button"
-                        onClick={() => setCountdownSeconds(secs)}
-                        className={`px-1.5 py-0.5 rounded text-[10px] font-semibold transition-all ${
-                          countdownSeconds === secs
-                            ? 'bg-[#78A5FF] text-[#101A32] shadow-sm'
-                            : 'text-[#929CAF] hover:text-[#F3F5F9]'
-                        }`}
-                        title={secs === 0 ? 'Iniciar gravação imediatamente sem contagem' : `Contagem regressiva de ${secs} segundos`}
-                      >
-                        {secs === 0 ? '0s (Direto)' : `${secs}s`}
-                      </button>
-                    ))}
+                {/* 16-Segment Calibrated LED VU Meter with Clipping Warning */}
+                <div className="space-y-0.5">
+                  <div className="flex items-center justify-between text-[9px] text-[#929CAF] font-mono px-0.5">
+                    <span>-40 dB</span>
+                    <span>-18 dB</span>
+                    <span>-6 dB</span>
+                    <span className={isClipping ? 'text-[#FF647C] font-bold' : 'text-[#929CAF]'}>0 dB</span>
+                  </div>
+                  <div className="flex items-center space-x-1 h-2 w-full bg-[#0B0E14] p-0.5 rounded-lg border border-[#303A4B]">
+                    {Array.from({ length: 16 }).map((_, idx) => {
+                      const activeThreshold = ((idx + 1) / 16) * 100;
+                      const isLit = audioLevel >= activeThreshold;
+                      const isRed = idx >= 14;
+                      const isYellow = idx >= 10 && idx < 14;
+                      const barColor = isLit
+                        ? isRed
+                          ? 'bg-[#FF647C]'
+                          : isYellow
+                          ? 'bg-[#F2B66D]'
+                          : 'bg-[#83B8FF]'
+                        : 'bg-[#191F2B]';
+                      return (
+                        <div
+                          key={idx}
+                          className={`flex-1 h-full rounded-sm transition-all duration-75 ${barColor}`}
+                        />
+                      );
+                    })}
+                  </div>
+                </div>
+
+                {/* Volume & Gain Booster Slider (0% to 200%) */}
+                <div className="space-y-1 pt-1 border-t border-[#303A4B]/60">
+                  <div className="flex items-center justify-between text-xs">
+                    <span className="text-[#B7C0CE] font-medium flex items-center gap-1.5 text-[11px]">
+                      <Sliders className="w-3.5 h-3.5 text-[#78A5FF]" />
+                      <span>Ganho de Entrada:</span>
+                    </span>
+                    <div className="flex items-center space-x-2">
+                      <span className="font-mono text-xs font-semibold text-[#9AB9FF]">
+                        {micVolume}% ({formatGainDb(micVolume)})
+                      </span>
+                      {micVolume !== 100 && (
+                        <button
+                          type="button"
+                          onClick={() => setMicVolume(100)}
+                          title="Restaurar nível padrão (100%)"
+                          className="text-[9px] px-1.5 py-0.5 rounded bg-[#191F2B] hover:bg-[#222B39] text-[#B7C0CE] hover:text-[#F3F5F9] flex items-center gap-1 transition-colors"
+                        >
+                          <RotateCcw className="w-2.5 h-2.5" />
+                          <span>100%</span>
+                        </button>
+                      )}
+                    </div>
+                  </div>
+
+                  <div className="flex items-center space-x-3">
+                    <input
+                      type="range"
+                      min="0"
+                      max="200"
+                      step="5"
+                      value={micVolume}
+                      onChange={(e) => setMicVolume(Number(e.target.value))}
+                      className="w-full h-1.5 bg-[#0B0E14] rounded-lg appearance-none cursor-pointer accent-[#78A5FF]"
+                    />
+                  </div>
+                  <div className="flex justify-between text-[9px] text-[#929CAF]">
+                    <span>0% (Mudo)</span>
+                    <span>100% (Padrão)</span>
+                    <span>200% (+6 dB Boost)</span>
+                  </div>
+                </div>
+
+                {/* Noise Reduction (Redução de Ruído) - 4 Real DSP Levels */}
+                <div className="space-y-1 pt-1 border-t border-[#303A4B]/60">
+                  <div className="flex items-center justify-between text-xs">
+                    <span className="text-[#B7C0CE] font-medium flex items-center gap-1.5 text-[11px]">
+                      <ShieldCheck className="w-3.5 h-3.5 text-[#83B8FF]" />
+                      <span>Redução de Ruído:</span>
+                    </span>
+                    <span className="text-[10px] font-mono text-[#83B8FF] capitalize">
+                      {noiseSuppressionLevel === 'off' && 'Desativado'}
+                      {noiseSuppressionLevel === 'low' && 'Leve (80Hz)'}
+                      {noiseSuppressionLevel === 'medium' && 'Moderado (Recomendado)'}
+                      {noiseSuppressionLevel === 'high' && 'Agressivo (Estrito)'}
+                    </span>
+                  </div>
+
+                  {/* 4-Level Segmented Controls */}
+                  <div className="grid grid-cols-4 gap-1 p-0.5 bg-[#0B0E14] rounded-lg border border-[#303A4B]">
+                    {(['off', 'low', 'medium', 'high'] as const).map((lvl) => {
+                      const labels = {
+                        off: 'Desativado',
+                        low: 'Leve',
+                        medium: 'Moderado',
+                        high: 'Agressivo'
+                      };
+                      const isActive = noiseSuppressionLevel === lvl;
+                      return (
+                        <button
+                          key={lvl}
+                          type="button"
+                          onClick={() => setNoiseSuppressionLevel(lvl)}
+                          className={`py-1 text-[10px] font-medium rounded transition-all text-center ${
+                            isActive
+                              ? 'bg-[#78A5FF] text-[#101A32] font-semibold shadow-sm'
+                              : 'text-[#929CAF] hover:text-[#F3F5F9] hover:bg-[#191F2B]'
+                          }`}
+                        >
+                          {labels[lvl]}
+                        </button>
+                      );
+                    })}
+                  </div>
+
+                  <p className="text-[10px] text-[#929CAF] leading-tight">
+                    {noiseSuppressionLevel === 'off' && 'Sinal original puro sem filtros adicionais.'}
+                    {noiseSuppressionLevel === 'low' && 'Filtro passa-alta 80Hz: remove zumbidos de rede elétrica e batidas na mesa.'}
+                    {noiseSuppressionLevel === 'medium' && 'Passa-alta 120Hz + Notch 3.5kHz: elimina ruído de ventoinhas, computadores e ar condicionado.'}
+                    {noiseSuppressionLevel === 'high' && 'Isolamento estrito: corta ruídos e foca na frequência central da voz humana.'}
+                  </p>
+                </div>
+
+                {/* Listen to Test (Ouvir para Testar / Audio Monitoring) */}
+                <div className="pt-1.5 border-t border-[#303A4B]/60 space-y-1.5">
+                  <button
+                    type="button"
+                    onClick={() => setIsMonitoringAudio(!isMonitoringAudio)}
+                    className={`w-full py-1.5 px-3 rounded-lg text-xs font-semibold flex items-center justify-center space-x-2 transition-all ${
+                      isMonitoringAudio
+                        ? 'bg-[#F2B66D]/20 text-[#F2B66D] border border-[#F2B66D]/40 hover:bg-[#F2B66D]/30'
+                        : 'bg-[#191F2B] hover:bg-[#222B39] text-[#B7C0CE] hover:text-[#F3F5F9] border border-[#303A4B]'
+                    }`}
+                  >
+                    <Headphones className="w-3.5 h-3.5 text-[#78A5FF]" />
+                    <span>
+                      {isMonitoringAudio ? 'Desligar Monitoração de Áudio' : 'Ouvir para Testar (Retorno ao Vivo)'}
+                    </span>
+                  </button>
+
+                  {isMonitoringAudio ? (
+                    <div className="p-1.5 bg-[#191F2B] border border-[#F2B66D]/30 rounded-lg text-[10px] text-[#F2B66D] flex items-center space-x-1.5">
+                      <Info className="w-3.5 h-3.5 text-[#F2B66D] shrink-0" />
+                      <span>Monitoração ativa em tempo real. Use fones de ouvido para evitar microfonia.</span>
+                    </div>
+                  ) : (
+                    <span className="text-[9px] text-[#929CAF] block text-center">
+                      Dica: use fones de ouvido antes de ligar a monitoração para evitar eco com as caixas de som.
+                    </span>
+                  )}
+                </div>
+              </div>
+            </div>
+
+            {/* Advanced Recording Settings (Resolution, FPS, System Audio) */}
+            <div className="space-y-1">
+              <h2 className="text-[10px] font-bold text-[#929CAF] uppercase tracking-wider block">
+                Preferências de Gravação & Saída
+              </h2>
+              <div className="bg-[#121722] border border-[#303A4B] rounded-xl p-2 space-y-2">
+                {/* Row 1: Qualidade & FPS + Contagem */}
+                <div className="flex items-center justify-between text-xs flex-wrap gap-2">
+                  <div className="flex items-center space-x-1.5">
+                    <span className="text-[#929CAF] font-medium text-[11px]">Qualidade & Taxa:</span>
+                    <select
+                      value={resolution}
+                      onChange={(e) => setResolution(e.target.value as any)}
+                      className="bg-[#0B0E14] border border-[#303A4B] rounded px-1.5 py-0.5 text-[11px] text-[#F3F5F9] focus:outline-none"
+                    >
+                      <option value="720p">720p (HD)</option>
+                      <option value="1080p">1080p (FHD)</option>
+                      <option value="4k">4K (Ultra)</option>
+                    </select>
+
+                    <select
+                      value={fps}
+                      onChange={(e) => setFps(Number(e.target.value))}
+                      className="bg-[#0B0E14] border border-[#303A4B] rounded px-1.5 py-0.5 text-[11px] text-[#F3F5F9] focus:outline-none"
+                    >
+                      <option value={30}>30 fps</option>
+                      <option value={60}>60 fps</option>
+                    </select>
+                  </div>
+
+                  <div className="flex items-center space-x-1">
+                    <Clock className="w-3.5 h-3.5 text-[#78A5FF]" />
+                    <div className="flex items-center space-x-0.5 bg-[#0B0E14] p-0.5 rounded-lg border border-[#303A4B]">
+                      {([0, 3, 5] as const).map((secs) => (
+                        <button
+                          key={secs}
+                          type="button"
+                          onClick={() => setCountdownSeconds(secs)}
+                          className={`px-1.5 py-0.5 rounded text-[10px] font-semibold transition-all ${
+                            countdownSeconds === secs
+                              ? 'bg-[#78A5FF] text-[#101A32] shadow-sm'
+                              : 'text-[#929CAF] hover:text-[#F3F5F9]'
+                          }`}
+                          title={secs === 0 ? 'Iniciar gravação imediatamente sem contagem' : `Contagem regressiva de ${secs} segundos`}
+                        >
+                          {secs === 0 ? '0s (Direto)' : `${secs}s`}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+
+                {/* Row 2: Som do Sistema, Prompter, Cursor */}
+                <div className="grid grid-cols-3 gap-2 pt-1.5 border-t border-[#303A4B] text-[11px]">
+                  <label className="flex items-center space-x-1.5 cursor-pointer">
+                    <input
+                      type="checkbox"
+                      checked={includeSystemAudio}
+                      onChange={(e) => setIncludeSystemAudio(e.target.checked)}
+                      className="w-3.5 h-3.5 accent-[#78A5FF] rounded cursor-pointer"
+                    />
+                    <span className="text-[#B7C0CE] truncate text-[11px]" title="Gravar Som do Sistema">Som Sistema</span>
+                  </label>
+
+                  <label className="flex items-center space-x-1.5 cursor-pointer">
+                    <input
+                      type="checkbox"
+                      checked={highlightCursor}
+                      onChange={(e) => setHighlightCursor(e.target.checked)}
+                      className="w-3.5 h-3.5 accent-[#78A5FF] rounded cursor-pointer"
+                    />
+                    <span className="text-[#B7C0CE] truncate text-[11px]" title="Destacar Cursor & Cliques">Cursor Ativo</span>
+                  </label>
+
+                  <div className="flex items-center space-x-1 justify-end">
+                    <button
+                      type="button"
+                      onClick={() => window.electronAPI.toggleSpeakerNotes()}
+                      className={`text-[10px] px-1.5 py-0.5 rounded font-medium transition-all ${
+                        isSpeakerNotesOpen
+                          ? 'bg-[#78A5FF] text-[#101A32] font-semibold'
+                          : 'bg-[#191F2B] text-[#B7C0CE] hover:text-[#F3F5F9] border border-[#303A4B]'
+                      }`}
+                      title="Abrir / Editar Teleprompter"
+                    >
+                      {isSpeakerNotesOpen ? 'Prompter' : 'Prompter'}
+                    </button>
+                    <input
+                      type="checkbox"
+                      checked={speakerNotesEnabled}
+                      onChange={(e) => setSpeakerNotesEnabled(e.target.checked)}
+                      className="w-3.5 h-3.5 accent-[#78A5FF] rounded cursor-pointer"
+                      title="Abrir teleprompter automaticamente ao iniciar gravação"
+                    />
                   </div>
                 </div>
               </div>
+            </div>
 
-              {/* Row 2: Som do Sistema, Prompter, Cursor */}
-              <div className="grid grid-cols-3 gap-2 pt-1.5 border-t border-[#303A4B] text-[11px]">
-                <label className="flex items-center space-x-1.5 cursor-pointer">
-                  <input
-                    type="checkbox"
-                    checked={includeSystemAudio}
-                    onChange={(e) => setIncludeSystemAudio(e.target.checked)}
-                    className="w-3.5 h-3.5 accent-[#78A5FF] rounded cursor-pointer"
-                  />
-                  <span className="text-[#B7C0CE] truncate" title="Gravar Som do Sistema">Som Sistema</span>
-                </label>
-
-                <label className="flex items-center space-x-1.5 cursor-pointer">
-                  <input
-                    type="checkbox"
-                    checked={highlightCursor}
-                    onChange={(e) => setHighlightCursor(e.target.checked)}
-                    className="w-3.5 h-3.5 accent-[#78A5FF] rounded cursor-pointer"
-                  />
-                  <span className="text-[#B7C0CE] truncate" title="Destacar Cursor & Cliques">Cursor Ativo</span>
-                </label>
-
-                <div className="flex items-center space-x-1 justify-end">
-                  <button
-                    type="button"
-                    onClick={() => window.electronAPI.toggleSpeakerNotes()}
-                    className={`text-[10px] px-1.5 py-0.5 rounded font-medium transition-all ${
-                      isSpeakerNotesOpen
-                        ? 'bg-[#78A5FF] text-[#101A32] font-semibold'
-                        : 'bg-[#191F2B] text-[#B7C0CE] hover:text-[#F3F5F9] border border-[#303A4B]'
-                    }`}
-                    title="Abrir / Editar Teleprompter"
-                  >
-                    {isSpeakerNotesOpen ? 'Prompter' : 'Prompter'}
-                  </button>
-                  <input
-                    type="checkbox"
-                    checked={speakerNotesEnabled}
-                    onChange={(e) => setSpeakerNotesEnabled(e.target.checked)}
-                    className="w-3.5 h-3.5 accent-[#78A5FF] rounded cursor-pointer"
-                    title="Abrir teleprompter automaticamente ao iniciar gravação"
-                  />
-                </div>
+            {/* Global Share Link Status Pill */}
+            <div className="bg-[#121722] border border-[#303A4B] rounded-xl px-3 py-1.5 flex items-center justify-between text-xs">
+              <div className="flex items-center space-x-2 truncate">
+                <Globe className="w-3.5 h-3.5 text-[#78A5FF] shrink-0" />
+                <span className="text-[10px] text-[#929CAF]">Link Público:</span>
+                {publicUrl ? (
+                  <span className="text-[10px] text-[#83B8FF] font-medium truncate flex items-center space-x-1">
+                    <span className="w-1.5 h-1.5 rounded-full bg-[#83B8FF] inline-block" />
+                    <span>Ativo para compartilhamento</span>
+                  </span>
+                ) : (
+                  <span className="text-[10px] text-[#929CAF]">Iniciando túnel seguro...</span>
+                )}
               </div>
+              {publicUrl && (
+                isHubCopied ? (
+                  <span className="text-[10px] text-[#83B8FF] font-semibold shrink-0 ml-2 flex items-center space-x-1">
+                    <Check className="w-3 h-3 text-[#83B8FF]" />
+                    <span>Copiado!</span>
+                  </span>
+                ) : (
+                  <button
+                    onClick={() => {
+                      navigator.clipboard.writeText(publicUrl);
+                      setIsHubCopied(true);
+                      setTimeout(() => setIsHubCopied(false), 2500);
+                    }}
+                    className="text-[10px] text-[#78A5FF] hover:text-[#9AB9FF] font-semibold shrink-0 ml-2"
+                  >
+                    Copiar Hub
+                  </button>
+                )
+              )}
             </div>
           </div>
 
-          {/* Global Share Link Status Pill */}
-          <div className="bg-[#121722] border border-[#303A4B] rounded-xl px-3 py-2 flex items-center justify-between text-xs">
-            <div className="flex items-center space-x-2 truncate">
-              <Globe className="w-3.5 h-3.5 text-[#78A5FF] shrink-0" />
-              <span className="text-[11px] text-[#929CAF]">Link Público:</span>
-              {publicUrl ? (
-                <span className="text-[11px] text-[#83B8FF] font-medium truncate flex items-center space-x-1">
-                  <span className="w-1.5 h-1.5 rounded-full bg-[#83B8FF] inline-block" />
-                  <span>Ativo para compartilhamento</span>
-                </span>
-              ) : (
-                <span className="text-[11px] text-[#929CAF]">Iniciando túnel seguro...</span>
-              )}
-            </div>
-            {publicUrl && (
-              isHubCopied ? (
-                <span className="text-[11px] text-[#83B8FF] font-semibold shrink-0 ml-2 flex items-center space-x-1">
-                  <Check className="w-3 h-3 text-[#83B8FF]" />
-                  <span>Copiado!</span>
-                </span>
-              ) : (
-                <button
-                  onClick={() => {
-                    navigator.clipboard.writeText(publicUrl);
-                    setIsHubCopied(true);
-                    setTimeout(() => setIsHubCopied(false), 2500);
-                  }}
-                  className="text-[11px] text-[#78A5FF] hover:text-[#9AB9FF] font-semibold shrink-0 ml-2"
-                >
-                  Copiar Hub
-                </button>
-              )
-            )}
-          </div>
-        </div>
-
-        {/* ========================================================================= */}
-        {/* STICKY BOTTOM ACTIONS BAR - GUARANTEED NEVER CUT OFF OR HIDDEN */}
-        {/* ========================================================================= */}
-        <div className="shrink-0 bg-[#0E121A] border-t border-[#303A4B] px-4 py-3 space-y-2 shadow-[0_-10px_25px_rgba(0,0,0,0.6)]">
-          <button
-            onClick={handleStart}
-            className="w-full bg-[#FF647C] hover:bg-[#FF647C]/90 active:scale-[0.99] text-[#2B0E13] font-black py-3 px-4 rounded-xl shadow-lg shadow-[#FF647C]/20 flex items-center justify-center space-x-2.5 transition-all cursor-pointer"
-          >
-            <div className="w-2.5 h-2.5 rounded-full bg-[#2B0E13]" />
-            <span className="tracking-wide">INICIAR GRAVAÇÃO</span>
-          </button>
-
-          <button
-            onClick={() => window.electronAPI.startLiveShare()}
-            title="Transmitir tela ao vivo com qualidade ultra fluida de até 60 FPS para qualquer dispositivo via link ou QR Code"
-            className="w-full bg-[#1A2A47] hover:bg-[#191F2B] active:scale-[0.99] text-[#78A5FF] hover:text-[#9AB9FF] font-bold py-2 px-4 rounded-xl shadow-md flex items-center justify-center space-x-2 transition-all border border-[#78A5FF]/50 cursor-pointer"
-          >
-            <Radio className="w-3.5 h-3.5 text-[#78A5FF] animate-pulse" />
-            <span className="text-xs tracking-wide">COMPARTILHAR TELA AO VIVO (60 FPS)</span>
-          </button>
-
-          {/* Quick Shortcuts & App Version / Update Check */}
-          <div className="flex items-center justify-between pt-1 border-t border-[#303A4B]/60 text-[10px] text-[#929CAF]">
-            <span className="font-mono flex items-center gap-1.5">
-              <span>v{appVersion || '2.5.0'}</span>
-              {updateFeedback && (
-                <span className="text-[#83B8FF] font-sans font-medium text-[10px] bg-[#1A2A47] border border-[#83B8FF]/40 px-1 py-0.2 rounded">
-                  {updateFeedback}
-                </span>
-              )}
-            </span>
-
-            <div className="flex items-center space-x-1.5 font-mono text-[10px]">
-              <span title="Pressione 1 a 4 para alternar modos">[1-4] Modos</span>
-              <span>•</span>
-              <span title="Pressione Enter para gravar">[Enter] Gravar</span>
-              <span>•</span>
-              <span title="Atalho global do sistema" className="text-[#B7C0CE] font-semibold">{getShortcutLabel('a')}</span>
-            </div>
+          {/* ========================================================================= */}
+          {/* STICKY BOTTOM ACTIONS BAR - GUARANTEED NEVER CUT OFF OR HIDDEN */}
+          {/* ========================================================================= */}
+          <div className="shrink-0 bg-[#0E121A] border-t border-[#303A4B] px-4 py-2.5 space-y-2 shadow-[0_-10px_25px_rgba(0,0,0,0.6)]">
+            <button
+              onClick={handleStart}
+              className="w-full bg-[#FF647C] hover:bg-[#FF647C]/90 active:scale-[0.99] text-[#2B0E13] font-black py-2.5 px-4 rounded-xl shadow-lg shadow-[#FF647C]/20 flex items-center justify-center space-x-2.5 transition-all cursor-pointer"
+            >
+              <div className="w-2.5 h-2.5 rounded-full bg-[#2B0E13]" />
+              <span className="tracking-wide text-xs">INICIAR GRAVAÇÃO</span>
+            </button>
 
             <button
-              onClick={async () => {
-                setIsCheckingUpdate(true);
-                setUpdateFeedback(null);
-                try {
-                  const res = await window.electronAPI?.checkForUpdates?.();
-                  setIsCheckingUpdate(false);
-                  if (res?.isLatest) {
-                    setUpdateFeedback('Versão mais recente!');
-                    setTimeout(() => setUpdateFeedback(null), 3500);
-                  }
-                } catch (e) {
-                  setIsCheckingUpdate(false);
-                }
-              }}
-              disabled={isCheckingUpdate}
-              className="flex items-center space-x-1 hover:text-[#78A5FF] text-[#B7C0CE] transition-colors cursor-pointer"
-              title="Checar se há novas versões"
+              onClick={() => window.electronAPI.startLiveShare()}
+              title="Transmitir tela ao vivo com qualidade ultra fluida de até 60 FPS para qualquer dispositivo via link ou QR Code"
+              className="w-full bg-[#1A2A47] hover:bg-[#191F2B] active:scale-[0.99] text-[#78A5FF] hover:text-[#9AB9FF] font-bold py-1.5 px-4 rounded-xl shadow-md flex items-center justify-center space-x-2 transition-all border border-[#78A5FF]/50 cursor-pointer"
             >
-              <RefreshCw className={`w-2.5 h-2.5 ${isCheckingUpdate ? 'animate-spin text-[#78A5FF]' : ''}`} />
-              <span>{isCheckingUpdate ? '...' : 'Atualizações'}</span>
+              <Radio className="w-3.5 h-3.5 text-[#78A5FF] animate-pulse" />
+              <span className="text-[11px] tracking-wide">COMPARTILHAR TELA AO VIVO (60 FPS)</span>
             </button>
+
+            {/* Quick Shortcuts & App Version / Update Check */}
+            <div className="flex items-center justify-between pt-1 border-t border-[#303A4B]/60 text-[9px] text-[#929CAF]">
+              <span className="font-mono flex items-center gap-1.5">
+                <span>v{appVersion || '2.5.1'}</span>
+                {updateFeedback && (
+                  <span className="text-[#83B8FF] font-sans font-medium text-[9px] bg-[#1A2A47] border border-[#83B8FF]/40 px-1 py-0.2 rounded">
+                    {updateFeedback}
+                  </span>
+                )}
+              </span>
+
+              <div className="flex items-center space-x-1.5 font-mono text-[9px]">
+                <span title="Pressione 1 a 4 para alternar modos">[1-4] Modos</span>
+                <span>•</span>
+                <span title="Pressione Enter para gravar">[Enter] Gravar</span>
+                <span>•</span>
+                <span title="Atalho global do sistema" className="text-[#B7C0CE] font-semibold">{getShortcutLabel('a')}</span>
+              </div>
+
+              <button
+                onClick={async () => {
+                  setIsCheckingUpdate(true);
+                  setUpdateFeedback(null);
+                  try {
+                    const res = await window.electronAPI?.checkForUpdates?.();
+                    setIsCheckingUpdate(false);
+                    if (res?.isLatest) {
+                      setUpdateFeedback('Versão mais recente!');
+                      setTimeout(() => setUpdateFeedback(null), 3500);
+                    }
+                  } catch (e) {
+                    setIsCheckingUpdate(false);
+                  }
+                }}
+                disabled={isCheckingUpdate}
+                className="flex items-center space-x-1 hover:text-[#78A5FF] text-[#B7C0CE] transition-colors cursor-pointer"
+                title="Checar se há novas versões"
+              >
+                <RefreshCw className={`w-2.5 h-2.5 ${isCheckingUpdate ? 'animate-spin text-[#78A5FF]' : ''}`} />
+                <span>{isCheckingUpdate ? '...' : 'Atualizações'}</span>
+              </button>
+            </div>
           </div>
         </div>
-      </div>
       )}
     </div>
   );
