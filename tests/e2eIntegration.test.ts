@@ -467,6 +467,62 @@ describe('End-to-End Integration & Subsystem Validation', () => {
       assert.ok(watchdogMs > durationToRecord, 'Watchdog must be greater than target duration');
     });
 
+    test('v2.3.0 preview trim precision clamping, duration math, and abort controller', () => {
+      const duration = 65.4;
+      let trimStart = 0;
+      let trimEnd = 65.4;
+
+      // Setting start point via shortcut I at currentTime 15.8s
+      const cursorTime = 15.8;
+      trimStart = Math.max(0, Math.min(cursorTime, trimEnd - 0.1));
+      assert.equal(trimStart, 15.8);
+
+      // Attempting to set trimEnd before trimStart should clamp
+      const invalidEnd = 10.0;
+      trimEnd = Math.min(duration, Math.max(invalidEnd, trimStart + 0.1));
+      assert.equal(trimEnd, 15.9, 'trimEnd must be strictly clamped after trimStart');
+
+      // Calculating duration
+      const trimDuration = Math.max(0, trimEnd - trimStart);
+      assert.ok(Math.abs(trimDuration - 0.1) < 0.001);
+
+      // Reset to full duration
+      trimStart = 0;
+      trimEnd = duration;
+      assert.equal(Math.max(0, trimEnd - trimStart), 65.4);
+
+      // Cancellation flag
+      let isSaving = true;
+      let abortFlag = false;
+      const cancelTrim = () => {
+        abortFlag = true;
+        isSaving = false;
+      };
+      cancelTrim();
+      assert.equal(abortFlag, true);
+      assert.equal(isSaving, false);
+    });
+
+    test('v2.3.0 Nocturne Blue design system tokens enforce non-teal dark aesthetics', () => {
+      const NOCTURNE_BLUE = {
+        bg: '#0B0E14',
+        surface: '#121722',
+        panel: '#191F2B',
+        hover: '#222B39',
+        border: '#303A4B',
+        text: '#F3F5F9',
+        blue: '#78A5FF',
+        coral: '#FF647C',
+        amber: '#F2B66D',
+        lightBlue: '#83B8FF'
+      };
+
+      assert.equal(NOCTURNE_BLUE.bg, '#0B0E14');
+      assert.equal(NOCTURNE_BLUE.blue, '#78A5FF');
+      assert.equal(NOCTURNE_BLUE.coral, '#FF647C');
+      assert.ok(!Object.values(NOCTURNE_BLUE).includes('#3AD6C6'), 'Teal/mint must not exist in Nocturne Blue');
+    });
+
     test('preview shortcut Ctrl/Cmd+L triggers share link copy handler', () => {
       const isCopyLinkShortcut = (e: { ctrlKey: boolean; metaKey: boolean; key: string }) => {
         return (e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'l';

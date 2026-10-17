@@ -101,8 +101,8 @@ export const LibraryView: React.FC = () => {
 
   if (loading) {
     return (
-      <div className="flex-1 flex items-center justify-center text-[#92A2AE] text-xs">
-        <div className="w-5 h-5 rounded-full border-2 border-[#3AD6C6] border-t-transparent animate-spin mr-2" />
+      <div className="flex-1 flex items-center justify-center text-[#929CAF] text-xs">
+        <div className="w-5 h-5 rounded-full border-2 border-[#78A5FF] border-t-transparent animate-spin mr-2" />
         <span>Carregando biblioteca Aura...</span>
       </div>
     );
@@ -113,7 +113,7 @@ export const LibraryView: React.FC = () => {
       {/* Search & Stats Bar */}
       <div className="space-y-2 shrink-0">
         <div className="relative">
-          <Search className="w-4 h-4 text-[#92A2AE] absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" />
+          <Search className="w-4 h-4 text-[#929CAF] absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" />
           <input
             type="text"
             value={searchQuery}
@@ -122,22 +122,22 @@ export const LibraryView: React.FC = () => {
               if (e.key === 'Escape') setSearchQuery('');
             }}
             placeholder="Buscar gravações por título..."
-            className="w-full bg-[#111A22] border border-[#31414D] rounded-xl pl-9 pr-8 py-2 text-xs text-[#F4F7FA] placeholder-[#92A2AE] focus:outline-none focus:border-[#3AD6C6] transition-colors"
+            className="w-full bg-[#121722] border border-[#303A4B] rounded-xl pl-9 pr-8 py-2 text-xs text-[#F3F5F9] placeholder-[#929CAF] focus:outline-none focus:border-[#78A5FF] transition-colors"
           />
           {searchQuery && (
             <button
               onClick={() => setSearchQuery('')}
               title="Limpar busca (Esc)"
-              className="absolute right-2.5 top-1/2 -translate-y-1/2 p-0.5 rounded text-[#92A2AE] hover:text-[#F4F7FA] transition-colors"
+              className="absolute right-2.5 top-1/2 -translate-y-1/2 p-0.5 rounded text-[#929CAF] hover:text-[#F3F5F9] transition-colors"
             >
               <X className="w-3.5 h-3.5" />
             </button>
           )}
         </div>
 
-        <div className="flex items-center justify-between text-[11px] text-[#C0CDD6] px-1 gap-2 flex-wrap">
+        <div className="flex items-center justify-between text-[11px] text-[#B7C0CE] px-1 gap-2 flex-wrap">
           <div className="flex items-center space-x-1">
-            <span className="text-[#92A2AE] text-[10px] uppercase font-bold tracking-wider mr-0.5">Ordenar:</span>
+            <span className="text-[#929CAF] text-[10px] uppercase font-bold tracking-wider mr-0.5">Ordenar:</span>
             {(
               [
                 { id: 'newest', label: 'Recentes' },
@@ -151,8 +151,8 @@ export const LibraryView: React.FC = () => {
                 onClick={() => setSortCriteria(item.id)}
                 className={`px-2 py-0.5 rounded-lg text-[10px] font-medium transition-all ${
                   sortCriteria === item.id
-                    ? 'bg-[#12312F] text-[#3AD6C6] border border-[#3AD6C6]/40'
-                    : 'text-[#92A2AE] hover:text-[#F4F7FA] hover:bg-[#18242E]'
+                    ? 'bg-[#1A2A47] text-[#78A5FF] border border-[#78A5FF]/40'
+                    : 'text-[#929CAF] hover:text-[#F3F5F9] hover:bg-[#191F2B]'
                 }`}
               >
                 {item.label}
@@ -160,18 +160,18 @@ export const LibraryView: React.FC = () => {
             ))}
           </div>
 
-          <div className="flex items-center space-x-2 text-[10px] text-[#C0CDD6]">
+          <div className="flex items-center space-x-2 text-[10px] text-[#B7C0CE]">
             <span>
               {searchQuery ? (
                 <>
-                  <span className="font-semibold text-[#F4F7FA]">{sortedAndFiltered.length}</span> de {recordings.length} vídeos
+                  <span className="font-semibold text-[#F3F5F9]">{sortedAndFiltered.length}</span> de {recordings.length} vídeos
                 </>
               ) : (
                 `${recordings.length} ${recordings.length === 1 ? 'vídeo gravado' : 'vídeos gravados'}`
               )}
             </span>
             <span>•</span>
-            <span className="font-mono text-[#3AD6C6] font-medium">{formatSize(totalBytes)} em disco</span>
+            <span className="font-mono text-[#78A5FF] font-medium">{formatSize(totalBytes)} em disco</span>
           </div>
         </div>
       </div>
@@ -179,18 +179,18 @@ export const LibraryView: React.FC = () => {
       {/* Videos List */}
       <div className="flex-1 overflow-y-auto space-y-2 pr-1">
         {sortedAndFiltered.length === 0 ? (
-          <div className="h-64 flex flex-col items-center justify-center text-[#92A2AE] space-y-2 text-center p-4">
-            <Film className="w-10 h-10 text-[#31414D] stroke-[1.5]" />
-            <p className="text-xs font-semibold text-[#F4F7FA]">
+          <div className="h-64 flex flex-col items-center justify-center text-[#929CAF] space-y-2 text-center p-4">
+            <Film className="w-10 h-10 text-[#303A4B] stroke-[1.5]" />
+            <p className="text-xs font-semibold text-[#F3F5F9]">
               {searchQuery ? 'Nenhum vídeo com esse nome' : 'Nenhuma gravação encontrada'}
             </p>
-            <p className="text-[11px] max-w-[240px] text-[#92A2AE]">
+            <p className="text-[11px] max-w-[240px] text-[#929CAF]">
               {searchQuery ? 'Tente buscar com outras palavras-chave.' : 'Inicie sua primeira gravação na aba "Nova Gravação".'}
             </p>
             {searchQuery && (
               <button
                 onClick={() => setSearchQuery('')}
-                className="mt-2 px-3 py-1 bg-[#12312F] hover:bg-[#12312F]/80 border border-[#3AD6C6]/30 text-[#3AD6C6] text-xs rounded-lg transition-colors font-medium"
+                className="mt-2 px-3 py-1 bg-[#1A2A47] hover:bg-[#1A2A47]/80 border border-[#78A5FF]/30 text-[#78A5FF] text-xs rounded-lg transition-colors font-medium"
               >
                 Limpar Busca
               </button>
@@ -201,12 +201,12 @@ export const LibraryView: React.FC = () => {
             <div
               key={rec.id}
               onClick={() => window.electronAPI.openPreview(rec)}
-              className="bg-[#111A22] border border-[#31414D] hover:border-[#3AD6C6]/50 rounded-xl p-3 flex items-center justify-between transition-all group shadow-sm cursor-pointer hover:bg-[#18242E]"
+              className="bg-[#121722] border border-[#303A4B] hover:border-[#78A5FF]/50 rounded-xl p-3 flex items-center justify-between transition-all group shadow-sm cursor-pointer hover:bg-[#191F2B]"
               title="Clique para assistir e editar este vídeo no Studio"
             >
               <div className="flex items-center space-x-3 min-w-0">
-                <div className="w-10 h-10 rounded-xl bg-[#18242E] border border-[#31414D] flex items-center justify-center shrink-0 group-hover:border-[#3AD6C6]/60 group-hover:bg-[#3AD6C6] transition-colors">
-                  <Play className="w-4 h-4 text-[#3AD6C6] group-hover:text-[#062B2A] fill-current transition-colors ml-0.5" />
+                <div className="w-10 h-10 rounded-xl bg-[#191F2B] border border-[#303A4B] flex items-center justify-center shrink-0 group-hover:border-[#78A5FF]/60 group-hover:bg-[#78A5FF] transition-colors">
+                  <Play className="w-4 h-4 text-[#78A5FF] group-hover:text-[#101A32] fill-current transition-colors ml-0.5" />
                 </div>
 
                 <div className="min-w-0 flex-1">
@@ -221,18 +221,18 @@ export const LibraryView: React.FC = () => {
                           if (e.key === 'Escape') setEditingId(null);
                         }}
                         autoFocus
-                        className="bg-[#0B1117] border border-[#3AD6C6]/60 rounded px-2 py-0.5 text-xs text-[#F4F7FA] focus:outline-none focus:ring-1 focus:ring-[#3AD6C6] w-48"
+                        className="bg-[#0B0E14] border border-[#78A5FF]/60 rounded px-2 py-0.5 text-xs text-[#F3F5F9] focus:outline-none focus:ring-1 focus:ring-[#78A5FF] w-48"
                       />
                       <button
                         onClick={() => handleSaveRename(rec.id)}
-                        className="p-1 rounded bg-[#3AD6C6] hover:bg-[#65E6D8] text-[#062B2A]"
+                        className="p-1 rounded bg-[#78A5FF] hover:bg-[#9AB9FF] text-[#101A32]"
                         title="Salvar nome"
                       >
                         <Check className="w-3 h-3 stroke-[3]" />
                       </button>
                       <button
                         onClick={() => setEditingId(null)}
-                        className="p-1 rounded bg-[#18242E] hover:bg-[#202E39] text-[#C0CDD6]"
+                        className="p-1 rounded bg-[#191F2B] hover:bg-[#222B39] text-[#B7C0CE]"
                         title="Cancelar"
                       >
                         <X className="w-3 h-3" />
@@ -240,7 +240,7 @@ export const LibraryView: React.FC = () => {
                     </div>
                   ) : (
                     <div className="flex items-center space-x-1.5 group/title">
-                      <h3 className="text-xs font-semibold text-[#F4F7FA] truncate max-w-[190px] group-hover:text-[#3AD6C6] transition-colors" title={rec.title}>
+                      <h3 className="text-xs font-semibold text-[#F3F5F9] truncate max-w-[190px] group-hover:text-[#78A5FF] transition-colors" title={rec.title}>
                         {rec.title}
                       </h3>
                       <button
@@ -249,27 +249,27 @@ export const LibraryView: React.FC = () => {
                           setEditingId(rec.id);
                           setEditedTitle(rec.title);
                         }}
-                        className="opacity-0 group-hover/title:opacity-100 p-0.5 text-[#92A2AE] hover:text-[#3AD6C6] transition-opacity"
+                        className="opacity-0 group-hover/title:opacity-100 p-0.5 text-[#929CAF] hover:text-[#78A5FF] transition-opacity"
                         title="Renomear gravação"
                       >
                         <Edit3 className="w-3 h-3" />
                       </button>
                     </div>
                   )}
-                  <div className="flex items-center space-x-2 text-[10px] text-[#92A2AE] mt-0.5">
+                  <div className="flex items-center space-x-2 text-[10px] text-[#929CAF] mt-0.5">
                     <span className="flex items-center space-x-1">
-                      <Clock className="w-3 h-3 text-[#92A2AE]" />
+                      <Clock className="w-3 h-3 text-[#929CAF]" />
                       <span>{formatDuration(rec.durationMs)}</span>
                     </span>
                     <span>•</span>
                     <span>{formatSize(rec.fileSize)}</span>
                     <span>•</span>
-                    <span className="font-mono text-[#C0CDD6]">{rec.resolution || '1080p'}</span>
+                    <span className="font-mono text-[#B7C0CE]">{rec.resolution || '1080p'}</span>
                     {rec.createdAt && (
                       <>
                         <span>•</span>
-                        <span className="flex items-center space-x-1 text-[#92A2AE]" title={new Date(rec.createdAt).toLocaleString()}>
-                          <Calendar className="w-2.5 h-2.5 text-[#92A2AE]" />
+                        <span className="flex items-center space-x-1 text-[#929CAF]" title={new Date(rec.createdAt).toLocaleString()}>
+                          <Calendar className="w-2.5 h-2.5 text-[#929CAF]" />
                           <span>{formatRelativeDate(rec.createdAt)}</span>
                         </span>
                       </>
@@ -289,9 +289,9 @@ export const LibraryView: React.FC = () => {
                     setTimeout(() => setCopiedId(null), 2000);
                   }}
                   title="Copiar Link Compartilhável"
-                  className="p-1.5 rounded-lg text-[#3AD6C6] hover:bg-[#12312F] transition-colors"
+                  className="p-1.5 rounded-lg text-[#78A5FF] hover:bg-[#1A2A47] transition-colors"
                 >
-                  {copiedId === rec.id ? <Check className="w-3.5 h-3.5 text-[#4CD6A0]" /> : <Share2 className="w-3.5 h-3.5" />}
+                  {copiedId === rec.id ? <Check className="w-3.5 h-3.5 text-[#83B8FF]" /> : <Share2 className="w-3.5 h-3.5" />}
                 </button>
 
                 {/* Download video */}
@@ -301,7 +301,7 @@ export const LibraryView: React.FC = () => {
                     window.electronAPI.downloadRecording(rec.id);
                   }}
                   title="Baixar Vídeo no Computador"
-                  className="p-1.5 rounded-lg text-[#4CD6A0] hover:bg-[#4CD6A0]/10 transition-colors"
+                  className="p-1.5 rounded-lg text-[#83B8FF] hover:bg-[#83B8FF]/10 transition-colors"
                 >
                   <Download className="w-3.5 h-3.5" />
                 </button>
@@ -314,7 +314,7 @@ export const LibraryView: React.FC = () => {
                     window.electronAPI.openExternalUrl(url);
                   }}
                   title="Assistir no Navegador"
-                  className="p-1.5 rounded-lg text-[#3AD6C6] hover:bg-[#12312F] transition-colors"
+                  className="p-1.5 rounded-lg text-[#78A5FF] hover:bg-[#1A2A47] transition-colors"
                 >
                   <ExternalLink className="w-3.5 h-3.5" />
                 </button>
@@ -328,10 +328,10 @@ export const LibraryView: React.FC = () => {
                     setTimeout(() => setCopiedPathId(null), 2000);
                   }}
                   title="Copiar Caminho do Arquivo (C:\...)"
-                  className="p-1.5 rounded-lg text-[#92A2AE] hover:text-[#3AD6C6] hover:bg-[#18242E] transition-colors"
+                  className="p-1.5 rounded-lg text-[#929CAF] hover:text-[#78A5FF] hover:bg-[#191F2B] transition-colors"
                 >
                   {copiedPathId === rec.id ? (
-                    <Check className="w-3.5 h-3.5 text-[#4CD6A0]" />
+                    <Check className="w-3.5 h-3.5 text-[#83B8FF]" />
                   ) : (
                     <Copy className="w-3.5 h-3.5" />
                   )}
@@ -344,14 +344,14 @@ export const LibraryView: React.FC = () => {
                     handleOpenFolder(rec.filePath);
                   }}
                   title="Abrir Pasta no Windows Explorer"
-                  className="p-1.5 rounded-lg text-[#92A2AE] hover:text-[#F4F7FA] hover:bg-[#18242E] transition-colors"
+                  className="p-1.5 rounded-lg text-[#929CAF] hover:text-[#F3F5F9] hover:bg-[#191F2B] transition-colors"
                 >
                   <FolderOpen className="w-3.5 h-3.5" />
                 </button>
 
                 {/* Delete with inline confirmation */}
                 {confirmDeleteId === rec.id ? (
-                  <div className="flex items-center space-x-1 bg-[#FF5F6D]/20 border border-[#FF5F6D]/40 rounded-lg px-1.5 py-0.5" onClick={(e) => e.stopPropagation()}>
+                  <div className="flex items-center space-x-1 bg-[#FF647C]/20 border border-[#FF647C]/40 rounded-lg px-1.5 py-0.5" onClick={(e) => e.stopPropagation()}>
                     <button
                       onClick={() => handleDelete(rec.id)}
                       title="Confirmar exclusão definitiva"
@@ -362,7 +362,7 @@ export const LibraryView: React.FC = () => {
                     <button
                       onClick={() => setConfirmDeleteId(null)}
                       title="Cancelar"
-                      className="text-[10px] text-[#C0CDD6] hover:text-[#F4F7FA] px-1 py-0.5 transition-colors"
+                      className="text-[10px] text-[#B7C0CE] hover:text-[#F3F5F9] px-1 py-0.5 transition-colors"
                     >
                       Cancelar
                     </button>
@@ -374,7 +374,7 @@ export const LibraryView: React.FC = () => {
                       setConfirmDeleteId(rec.id);
                     }}
                     title="Excluir Gravação"
-                    className="p-1.5 rounded-lg text-[#92A2AE] hover:text-[#FF5F6D] hover:bg-[#FF5F6D]/10 transition-colors"
+                    className="p-1.5 rounded-lg text-[#929CAF] hover:text-[#FF647C] hover:bg-[#FF647C]/10 transition-colors"
                   >
                     <Trash2 className="w-3.5 h-3.5" />
                   </button>

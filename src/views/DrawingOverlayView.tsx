@@ -99,7 +99,7 @@ export const DrawingOverlayView: React.FC = () => {
   const [whiteboardMode, setWhiteboardMode] = useState<WhiteboardMode>('screen');
   const [stampType, setStampType] = useState<StampType>('number');
   const [color, setColor] = useState(() => {
-    return localStorage.getItem('aura_draw_color') || '#3AD6C6';
+    return localStorage.getItem('aura_draw_color') || '#78A5FF';
   });
   const [strokeWidth, setStrokeWidth] = useState(() => {
     const saved = localStorage.getItem('aura_draw_width');
@@ -163,12 +163,12 @@ export const DrawingOverlayView: React.FC = () => {
   const nextStampRef = useRef(1);
 
   const colors = [
-    { name: 'Signal Mint', hex: '#3AD6C6' },
-    { name: 'Coral Gravação', hex: '#FF5F6D' },
-    { name: 'Âmbar Aviso', hex: '#FFBD66' },
-    { name: 'Verde Sucesso', hex: '#4CD6A0' },
-    { name: 'Mint Claro', hex: '#65E6D8' },
-    { name: 'Branco Studio', hex: '#F4F7FA' }
+    { name: 'Azul Nocturne', hex: '#78A5FF' },
+    { name: 'Coral Estúdio', hex: '#FF647C' },
+    { name: 'Âmbar Alerta', hex: '#F2B66D' },
+    { name: 'Azul Claro', hex: '#83B8FF' },
+    { name: 'Azul Celeste', hex: '#9AB9FF' },
+    { name: 'Branco Puro', hex: '#F3F5F9' }
   ];
 
   useEffect(() => {
@@ -1180,30 +1180,30 @@ export const DrawingOverlayView: React.FC = () => {
         <div
           className={`absolute ${
             dockPosition === 'top' ? 'top-4' : 'bottom-4'
-          } left-1/2 -translate-x-1/2 flex items-center space-x-2 bg-[#0B1117]/95 backdrop-blur-2xl border border-[#31414D] px-4 py-2 rounded-full shadow-2xl text-[#F4F7FA] z-50 cursor-pointer hover:border-[#3AD6C6]/50 transition-all`}
+          } left-1/2 -translate-x-1/2 flex items-center space-x-2 bg-[#0B0E14]/95 backdrop-blur-2xl border border-[#303A4B] px-4 py-2 rounded-full shadow-2xl text-[#F3F5F9] z-50 cursor-pointer hover:border-[#78A5FF]/50 transition-all`}
           style={{ WebkitAppRegion: 'no-drag' } as any}
           onClick={() => setIsMinimized(false)}
         >
-          <Sparkles className="w-4 h-4 text-[#3AD6C6] animate-pulse" />
-          <span className="text-xs font-bold text-[#F4F7FA]">Anotações Aura Studio</span>
-          <span className="text-[10px] text-[#92A2AE] font-mono">({tool})</span>
-          <Maximize2 className="w-3.5 h-3.5 text-[#92A2AE] ml-1" />
+          <Sparkles className="w-4 h-4 text-[#78A5FF] animate-pulse" />
+          <span className="text-xs font-bold text-[#F3F5F9]">Anotações Aura Studio</span>
+          <span className="text-[10px] text-[#929CAF] font-mono">({tool})</span>
+          <Maximize2 className="w-3.5 h-3.5 text-[#929CAF] ml-1" />
         </div>
       ) : (
         /* Expanded Floating Toolbar Dock */
         <div
           className={`absolute ${
             dockPosition === 'top' ? 'top-3' : 'bottom-3'
-          } left-1/2 -translate-x-1/2 flex items-center space-x-1.5 bg-[#0B1117]/95 backdrop-blur-2xl border border-[#31414D] px-3 py-1.5 rounded-2xl shadow-2xl text-[#F4F7FA] z-50 cursor-default max-w-[96vw] overflow-x-auto`}
+          } left-1/2 -translate-x-1/2 flex items-center space-x-1.5 bg-[#0B0E14]/95 backdrop-blur-2xl border border-[#303A4B] px-3 py-1.5 rounded-2xl shadow-2xl text-[#F3F5F9] z-50 cursor-default max-w-[96vw] overflow-x-auto`}
           style={{ WebkitAppRegion: 'no-drag' } as any}
         >
           {/* Main Drawing Tools */}
-          <div className="flex items-center space-x-1 border-r border-[#31414D] pr-1.5">
+          <div className="flex items-center space-x-1 border-r border-[#303A4B] pr-1.5">
             <button
               onClick={() => setTool('pen')}
               title="Caneta Livre (P)"
               className={`p-2 rounded-xl transition-all ${
-                tool === 'pen' ? 'bg-[#12312F] text-[#3AD6C6] border border-[#3AD6C6]/50 font-bold shadow-sm' : 'text-[#92A2AE] hover:text-[#F4F7FA] hover:bg-[#202E39]'
+                tool === 'pen' ? 'bg-[#1A2A47] text-[#78A5FF] border border-[#78A5FF]/50 font-bold shadow-sm' : 'text-[#929CAF] hover:text-[#F3F5F9] hover:bg-[#222B39]'
               }`}
             >
               <Pen className="w-3.5 h-3.5" />
@@ -1214,11 +1214,11 @@ export const DrawingOverlayView: React.FC = () => {
               title="Caneta Inteligente Auto-Snap (S) • Converte traços livres em círculos, retângulos, triângulos e diamantes perfeitos!"
               className={`p-2 rounded-xl transition-all relative ${
                 tool === 'smartpen'
-                  ? 'bg-[#12312F] text-[#3AD6C6] border border-[#3AD6C6]/50 font-bold shadow-sm'
-                  : 'text-[#92A2AE] hover:text-[#F4F7FA] hover:bg-[#202E39]'
+                  ? 'bg-[#1A2A47] text-[#78A5FF] border border-[#78A5FF]/50 font-bold shadow-sm'
+                  : 'text-[#929CAF] hover:text-[#F3F5F9] hover:bg-[#222B39]'
               }`}
             >
-              <Sparkles className="w-3.5 h-3.5 text-[#FFBD66]" />
+              <Sparkles className="w-3.5 h-3.5 text-[#F2B66D]" />
             </button>
 
             <button
@@ -1226,11 +1226,11 @@ export const DrawingOverlayView: React.FC = () => {
               title="Apontador Laser Dinâmico (Z) • Ponto neon e rastro brilhante para apresentações fluidas"
               className={`p-2 rounded-xl transition-all ${
                 tool === 'laser'
-                  ? 'bg-[#FF5F6D] text-[#2B0E13] font-bold shadow-sm ring-1 ring-[#FF5F6D]'
-                  : 'text-[#92A2AE] hover:text-[#F4F7FA] hover:bg-[#202E39]'
+                  ? 'bg-[#FF647C] text-[#2B0E13] font-bold shadow-sm ring-1 ring-[#FF647C]'
+                  : 'text-[#929CAF] hover:text-[#F3F5F9] hover:bg-[#222B39]'
               }`}
             >
-              <Zap className="w-3.5 h-3.5 text-[#FFBD66]" />
+              <Zap className="w-3.5 h-3.5 text-[#F2B66D]" />
             </button>
 
             <button

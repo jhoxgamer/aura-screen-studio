@@ -631,22 +631,22 @@ export const PreRecordingView: React.FC = () => {
   };
 
   return (
-    <div className="w-[470px] min-h-[730px] bg-[#0B1117] text-[#F4F7FA] rounded-2xl border border-[#31414D] shadow-2xl flex flex-col overflow-hidden select-none font-sans">
+    <div className="w-[470px] min-h-[730px] bg-[#0B0E14] text-[#F3F5F9] rounded-2xl border border-[#303A4B] shadow-2xl flex flex-col overflow-hidden select-none font-sans">
       {/* Title Bar / Drag Handle */}
       <div
-        className="h-12 bg-[#111A22] px-4 flex items-center justify-between border-b border-[#31414D]"
+        className="h-12 bg-[#121722] px-4 flex items-center justify-between border-b border-[#303A4B]"
         style={{ WebkitAppRegion: 'drag' } as any}
       >
         <div className="flex items-center space-x-2.5">
           {/* Authentic Studio Emblem */}
-          <div className="w-7 h-7 rounded-lg bg-[#18242E] border border-[#31414D] flex items-center justify-center">
-            <div className="w-3.5 h-3.5 rounded-full border-2 border-[#3AD6C6] flex items-center justify-center">
-              <div className="w-1.5 h-1.5 rounded-full bg-[#FF5F6D]" />
+          <div className="w-7 h-7 rounded-lg bg-[#191F2B] border border-[#303A4B] flex items-center justify-center">
+            <div className="w-3.5 h-3.5 rounded-full border-2 border-[#78A5FF] flex items-center justify-center">
+              <div className="w-1.5 h-1.5 rounded-full bg-[#FF647C]" />
             </div>
           </div>
           <div className="flex items-center space-x-2">
-            <span className="font-semibold text-sm tracking-tight text-[#F4F7FA]">Aura Screen Studio</span>
-            <span className="text-[10px] text-[#C0CDD6] bg-[#18242E] border border-[#31414D] px-1.5 py-0.5 rounded font-mono">
+            <span className="font-semibold text-sm tracking-tight text-[#F3F5F9]">Aura Screen Studio</span>
+            <span className="text-[10px] text-[#B7C0CE] bg-[#191F2B] border border-[#303A4B] px-1.5 py-0.5 rounded font-mono">
               v{appVersion || '2.2.0'}
             </span>
           </div>
@@ -656,35 +656,35 @@ export const PreRecordingView: React.FC = () => {
           <button
             onClick={() => window.electronAPI.startLiveShare()}
             title="Transmitir Tela ao Vivo em 60 FPS (Alt+Shift+Z)"
-            className="flex items-center space-x-1.5 px-2.5 py-1 rounded-md bg-[#12312F] hover:bg-[#18242E] text-[#3AD6C6] hover:text-[#65E6D8] text-[11px] font-semibold transition-colors border border-[#3AD6C6]/50"
+            className="flex items-center space-x-1.5 px-2.5 py-1 rounded-md bg-[#1A2A47] hover:bg-[#191F2B] text-[#78A5FF] hover:text-[#9AB9FF] text-[11px] font-semibold transition-colors border border-[#78A5FF]/50"
           >
-            <Radio className="w-3.5 h-3.5 text-[#3AD6C6] animate-pulse" />
+            <Radio className="w-3.5 h-3.5 text-[#78A5FF] animate-pulse" />
             <span>Ao Vivo (60 FPS)</span>
           </button>
           <button
             onClick={() => window.electronAPI.takeScreenshot()}
             title={`Capturar Screenshot com Anotações (${getShortcutLabel('s')})`}
-            className="flex items-center space-x-1 px-2.5 py-1 rounded-md bg-[#18242E] hover:bg-[#202E39] text-[#C0CDD6] hover:text-[#3AD6C6] text-[11px] font-medium transition-colors border border-[#31414D]"
+            className="flex items-center space-x-1 px-2.5 py-1 rounded-md bg-[#191F2B] hover:bg-[#222B39] text-[#B7C0CE] hover:text-[#78A5FF] text-[11px] font-medium transition-colors border border-[#303A4B]"
           >
-            <Camera className="w-3.5 h-3.5 text-[#3AD6C6]" />
+            <Camera className="w-3.5 h-3.5 text-[#78A5FF]" />
             <span>Screenshot</span>
           </button>
           <button
             onClick={() => window.electronAPI.checkForUpdates()}
             title="Verificar Atualizações"
-            className="p-1.5 hover:bg-[#202E39] rounded-md text-[#92A2AE] hover:text-[#F4F7FA] transition-colors"
+            className="p-1.5 hover:bg-[#222B39] rounded-md text-[#929CAF] hover:text-[#F3F5F9] transition-colors"
           >
             <RefreshCw className="w-3.5 h-3.5" />
           </button>
           <button
             onClick={() => window.electronAPI.minimizeCurrentWindow()}
-            className="p-1.5 hover:bg-[#202E39] rounded-md text-[#92A2AE] hover:text-[#F4F7FA] transition-colors"
+            className="p-1.5 hover:bg-[#222B39] rounded-md text-[#929CAF] hover:text-[#F3F5F9] transition-colors"
           >
             <Minus className="w-3.5 h-3.5" />
           </button>
           <button
             onClick={() => window.electronAPI.closeCurrentWindow()}
-            className="p-1.5 hover:bg-[#B83A48]/20 hover:text-[#FF5F6D] rounded-md text-[#92A2AE] transition-colors"
+            className="p-1.5 hover:bg-[#B83A48]/20 hover:text-[#FF647C] rounded-md text-[#929CAF] transition-colors"
           >
             <X className="w-3.5 h-3.5" />
           </button>
@@ -692,27 +692,27 @@ export const PreRecordingView: React.FC = () => {
       </div>
 
       {/* Tabs */}
-      <div className="flex border-b border-[#31414D] px-4 bg-[#111A22] pt-2">
+      <div className="flex border-b border-[#303A4B] px-4 bg-[#121722] pt-2">
         <button
           onClick={() => setActiveTab('record')}
           className={`flex items-center space-x-2 px-4 py-2 font-semibold text-xs rounded-t-lg transition-all ${
             activeTab === 'record'
-              ? 'text-[#F4F7FA] border-b-2 border-[#3AD6C6] bg-[#18242E]'
-              : 'text-[#92A2AE] hover:text-[#F4F7FA]'
+              ? 'text-[#F3F5F9] border-b-2 border-[#78A5FF] bg-[#191F2B]'
+              : 'text-[#929CAF] hover:text-[#F3F5F9]'
           }`}
         >
-          <PlayCircle className="w-3.5 h-3.5 text-[#3AD6C6]" />
+          <PlayCircle className="w-3.5 h-3.5 text-[#78A5FF]" />
           <span>Nova Gravação</span>
         </button>
         <button
           onClick={() => setActiveTab('library')}
           className={`flex items-center space-x-2 px-4 py-2 font-semibold text-xs rounded-t-lg transition-all ${
             activeTab === 'library'
-              ? 'text-[#F4F7FA] border-b-2 border-[#3AD6C6] bg-[#18242E]'
-              : 'text-[#92A2AE] hover:text-[#F4F7FA]'
+              ? 'text-[#F3F5F9] border-b-2 border-[#78A5FF] bg-[#191F2B]'
+              : 'text-[#929CAF] hover:text-[#F3F5F9]'
           }`}
         >
-          <FolderOpen className="w-3.5 h-3.5 text-[#C0CDD6]" />
+          <FolderOpen className="w-3.5 h-3.5 text-[#B7C0CE]" />
           <span>Biblioteca de Vídeos</span>
         </button>
       </div>
@@ -723,17 +723,17 @@ export const PreRecordingView: React.FC = () => {
         <div className="flex-1 p-4 overflow-y-auto space-y-4">
           {/* In-App Auto-Update Notification Banner */}
           {updaterStatus.state === 'downloading' && (
-            <div className="p-3 bg-[#18242E] border border-[#3AD6C6]/40 rounded-xl space-y-1.5">
-              <div className="flex items-center justify-between text-xs font-semibold text-[#3AD6C6]">
+            <div className="p-3 bg-[#191F2B] border border-[#78A5FF]/40 rounded-xl space-y-1.5">
+              <div className="flex items-center justify-between text-xs font-semibold text-[#78A5FF]">
                 <span className="flex items-center space-x-1.5">
-                  <RefreshCw className="w-3.5 h-3.5 animate-spin text-[#3AD6C6]" />
+                  <RefreshCw className="w-3.5 h-3.5 animate-spin text-[#78A5FF]" />
                   <span>Baixando atualização v{updaterStatus.version || ''}...</span>
                 </span>
-                <span className="font-mono text-[#F4F7FA]">{updaterStatus.percent || 0}%</span>
+                <span className="font-mono text-[#F3F5F9]">{updaterStatus.percent || 0}%</span>
               </div>
-              <div className="w-full bg-[#111A22] rounded-full h-1.5 overflow-hidden">
+              <div className="w-full bg-[#121722] rounded-full h-1.5 overflow-hidden">
                 <div
-                  className="bg-[#3AD6C6] h-full rounded-full transition-all duration-300"
+                  className="bg-[#78A5FF] h-full rounded-full transition-all duration-300"
                   style={{ width: `${updaterStatus.percent || 0}%` }}
                 />
               </div>
@@ -741,19 +741,19 @@ export const PreRecordingView: React.FC = () => {
           )}
 
           {updaterStatus.state === 'downloaded' && (
-            <div className="p-3 bg-[#12312F] border border-[#4CD6A0]/50 rounded-xl flex items-center justify-between">
+            <div className="p-3 bg-[#1A2A47] border border-[#83B8FF]/50 rounded-xl flex items-center justify-between">
               <div className="text-xs">
-                <span className="font-bold text-[#4CD6A0] flex items-center gap-1.5">
-                  <ShieldCheck className="w-4 h-4 text-[#4CD6A0]" />
+                <span className="font-bold text-[#83B8FF] flex items-center gap-1.5">
+                  <ShieldCheck className="w-4 h-4 text-[#83B8FF]" />
                   Atualização v{updaterStatus.version || ''} Pronta
                 </span>
-                <span className="text-[11px] text-[#C0CDD6] block">
+                <span className="text-[11px] text-[#B7C0CE] block">
                   Reinicie para aplicar as melhorias no app.
                 </span>
               </div>
               <button
                 onClick={() => window.electronAPI?.installUpdateNow?.()}
-                className="px-3 py-1.5 bg-[#4CD6A0] hover:bg-[#65E6D8] text-[#062B2A] text-xs font-bold rounded-lg transition-colors whitespace-nowrap"
+                className="px-3 py-1.5 bg-[#83B8FF] hover:bg-[#9AB9FF] text-[#101A32] text-xs font-bold rounded-lg transition-colors whitespace-nowrap"
               >
                 Reiniciar Agora
               </button>
@@ -762,7 +762,7 @@ export const PreRecordingView: React.FC = () => {
 
           {/* Mode Selector */}
           <div>
-            <label className="text-[11px] font-bold text-[#92A2AE] uppercase tracking-wider block mb-2">
+            <label className="text-[11px] font-bold text-[#929CAF] uppercase tracking-wider block mb-2">
               Modo de Gravação
             </label>
             <div className="grid grid-cols-4 gap-1.5">
@@ -770,13 +770,13 @@ export const PreRecordingView: React.FC = () => {
                 onClick={() => setMode('screen-cam')}
                 className={`flex flex-col items-center justify-center p-2.5 rounded-xl border text-center transition-all ${
                   mode === 'screen-cam'
-                    ? 'bg-[#12312F] border-2 border-[#3AD6C6] text-[#3AD6C6] font-bold shadow-sm'
-                    : 'bg-[#111A22] border border-[#31414D] text-[#C0CDD6] hover:border-[#3AD6C6]/40 hover:text-[#F4F7FA]'
+                    ? 'bg-[#1A2A47] border-2 border-[#78A5FF] text-[#78A5FF] font-bold shadow-sm'
+                    : 'bg-[#121722] border border-[#303A4B] text-[#B7C0CE] hover:border-[#78A5FF]/40 hover:text-[#F3F5F9]'
                 }`}
               >
                 <div className="relative mb-1">
-                  <Monitor className="w-4 h-4 text-[#3AD6C6]" />
-                  <span className="absolute -bottom-0.5 -right-0.5 w-2 h-2 rounded-full bg-[#FF5F6D] border border-[#111A22]" />
+                  <Monitor className="w-4 h-4 text-[#78A5FF]" />
+                  <span className="absolute -bottom-0.5 -right-0.5 w-2 h-2 rounded-full bg-[#FF647C] border border-[#121722]" />
                 </div>
                 <span className="text-[11px] leading-tight font-medium">Tela + Cam</span>
               </button>
@@ -785,11 +785,11 @@ export const PreRecordingView: React.FC = () => {
                 onClick={() => setMode('screen-only')}
                 className={`flex flex-col items-center justify-center p-2.5 rounded-xl border text-center transition-all ${
                   mode === 'screen-only'
-                    ? 'bg-[#12312F] border-2 border-[#3AD6C6] text-[#3AD6C6] font-bold shadow-sm'
-                    : 'bg-[#111A22] border border-[#31414D] text-[#C0CDD6] hover:border-[#3AD6C6]/40 hover:text-[#F4F7FA]'
+                    ? 'bg-[#1A2A47] border-2 border-[#78A5FF] text-[#78A5FF] font-bold shadow-sm'
+                    : 'bg-[#121722] border border-[#303A4B] text-[#B7C0CE] hover:border-[#78A5FF]/40 hover:text-[#F3F5F9]'
                 }`}
               >
-                <Monitor className="w-4 h-4 mb-1 text-[#C0CDD6]" />
+                <Monitor className="w-4 h-4 mb-1 text-[#B7C0CE]" />
                 <span className="text-[11px] leading-tight font-medium">Só Tela</span>
               </button>
 
@@ -797,11 +797,11 @@ export const PreRecordingView: React.FC = () => {
                 onClick={() => setMode('cam-only')}
                 className={`flex flex-col items-center justify-center p-2.5 rounded-xl border text-center transition-all ${
                   mode === 'cam-only'
-                    ? 'bg-[#12312F] border-2 border-[#3AD6C6] text-[#3AD6C6] font-bold shadow-sm'
-                    : 'bg-[#111A22] border border-[#31414D] text-[#C0CDD6] hover:border-[#3AD6C6]/40 hover:text-[#F4F7FA]'
+                    ? 'bg-[#1A2A47] border-2 border-[#78A5FF] text-[#78A5FF] font-bold shadow-sm'
+                    : 'bg-[#121722] border border-[#303A4B] text-[#B7C0CE] hover:border-[#78A5FF]/40 hover:text-[#F3F5F9]'
                 }`}
               >
-                <Camera className="w-4 h-4 mb-1 text-[#FF5F6D]" />
+                <Camera className="w-4 h-4 mb-1 text-[#FF647C]" />
                 <span className="text-[11px] leading-tight font-medium">Só Câmera</span>
               </button>
 
@@ -812,21 +812,21 @@ export const PreRecordingView: React.FC = () => {
                 }}
                 className={`flex flex-col items-center justify-center p-2.5 rounded-xl border text-center transition-all ${
                   mode === 'custom-area'
-                    ? 'bg-[#12312F] border-2 border-[#3AD6C6] text-[#3AD6C6] font-bold shadow-sm'
-                    : 'bg-[#111A22] border border-[#31414D] text-[#C0CDD6] hover:border-[#3AD6C6]/40 hover:text-[#F4F7FA]'
+                    ? 'bg-[#1A2A47] border-2 border-[#78A5FF] text-[#78A5FF] font-bold shadow-sm'
+                    : 'bg-[#121722] border border-[#303A4B] text-[#B7C0CE] hover:border-[#78A5FF]/40 hover:text-[#F3F5F9]'
                 }`}
               >
-                <Crop className="w-4 h-4 mb-1 text-[#4CD6A0]" />
+                <Crop className="w-4 h-4 mb-1 text-[#83B8FF]" />
                 <span className="text-[11px] leading-tight font-medium">Área Recorte</span>
               </button>
             </div>
 
             {/* Custom Area Details & Pick Button */}
             {mode === 'custom-area' && (
-              <div className="mt-2 p-2.5 bg-[#111A22] border border-[#31414D] rounded-xl flex items-center justify-between">
+              <div className="mt-2 p-2.5 bg-[#121722] border border-[#303A4B] rounded-xl flex items-center justify-between">
                 <div className="text-xs">
-                  <span className="text-[#92A2AE]">Região: </span>
-                  <span className="font-mono text-[#3AD6C6] font-bold">
+                  <span className="text-[#929CAF]">Região: </span>
+                  <span className="font-mono text-[#78A5FF] font-bold">
                     {cropArea ? `${Math.round(cropArea.width)} × ${Math.round(cropArea.height)} px` : 'Nenhuma definida'}
                   </span>
                 </div>
@@ -834,7 +834,7 @@ export const PreRecordingView: React.FC = () => {
                   {cropArea && (
                     <button
                       onClick={() => setCropArea(null)}
-                      className="px-2 py-1 rounded-lg bg-[#18242E] hover:bg-[#202E39] text-[#92A2AE] hover:text-[#FF5F6D] text-xs transition-colors"
+                      className="px-2 py-1 rounded-lg bg-[#191F2B] hover:bg-[#222B39] text-[#929CAF] hover:text-[#FF647C] text-xs transition-colors"
                       title="Redefinir para tela inteira"
                     >
                       Redefinir
@@ -842,7 +842,7 @@ export const PreRecordingView: React.FC = () => {
                   )}
                   <button
                     onClick={() => window.electronAPI.startCropSelection()}
-                    className="px-2.5 py-1 rounded-lg bg-[#12312F] hover:bg-[#18242E] text-[#3AD6C6] border border-[#3AD6C6]/40 text-xs font-bold transition-colors"
+                    className="px-2.5 py-1 rounded-lg bg-[#1A2A47] hover:bg-[#191F2B] text-[#78A5FF] border border-[#78A5FF]/40 text-xs font-bold transition-colors"
                   >
                     {cropArea ? 'Alterar Área' : 'Selecionar na Tela'}
                   </button>
@@ -868,15 +868,15 @@ export const PreRecordingView: React.FC = () => {
                   <span>Atualizar Janelas</span>
                 </button>
               </div>
-              <div className="bg-[#131620] border border-[#222838] rounded-xl p-2.5 flex items-center space-x-3">
+              <div className="bg-[#121722] border border-[#191F2B] rounded-xl p-2.5 flex items-center space-x-3">
                 {selectedSource?.thumbnail ? (
                   <img
                     src={selectedSource.thumbnail}
                     alt="preview"
-                    className="w-16 h-10 object-cover rounded border border-[#2a3147]"
+                    className="w-16 h-10 object-cover rounded border border-[#303A4B]"
                   />
                 ) : (
-                  <div className="w-16 h-10 bg-[#0c0e14] rounded flex items-center justify-center border border-[#222838]">
+                  <div className="w-16 h-10 bg-[#0B0E14] rounded flex items-center justify-center border border-[#191F2B]">
                     <Monitor className="w-5 h-5 text-slate-500" />
                   </div>
                 )}
@@ -885,13 +885,13 @@ export const PreRecordingView: React.FC = () => {
                   <select
                     value={selectedSourceId}
                     onChange={(e) => setSelectedSourceId(e.target.value)}
-                    className="w-full bg-[#0c0e14] border border-[#262c3e] rounded-lg text-xs text-white p-2 font-medium focus:outline-none focus:border-indigo-500 truncate"
+                    className="w-full bg-[#0B0E14] border border-[#191F2B] rounded-lg text-xs text-white p-2 font-medium focus:outline-none focus:border-indigo-500 truncate"
                   >
                     {sources.length === 0 ? (
-                      <option value="" className="bg-[#121520]">Nenhuma tela ou janela encontrada</option>
+                      <option value="" className="bg-[#121722]">Nenhuma tela ou janela encontrada</option>
                     ) : (
                       sources.map((s) => (
-                        <option key={s.id} value={s.id} className="bg-[#121520]">
+                        <option key={s.id} value={s.id} className="bg-[#121722]">
                           {s.name}
                         </option>
                       ))
@@ -918,7 +918,7 @@ export const PreRecordingView: React.FC = () => {
                 </button>
               </div>
 
-              <div className="bg-[#131620] border border-[#222838] rounded-xl p-2.5 flex items-center space-x-2">
+              <div className="bg-[#121722] border border-[#191F2B] rounded-xl p-2.5 flex items-center space-x-2">
                 <Camera className="w-4 h-4 text-indigo-400 shrink-0" />
                 <select
                   value={selectedVideoId}
@@ -926,10 +926,10 @@ export const PreRecordingView: React.FC = () => {
                   className="w-full bg-transparent text-xs text-white focus:outline-none font-medium truncate"
                 >
                   {videoDevices.length === 0 ? (
-                    <option value="" className="bg-[#121520]">Nenhuma câmera conectada</option>
+                    <option value="" className="bg-[#121722]">Nenhuma câmera conectada</option>
                   ) : (
                     videoDevices.map((d) => (
-                      <option key={d.deviceId} value={d.deviceId} className="bg-[#121520]">
+                      <option key={d.deviceId} value={d.deviceId} className="bg-[#121722]">
                         {d.label || `Câmera (${d.deviceId.slice(0, 5)}...)`}
                       </option>
                     ))
@@ -939,7 +939,7 @@ export const PreRecordingView: React.FC = () => {
 
               {/* Live Webcam Framing Box */}
               {showLiveCamPreview && (
-                <div className="relative w-full h-28 bg-[#090b10] rounded-xl overflow-hidden border border-[#242b3d] flex items-center justify-center">
+                <div className="relative w-full h-28 bg-[#0B0E14] rounded-xl overflow-hidden border border-[#191F2B] flex items-center justify-center">
                   {camError ? (
                     <div className="flex flex-col items-center justify-center p-3 text-center space-y-1">
                       <Camera className="w-5 h-5 text-amber-400 opacity-60" />
@@ -988,7 +988,7 @@ export const PreRecordingView: React.FC = () => {
               )}
             </div>
 
-            <div className="bg-[#131620] border border-[#222838] rounded-xl p-3 space-y-3">
+            <div className="bg-[#121722] border border-[#191F2B] rounded-xl p-3 space-y-3">
               {micError && (
                 <div className="flex items-center space-x-2 p-2 bg-amber-500/10 border border-amber-500/30 rounded-lg text-amber-300 text-xs">
                   <AlertTriangle className="w-4 h-4 shrink-0 text-amber-400" />
@@ -1002,13 +1002,13 @@ export const PreRecordingView: React.FC = () => {
                 <select
                   value={selectedAudioId}
                   onChange={(e) => setSelectedAudioId(e.target.value)}
-                  className="w-full bg-[#0c0e14] border border-[#262c3e] rounded-lg text-xs text-white p-2 font-medium focus:outline-none focus:border-indigo-500 truncate"
+                  className="w-full bg-[#0B0E14] border border-[#191F2B] rounded-lg text-xs text-white p-2 font-medium focus:outline-none focus:border-indigo-500 truncate"
                 >
                   {audioDevices.length === 0 ? (
-                    <option value="" className="bg-[#121520]">Nenhum microfone detectado</option>
+                    <option value="" className="bg-[#121722]">Nenhum microfone detectado</option>
                   ) : (
                     audioDevices.map((d) => (
-                      <option key={d.deviceId} value={d.deviceId} className="bg-[#121520]">
+                      <option key={d.deviceId} value={d.deviceId} className="bg-[#121722]">
                         {d.label || `Microfone (${d.deviceId.slice(0, 5)}...)`}
                       </option>
                     ))
@@ -1024,7 +1024,7 @@ export const PreRecordingView: React.FC = () => {
                   <span>-6 dB</span>
                   <span className={isClipping ? 'text-rose-400 font-bold' : 'text-slate-500'}>0 dB</span>
                 </div>
-                <div className="flex items-center space-x-1 h-3 w-full bg-[#090b10] p-0.5 rounded-lg border border-[#202534]">
+                <div className="flex items-center space-x-1 h-3 w-full bg-[#0B0E14] p-0.5 rounded-lg border border-[#191F2B]">
                   {Array.from({ length: 16 }).map((_, idx) => {
                     const activeThreshold = ((idx + 1) / 16) * 100;
                     const isLit = audioLevel >= activeThreshold;
@@ -1036,7 +1036,7 @@ export const PreRecordingView: React.FC = () => {
                         : isYellow
                         ? 'bg-amber-400'
                         : 'bg-emerald-400'
-                      : 'bg-[#181c28]';
+                      : 'bg-[#191F2B]';
                     return (
                       <div
                         key={idx}
@@ -1048,7 +1048,7 @@ export const PreRecordingView: React.FC = () => {
               </div>
 
               {/* Volume & Gain Booster Slider (0% to 200%) */}
-              <div className="space-y-1.5 pt-1 border-t border-[#202534]">
+              <div className="space-y-1.5 pt-1 border-t border-[#191F2B]">
                 <div className="flex items-center justify-between text-xs">
                   <span className="text-slate-300 font-medium flex items-center gap-1.5">
                     <Sliders className="w-3.5 h-3.5 text-indigo-400" />
@@ -1063,7 +1063,7 @@ export const PreRecordingView: React.FC = () => {
                         type="button"
                         onClick={() => setMicVolume(100)}
                         title="Restaurar nível padrão (100%)"
-                        className="text-[10px] px-1.5 py-0.5 rounded bg-[#1a1f2e] hover:bg-[#252d42] text-slate-300 hover:text-white flex items-center gap-1 transition-colors"
+                        className="text-[10px] px-1.5 py-0.5 rounded bg-[#191F2B] hover:bg-[#191F2B] text-slate-300 hover:text-white flex items-center gap-1 transition-colors"
                       >
                         <RotateCcw className="w-2.5 h-2.5" />
                         <span>100%</span>
@@ -1080,7 +1080,7 @@ export const PreRecordingView: React.FC = () => {
                     step="5"
                     value={micVolume}
                     onChange={(e) => setMicVolume(Number(e.target.value))}
-                    className="w-full h-1.5 bg-[#0c0e14] rounded-lg appearance-none cursor-pointer accent-indigo-500"
+                    className="w-full h-1.5 bg-[#0B0E14] rounded-lg appearance-none cursor-pointer accent-indigo-500"
                   />
                 </div>
                 <div className="flex justify-between text-[10px] text-slate-500">
@@ -1091,7 +1091,7 @@ export const PreRecordingView: React.FC = () => {
               </div>
 
               {/* Noise Reduction (Redução de Ruído) - 4 Real DSP Levels */}
-              <div className="space-y-1.5 pt-1 border-t border-[#202534]">
+              <div className="space-y-1.5 pt-1 border-t border-[#191F2B]">
                 <div className="flex items-center justify-between text-xs">
                   <span className="text-slate-300 font-medium flex items-center gap-1.5">
                     <ShieldCheck className="w-3.5 h-3.5 text-emerald-400" />
@@ -1106,7 +1106,7 @@ export const PreRecordingView: React.FC = () => {
                 </div>
 
                 {/* 4-Level Segmented Controls */}
-                <div className="grid grid-cols-4 gap-1 p-0.5 bg-[#0c0e14] rounded-lg border border-[#202534]">
+                <div className="grid grid-cols-4 gap-1 p-0.5 bg-[#0B0E14] rounded-lg border border-[#191F2B]">
                   {(['off', 'low', 'medium', 'high'] as const).map((lvl) => {
                     const labels = {
                       off: 'Desativado',
@@ -1123,7 +1123,7 @@ export const PreRecordingView: React.FC = () => {
                         className={`py-1 text-[11px] font-medium rounded transition-all text-center ${
                           isActive
                             ? 'bg-indigo-600 text-white font-semibold shadow-sm'
-                            : 'text-slate-400 hover:text-white hover:bg-[#181c28]'
+                            : 'text-slate-400 hover:text-white hover:bg-[#191F2B]'
                         }`}
                       >
                         {labels[lvl]}
@@ -1141,14 +1141,14 @@ export const PreRecordingView: React.FC = () => {
               </div>
 
               {/* Listen to Test (Ouvir para Testar / Audio Monitoring) */}
-              <div className="pt-2 border-t border-[#202534] space-y-2">
+              <div className="pt-2 border-t border-[#191F2B] space-y-2">
                 <button
                   type="button"
                   onClick={() => setIsMonitoringAudio(!isMonitoringAudio)}
                   className={`w-full py-2 px-3 rounded-lg text-xs font-semibold flex items-center justify-center space-x-2 transition-all ${
                     isMonitoringAudio
                       ? 'bg-amber-500/20 text-amber-300 border border-amber-500/40 hover:bg-amber-500/30'
-                      : 'bg-[#181c28] hover:bg-[#202536] text-slate-300 hover:text-white border border-[#262c3e]'
+                      : 'bg-[#191F2B] hover:bg-[#191F2B] text-slate-300 hover:text-white border border-[#191F2B]'
                   }`}
                 >
                   <Headphones className="w-3.5 h-3.5 text-indigo-400" />
@@ -1175,7 +1175,7 @@ export const PreRecordingView: React.FC = () => {
           </div>
 
           {/* Advanced Recording Settings (Resolution, FPS, System Audio) */}
-          <div className="bg-[#131620] border border-[#222838] rounded-xl p-3 space-y-2.5">
+          <div className="bg-[#121722] border border-[#191F2B] rounded-xl p-3 space-y-2.5">
             <div className="flex items-center justify-between">
               <div className="flex items-center space-x-2">
                 <Volume2 className="w-4 h-4 text-indigo-400" />
@@ -1189,7 +1189,7 @@ export const PreRecordingView: React.FC = () => {
               />
             </div>
 
-            <div className="flex items-center justify-between pt-1.5 border-t border-[#202534]">
+            <div className="flex items-center justify-between pt-1.5 border-t border-[#191F2B]">
               <div className="flex items-center space-x-2">
                 <FileText className="w-4 h-4 text-slate-400" />
                 <span className="text-xs font-medium text-white">Teleprompter & Roteiro</span>
@@ -1201,7 +1201,7 @@ export const PreRecordingView: React.FC = () => {
                   className={`text-[10px] px-2 py-0.5 rounded font-medium transition-all ${
                     isSpeakerNotesOpen
                       ? 'bg-indigo-600 text-white font-semibold'
-                      : 'bg-[#181c28] text-slate-300 hover:text-white hover:bg-[#202536] border border-[#262c3e]'
+                      : 'bg-[#191F2B] text-slate-300 hover:text-white hover:bg-[#191F2B] border border-[#191F2B]'
                   }`}
                 >
                   {isSpeakerNotesOpen ? 'Prompter Aberto' : 'Abrir / Editar'}
@@ -1216,7 +1216,7 @@ export const PreRecordingView: React.FC = () => {
               </div>
             </div>
 
-            <div className="flex items-center justify-between pt-1.5 border-t border-[#202534]">
+            <div className="flex items-center justify-between pt-1.5 border-t border-[#191F2B]">
               <div className="flex items-center space-x-2">
                 <MousePointer className="w-4 h-4 text-slate-400" />
                 <span className="text-xs font-medium text-white">Destacar Cursor & Cliques</span>
@@ -1229,13 +1229,13 @@ export const PreRecordingView: React.FC = () => {
               />
             </div>
 
-            <div className="flex items-center justify-between pt-1.5 border-t border-[#202534]">
+            <div className="flex items-center justify-between pt-1.5 border-t border-[#191F2B]">
               <span className="text-xs font-medium text-white">Qualidade & Taxa</span>
               <div className="flex items-center space-x-2">
                 <select
                   value={resolution}
                   onChange={(e) => setResolution(e.target.value as any)}
-                  className="bg-[#0c0e14] border border-[#262c3e] rounded px-2 py-1 text-[11px] text-white focus:outline-none"
+                  className="bg-[#0B0E14] border border-[#191F2B] rounded px-2 py-1 text-[11px] text-white focus:outline-none"
                 >
                   <option value="720p">720p (HD)</option>
                   <option value="1080p">1080p (FHD)</option>
@@ -1245,7 +1245,7 @@ export const PreRecordingView: React.FC = () => {
                 <select
                   value={fps}
                   onChange={(e) => setFps(Number(e.target.value))}
-                  className="bg-[#0c0e14] border border-[#262c3e] rounded px-2 py-1 text-[11px] text-white focus:outline-none"
+                  className="bg-[#0B0E14] border border-[#191F2B] rounded px-2 py-1 text-[11px] text-white focus:outline-none"
                 >
                   <option value={30}>30 fps</option>
                   <option value={60}>60 fps</option>
@@ -1254,12 +1254,12 @@ export const PreRecordingView: React.FC = () => {
             </div>
 
             {/* Countdown Duration Selector */}
-            <div className="flex items-center justify-between pt-1.5 border-t border-[#202534]">
+            <div className="flex items-center justify-between pt-1.5 border-t border-[#191F2B]">
               <div className="flex items-center space-x-2">
                 <Clock className="w-4 h-4 text-indigo-400" />
                 <span className="text-xs font-medium text-white">Contagem Regressiva</span>
               </div>
-              <div className="flex items-center space-x-1 bg-[#0c0e14] p-0.5 rounded-lg border border-[#262c3e]">
+              <div className="flex items-center space-x-1 bg-[#0B0E14] p-0.5 rounded-lg border border-[#191F2B]">
                 {([0, 3, 5] as const).map((secs) => (
                   <button
                     key={secs}
@@ -1280,23 +1280,23 @@ export const PreRecordingView: React.FC = () => {
           </div>
 
           {/* Global Share Link Status Pill */}
-          <div className="bg-[#111A22] border border-[#31414D] rounded-xl px-3 py-2 flex items-center justify-between text-xs">
+          <div className="bg-[#121722] border border-[#303A4B] rounded-xl px-3 py-2 flex items-center justify-between text-xs">
             <div className="flex items-center space-x-2 truncate">
-              <Globe className="w-3.5 h-3.5 text-[#3AD6C6] shrink-0" />
-              <span className="text-[11px] text-[#92A2AE]">Link Público:</span>
+              <Globe className="w-3.5 h-3.5 text-[#78A5FF] shrink-0" />
+              <span className="text-[11px] text-[#929CAF]">Link Público:</span>
               {publicUrl ? (
-                <span className="text-[11px] text-[#4CD6A0] font-medium truncate flex items-center space-x-1">
-                  <span className="w-1.5 h-1.5 rounded-full bg-[#4CD6A0] inline-block" />
+                <span className="text-[11px] text-[#83B8FF] font-medium truncate flex items-center space-x-1">
+                  <span className="w-1.5 h-1.5 rounded-full bg-[#83B8FF] inline-block" />
                   <span>Ativo para compartilhamento</span>
                 </span>
               ) : (
-                <span className="text-[11px] text-[#92A2AE]">Iniciando túnel seguro...</span>
+                <span className="text-[11px] text-[#929CAF]">Iniciando túnel seguro...</span>
               )}
             </div>
             {publicUrl && (
               isHubCopied ? (
-                <span className="text-[11px] text-[#4CD6A0] font-semibold shrink-0 ml-2 flex items-center space-x-1">
-                  <Check className="w-3 h-3 text-[#4CD6A0]" />
+                <span className="text-[11px] text-[#83B8FF] font-semibold shrink-0 ml-2 flex items-center space-x-1">
+                  <Check className="w-3 h-3 text-[#83B8FF]" />
                   <span>Copiado!</span>
                 </span>
               ) : (
@@ -1306,7 +1306,7 @@ export const PreRecordingView: React.FC = () => {
                     setIsHubCopied(true);
                     setTimeout(() => setIsHubCopied(false), 2500);
                   }}
-                  className="text-[11px] text-[#3AD6C6] hover:text-[#65E6D8] font-semibold shrink-0 ml-2"
+                  className="text-[11px] text-[#78A5FF] hover:text-[#9AB9FF] font-semibold shrink-0 ml-2"
                 >
                   Copiar Hub
                 </button>
@@ -1318,7 +1318,7 @@ export const PreRecordingView: React.FC = () => {
           <div className="pt-1 flex flex-col gap-2">
             <button
               onClick={handleStart}
-              className="w-full bg-[#FF5F6D] hover:bg-[#FF5F6D]/90 active:scale-[0.99] text-[#2B0E13] font-black py-3.5 px-4 rounded-xl shadow-lg shadow-[#FF5F6D]/20 flex items-center justify-center space-x-2.5 transition-all"
+              className="w-full bg-[#FF647C] hover:bg-[#FF647C]/90 active:scale-[0.99] text-[#2B0E13] font-black py-3.5 px-4 rounded-xl shadow-lg shadow-[#FF647C]/20 flex items-center justify-center space-x-2.5 transition-all"
             >
               <div className="w-2.5 h-2.5 rounded-full bg-[#2B0E13]" />
               <span className="tracking-wide">INICIAR GRAVAÇÃO</span>
@@ -1327,27 +1327,27 @@ export const PreRecordingView: React.FC = () => {
             <button
               onClick={() => window.electronAPI.startLiveShare()}
               title="Transmitir tela ao vivo com qualidade ultra fluida de até 60 FPS para qualquer dispositivo via link ou QR Code"
-              className="w-full bg-[#12312F] hover:bg-[#18242E] active:scale-[0.99] text-[#3AD6C6] hover:text-[#65E6D8] font-bold py-2.5 px-4 rounded-xl shadow-md flex items-center justify-center space-x-2 transition-all border border-[#3AD6C6]/50"
+              className="w-full bg-[#1A2A47] hover:bg-[#191F2B] active:scale-[0.99] text-[#78A5FF] hover:text-[#9AB9FF] font-bold py-2.5 px-4 rounded-xl shadow-md flex items-center justify-center space-x-2 transition-all border border-[#78A5FF]/50"
             >
-              <Radio className="w-4 h-4 text-[#3AD6C6] animate-pulse" />
+              <Radio className="w-4 h-4 text-[#78A5FF] animate-pulse" />
               <span className="text-xs tracking-wide">COMPARTILHAR TELA AO VIVO (60 FPS)</span>
             </button>
-            <div className="text-center mt-2.5 mb-1.5 flex items-center justify-center space-x-2 text-[10px] text-[#92A2AE] font-mono">
+            <div className="text-center mt-2.5 mb-1.5 flex items-center justify-center space-x-2 text-[10px] text-[#929CAF] font-mono">
               <span title="Pressione 1 a 4 para alternar modos">[1-4] Modos</span>
               <span>•</span>
               <span title="Pressione M para testar retorno de áudio">[M] Teste Áudio</span>
               <span>•</span>
               <span title="Pressione Enter para iniciar gravação">[Enter] Gravar</span>
               <span>•</span>
-              <span title="Atalho global do sistema" className="text-[#C0CDD6] font-semibold">{getShortcutLabel('a')}</span>
+              <span title="Atalho global do sistema" className="text-[#B7C0CE] font-semibold">{getShortcutLabel('a')}</span>
             </div>
 
             {/* App Version & Manual Update Check */}
-            <div className="flex items-center justify-between pt-2 border-t border-[#31414D] text-[11px] text-[#92A2AE]">
+            <div className="flex items-center justify-between pt-2 border-t border-[#303A4B] text-[11px] text-[#929CAF]">
               <span className="font-mono flex items-center gap-1.5">
                 <span>v{appVersion || '2.2.0'}</span>
                 {updateFeedback && (
-                  <span className="text-[#4CD6A0] font-sans font-medium text-[10px] bg-[#12312F] border border-[#4CD6A0]/40 px-1.5 py-0.5 rounded">
+                  <span className="text-[#83B8FF] font-sans font-medium text-[10px] bg-[#1A2A47] border border-[#83B8FF]/40 px-1.5 py-0.5 rounded">
                     {updateFeedback}
                   </span>
                 )}
@@ -1368,10 +1368,10 @@ export const PreRecordingView: React.FC = () => {
                   }
                 }}
                 disabled={isCheckingUpdate}
-                className="flex items-center space-x-1.5 hover:text-[#3AD6C6] text-[#C0CDD6] transition-colors"
+                className="flex items-center space-x-1.5 hover:text-[#78A5FF] text-[#B7C0CE] transition-colors"
                 title="Checar se há novas versões"
               >
-                <RefreshCw className={`w-3 h-3 ${isCheckingUpdate ? 'animate-spin text-[#3AD6C6]' : ''}`} />
+                <RefreshCw className={`w-3 h-3 ${isCheckingUpdate ? 'animate-spin text-[#78A5FF]' : ''}`} />
                 <span>{isCheckingUpdate ? 'Verificando...' : 'Buscar Atualizações'}</span>
               </button>
             </div>

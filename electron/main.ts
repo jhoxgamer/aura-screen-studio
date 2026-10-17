@@ -519,8 +519,8 @@ function createZoomShareBarWindow() {
 
   const primaryDisplay = screen.getPrimaryDisplay();
   const { width } = primaryDisplay.workAreaSize;
-  const barWidth = 720;
-  const barHeight = 68;
+  const barWidth = 860;
+  const barHeight = 72;
 
   zoomShareBarWindow = new BrowserWindow({
     width: barWidth,
@@ -988,17 +988,112 @@ function setupIpcHandlers() {
     return false;
   });
 
-  ipcMain.handle('recordings:trim', async (_, id: string, arrayBuffer: ArrayBuffer, newDurationMs: number) => {
+function findFfmpegBinary(): string | null {
+  const candidatePaths = [
+    'D:\\ffmpeg\\ffmpeg-9.0.1-essentials_build\\bin\\ffmpeg.exe',
+    path.join(process.resourcesPath || '', 'bin', 'ffmpeg.exe'),
+    path.join(process.resourcesPath || '', 'ffmpeg.exe'),
+    path.join(__dirname, '..', 'bin', 'ffmpeg.exe'),
+    'ffmpeg'
+  ];
+  for (const candidate of candidatePaths) {
+    try {
+      if (candidate === 'ffmpeg') {
+        const { execSync } = require('child_process');
+        execSync('ffmpeg -version', { stdio: 'ignore' });
+        return 'ffmpeg';
+      }
+      if (fs.existsSync(candidate)) {
+        return candidate;
+      }
+    } catch {}
+  }
+  return null;
+}
+
+async function trimVideoWithFfmpeg(inputPath: string, outputPath: string, startSec: number, endSec: number): Promise<boolean> {
+  const ffmpeg = findFfmpegBinary();
+  if (!ffmpeg) return false;
+  return new Promise((resolve) => {
+    const { spawn } = require('child_process');
+    // First attempt: fast lossless stream copy
+    const copyArgs = ['-y', '-ss', String(startSec), '-to', String(endSec), '-i', inputPath, '-c', 'copy', outputPath];
+    const proc = spawn(ffmpeg, copyArgs);
+    proc.on('close', (code: number) => {
+      if (code === 0 && fs.existsSync(outputPath) && fs.statSync(outputPath).size > 1000) {
+        resolve(true);
+      } else {
+        // Fallback: re-encode video and audio accurately with VP9 + Opus
+        const reencodeArgs = [
+          '-y', '-ss', String(startSec), '-to', String(endSec), '-i', inputPath,
+          '-c:v', 'libvpx-vp9', '-crf', '28', '-b:v', '0', '-c:a', 'libopus',
+          outputPath
+        ];
+        const proc2 = spawn(ffmpeg, reencodeArgs);
+        proc2.on('close', (code2: number) => {
+          resolve(code2 === 0 && fs.existsSync(outputPath) && fs.statSync(outputPath).size > 1000);
+        });
+        proc2.on('error', () => resolve(false));
+      }
+    });
+    proc.on('error', () => resolve(false));
+  });
+}
+
+  ipcMain.handle('recordings:trim', async (_, id: string, payloadOrBuffer: any, legacyDurationMs?: number) => {
     const list = readMetadata();
     const item = list.find((r) => r.id === id);
-    if (item && fs.existsSync(item.filePath)) {
-      const buffer = Buffer.from(arrayBuffer);
-      await fs.promises.writeFile(item.filePath, buffer);
-      item.durationMs = newDurationMs;
-      item.fileSize = buffer.length;
+    if (!item || !fs.existsSync(item.filePath)) {
+      return null;
+    }
+
+    // 1. Native High-Precision FFmpeg Trimming
+    if (payloadOrBuffer && typeof payloadOrBuffer === 'object' && !(payloadOrBuffer instanceof ArrayBuffer)) {
+      const { startSec, endSec, buffer } = payloadOrBuffer;
+      if (typeof startSec === 'number' && typeof endSec === 'number' && endSec > startSec) {
+        const tempTrimmed = path.join(RECORDINGS_DIR, `temp_trim_${Date.now()}_${path.basename(item.filePath)}`);
+        try {
+          const success = await trimVideoWithFfmpeg(item.filePath, tempTrimmed, startSec, endSec);
+          if (success && fs.existsSync(tempTrimmed)) {
+            // Replace original file with trimmed file
+            await fs.promises.unlink(item.filePath).catch(() => {});
+            await fs.promises.rename(tempTrimmed, item.filePath);
+            const newDurationMs = Math.round((endSec - startSec) * 1000);
+            item.durationMs = newDurationMs;
+            item.fileSize = fs.statSync(item.filePath).size;
+            writeMetadata(list);
+            return item;
+          }
+        } catch (ffmpegErr) {
+          console.error('[Aura Main] FFmpeg trim error:', ffmpegErr);
+        } finally {
+          if (fs.existsSync(tempTrimmed)) {
+            fs.promises.unlink(tempTrimmed).catch(() => {});
+          }
+        }
+      }
+
+      // If buffer was attached to payload object as fallback
+      if (buffer instanceof ArrayBuffer && typeof legacyDurationMs === 'number') {
+        const buf = Buffer.from(buffer);
+        await fs.promises.writeFile(item.filePath, buf);
+        item.durationMs = legacyDurationMs;
+        item.fileSize = buf.length;
+        writeMetadata(list);
+        return item;
+      }
+    }
+
+    // 2. Legacy / Direct ArrayBuffer Trimming (backward compatibility)
+    if (payloadOrBuffer instanceof ArrayBuffer) {
+      const buf = Buffer.from(payloadOrBuffer);
+      await fs.promises.writeFile(item.filePath, buf);
+      item.durationMs = typeof legacyDurationMs === 'number' ? legacyDurationMs : item.durationMs;
+      item.fileSize = buf.length;
       writeMetadata(list);
       return item;
     }
+
     return null;
   });
 

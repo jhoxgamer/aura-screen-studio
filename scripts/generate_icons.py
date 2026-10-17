@@ -6,96 +6,76 @@ def create_aura_logo(size=1024):
     # Canvas
     img = Image.new("RGBA", (size, size), (0, 0, 0, 0))
     
-    # Base squircle container
-    padding = size * 0.07
+    # Outer base squircle container
+    padding = size * 0.05
     rect = [padding, padding, size - padding, size - padding]
     corner_radius = size * 0.22
     
-    # Dark Midnight base (#0B1117 = 11, 17, 23)
+    # Base graphite mask (#0B0E14 = 11, 14, 20)
     base_mask = Image.new("L", (size, size), 0)
     draw_base_mask = ImageDraw.Draw(base_mask)
     draw_base_mask.rounded_rectangle(rect, radius=corner_radius, fill=255)
     
-    bg_surface = Image.new("RGBA", (size, size), (11, 17, 23, 255))
-    draw_bg = ImageDraw.Draw(bg_surface)
-    
-    cx, cy = size / 2, size / 2
-    # Subtle inner studio glow (#18242E = 24, 36, 46)
-    for r in range(int(size * 0.45), 0, -3):
-        factor = r / (size * 0.45)
-        alpha = int((1.0 - factor) * 40)
-        draw_bg.ellipse([cx - r, cy - r, cx + r, cy + r], fill=(24, 36, 46, alpha))
-        
+    bg_surface = Image.new("RGBA", (size, size), (11, 14, 20, 255))
     img.paste(bg_surface, (0, 0), base_mask)
     
-    # Border (#31414D = 49, 65, 77)
+    # Subtle graphite outer border (#303A4B = 48, 58, 75)
     rim_img = Image.new("RGBA", (size, size), (0, 0, 0, 0))
     draw_rim = ImageDraw.Draw(rim_img)
-    draw_rim.rounded_rectangle(rect, radius=corner_radius, outline=(49, 65, 77, 255), width=int(size * 0.016))
+    draw_rim.rounded_rectangle(rect, radius=corner_radius, outline=(48, 58, 75, 255), width=int(size * 0.02))
     img.alpha_composite(rim_img)
     
-    # Signal Mint Halo Layer (#3AD6C6 = 58, 214, 198)
-    glow_layer = Image.new("RGBA", (size, size), (0, 0, 0, 0))
-    draw_glow = ImageDraw.Draw(glow_layer)
-    glow_radius = size * 0.32
-    for gr in range(int(glow_radius * 1.3), int(glow_radius * 0.6), -2):
-        factor = (gr - glow_radius * 0.6) / (glow_radius * 0.7)
-        alpha = int((1.0 - factor) * 35)
-        draw_glow.ellipse([cx - gr, cy - gr, cx + gr, cy + gr], fill=(58, 214, 198, alpha))
-        
-    img.alpha_composite(glow_layer)
+    cx, cy = size / 2, size / 2
+
+    # Screen Viewfinder Rectangle in Nocturne Blue (#78A5FF = 120, 165, 255)
+    screen_padding = size * 0.18
+    screen_rect = [screen_padding, screen_padding, size - screen_padding, size - screen_padding]
+    screen_radius = size * 0.14
     
-    # Studio Viewfinder Framing Brackets in Signal Mint (#3AD6C6)
+    # Screen inner fill (#121722 = 18, 23, 34)
+    screen_layer = Image.new("RGBA", (size, size), (0, 0, 0, 0))
+    draw_screen = ImageDraw.Draw(screen_layer)
+    draw_screen.rounded_rectangle(screen_rect, radius=screen_radius, fill=(18, 23, 34, 255), 
+                                 outline=(120, 165, 255, 255), width=int(size * 0.045))
+    img.alpha_composite(screen_layer)
+    
+    # Viewfinder Corner Precision Brackets (#9AB9FF = 154, 185, 255)
     bracket_layer = Image.new("RGBA", (size, size), (0, 0, 0, 0))
     draw_bracket = ImageDraw.Draw(bracket_layer)
-    bracket_w = int(size * 0.038)
-    bracket_len = size * 0.14
-    margin = size * 0.22
+    bracket_w = int(size * 0.026)
+    bracket_len = size * 0.10
+    bm = size * 0.25
     
     # Top-Left
-    draw_bracket.line([(margin, margin + bracket_len), (margin, margin)], fill=(58, 214, 198, 255), width=bracket_w)
-    draw_bracket.line([(margin, margin), (margin + bracket_len, margin)], fill=(58, 214, 198, 255), width=bracket_w)
+    draw_bracket.line([(bm, bm + bracket_len), (bm, bm)], fill=(154, 185, 255, 255), width=bracket_w)
+    draw_bracket.line([(bm, bm), (bm + bracket_len, bm)], fill=(154, 185, 255, 255), width=bracket_w)
     
     # Top-Right
-    draw_bracket.line([(size - margin, margin + bracket_len), (size - margin, margin)], fill=(58, 214, 198, 255), width=bracket_w)
-    draw_bracket.line([(size - margin, margin), (size - margin - bracket_len, margin)], fill=(58, 214, 198, 255), width=bracket_w)
+    draw_bracket.line([(size - bm, bm + bracket_len), (size - bm, bm)], fill=(154, 185, 255, 255), width=bracket_w)
+    draw_bracket.line([(size - bm, bm), (size - bm - bracket_len, bm)], fill=(154, 185, 255, 255), width=bracket_w)
     
     # Bottom-Left
-    draw_bracket.line([(margin, size - margin - bracket_len), (margin, size - margin)], fill=(58, 214, 198, 255), width=bracket_w)
-    draw_bracket.line([(margin, size - margin), (margin + bracket_len, size - margin)], fill=(58, 214, 198, 255), width=bracket_w)
+    draw_bracket.line([(bm, size - bm - bracket_len), (bm, size - bm)], fill=(154, 185, 255, 255), width=bracket_w)
+    draw_bracket.line([(bm, size - bm), (bm + bracket_len, size - bm)], fill=(154, 185, 255, 255), width=bracket_w)
     
     # Bottom-Right
-    draw_bracket.line([(size - margin, size - margin - bracket_len), (size - margin, size - margin)], fill=(58, 214, 198, 255), width=bracket_w)
-    draw_bracket.line([(size - margin, size - margin), (size - margin - bracket_len, size - margin)], fill=(58, 214, 198, 255), width=bracket_w)
+    draw_bracket.line([(size - bm, size - bm - bracket_len), (size - bm, size - bm)], fill=(154, 185, 255, 255), width=bracket_w)
+    draw_bracket.line([(size - bm, size - bm), (size - bm - bracket_len, size - bm)], fill=(154, 185, 255, 255), width=bracket_w)
     
     img.alpha_composite(bracket_layer)
     
-    # Capture Ring in Signal Mint (#3AD6C6)
-    ring_layer = Image.new("RGBA", (size, size), (0, 0, 0, 0))
-    draw_ring = ImageDraw.Draw(ring_layer)
-    ring_r = size * 0.22
-    ring_w = int(size * 0.032)
-    draw_ring.ellipse([cx - ring_r, cy - ring_r, cx + ring_r, cy + ring_r], 
-                      outline=(101, 230, 216, 255), width=ring_w)
-    img.alpha_composite(ring_layer)
-    
-    # Center Focal Recording Core in Coral (#FF5F6D = 255, 95, 109)
+    # Center Focal Recording Core in Coral (#FF647C = 255, 100, 124)
     core_layer = Image.new("RGBA", (size, size), (0, 0, 0, 0))
     draw_core = ImageDraw.Draw(core_layer)
-    core_radius = size * 0.11
+    core_radius = size * 0.135
     
-    # Coral Glow
-    for cr in range(int(core_radius * 1.4), int(core_radius), -1):
-        alpha = int((1.0 - (cr - core_radius) / (core_radius * 0.4)) * 90)
-        draw_core.ellipse([cx - cr, cy - cr, cx + cr, cy + cr], fill=(255, 95, 109, alpha))
-        
-    # Core circle
+    # Core circle with contrast ring (#101A32 = 16, 26, 50)
     draw_core.ellipse([cx - core_radius, cy - core_radius, cx + core_radius, cy + core_radius], 
-                      fill=(255, 95, 109, 255), outline=(43, 14, 19, 240), width=int(size * 0.015))
+                      fill=(255, 100, 124, 255), outline=(16, 26, 50, 240), width=int(size * 0.02))
                       
     # Specular lens highlight glint (#FFFFFF)
     glint_x, glint_y = cx - core_radius * 0.35, cy - core_radius * 0.35
-    glint_r = core_radius * 0.3
+    glint_r = core_radius * 0.28
     draw_core.ellipse([glint_x - glint_r, glint_y - glint_r, glint_x + glint_r, glint_y + glint_r], 
                       fill=(255, 255, 255, 240))
                       
@@ -107,31 +87,31 @@ def create_tray_icon(size=256):
     draw = ImageDraw.Draw(img)
     cx, cy = size / 2, size / 2
     
-    # High-contrast framing brackets for tray (#3AD6C6)
+    # High-contrast framing brackets for tray in Nocturne Blue (#78A5FF = 120, 165, 255)
     bracket_w = int(size * 0.09)
     bracket_len = size * 0.28
     margin = size * 0.08
     
     # Top-Left
-    draw.line([(margin, margin + bracket_len), (margin, margin)], fill=(58, 214, 198, 255), width=bracket_w)
-    draw.line([(margin, margin), (margin + bracket_len, margin)], fill=(58, 214, 198, 255), width=bracket_w)
+    draw.line([(margin, margin + bracket_len), (margin, margin)], fill=(120, 165, 255, 255), width=bracket_w)
+    draw.line([(margin, margin), (margin + bracket_len, margin)], fill=(120, 165, 255, 255), width=bracket_w)
     
     # Top-Right
-    draw.line([(size - margin, margin + bracket_len), (size - margin, margin)], fill=(58, 214, 198, 255), width=bracket_w)
-    draw.line([(size - margin, margin), (size - margin - bracket_len, margin)], fill=(58, 214, 198, 255), width=bracket_w)
+    draw.line([(size - margin, margin + bracket_len), (size - margin, margin)], fill=(120, 165, 255, 255), width=bracket_w)
+    draw.line([(size - margin, margin), (size - margin - bracket_len, margin)], fill=(120, 165, 255, 255), width=bracket_w)
     
     # Bottom-Left
-    draw.line([(margin, size - margin - bracket_len), (margin, size - margin)], fill=(58, 214, 198, 255), width=bracket_w)
-    draw.line([(margin, size - margin), (margin + bracket_len, size - margin)], fill=(58, 214, 198, 255), width=bracket_w)
+    draw.line([(margin, size - margin - bracket_len), (margin, size - margin)], fill=(120, 165, 255, 255), width=bracket_w)
+    draw.line([(margin, size - margin), (margin + bracket_len, size - margin)], fill=(120, 165, 255, 255), width=bracket_w)
     
     # Bottom-Right
-    draw.line([(size - margin, size - margin - bracket_len), (size - margin, size - margin)], fill=(58, 214, 198, 255), width=bracket_w)
-    draw.line([(size - margin, size - margin), (size - margin - bracket_len, size - margin)], fill=(58, 214, 198, 255), width=bracket_w)
+    draw.line([(size - margin, size - margin - bracket_len), (size - margin, size - margin)], fill=(120, 165, 255, 255), width=bracket_w)
+    draw.line([(size - margin, size - margin), (size - margin - bracket_len, size - margin)], fill=(120, 165, 255, 255), width=bracket_w)
     
-    # Recording core dot in Coral (#FF5F6D)
+    # Recording core dot in Coral (#FF647C = 255, 100, 124)
     core_r = size * 0.22
     draw.ellipse([cx - core_r, cy - core_r, cx + core_r, cy + core_r], 
-                 fill=(255, 95, 109, 255), outline=(255, 255, 255, 220), width=int(size * 0.04))
+                 fill=(255, 100, 124, 255), outline=(255, 255, 255, 220), width=int(size * 0.04))
                  
     # Glint
     glint_r = core_r * 0.32
@@ -144,7 +124,7 @@ def main():
     icons_dir = os.path.abspath(r"D:\clone\2\public\assets\application-icons")
     os.makedirs(icons_dir, exist_ok=True)
     
-    print("[1/4] Generating Aura Logo Master Image (1024x1024) in Midnight Signal...")
+    print("[1/4] Generating Aura Logo Master Image (1024x1024) in Nocturne Blue...")
     master_logo = create_aura_logo(1024)
     
     logo_512 = master_logo.resize((512, 512), Image.Resampling.LANCZOS)
@@ -198,7 +178,7 @@ def main():
     logo_64.save(os.path.join(public_dir, "favicon.png"), "PNG")
     logo_32.save(os.path.join(public_dir, "favicon.ico"), "ICO", sizes=[(16, 16), (32, 32)])
     
-    print("[4/4] All Aura Screen Studio Midnight Signal icons created successfully!")
+    print("[4/4] All Aura Screen Studio Nocturne Blue icons created successfully!")
 
 if __name__ == "__main__":
     main()

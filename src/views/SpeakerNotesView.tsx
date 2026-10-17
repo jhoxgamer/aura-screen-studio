@@ -370,13 +370,13 @@ export const SpeakerNotesView: React.FC = () => {
   if (isCollapsed) {
     return (
       <div
-        className="w-screen h-screen flex items-center justify-between px-3 bg-[#111A22]/95 backdrop-blur-xl border border-[#31414D] rounded-full shadow-2xl text-[#F4F7FA] select-none font-sans"
+        className="w-screen h-screen flex items-center justify-between px-3 bg-[#121722]/95 backdrop-blur-xl border border-[#303A4B] rounded-full shadow-2xl text-[#F3F5F9] select-none font-sans"
         style={{ WebkitAppRegion: 'drag' } as any}
       >
         <div className="flex items-center space-x-2 overflow-hidden pr-2">
-          <div className="w-2 h-2 rounded-full bg-[#3AD6C6] animate-pulse shrink-0 shadow-sm shadow-[#3AD6C6]/50" />
-          <span className="text-xs font-semibold font-mono text-[#3AD6C6] shrink-0">Prompter</span>
-          <span className="text-[11px] text-[#C0CDD6] truncate max-w-[150px] font-medium">
+          <div className="w-2 h-2 rounded-full bg-[#78A5FF] animate-pulse shrink-0 shadow-sm shadow-[#78A5FF]/50" />
+          <span className="text-xs font-semibold font-mono text-[#78A5FF] shrink-0">Prompter</span>
+          <span className="text-[11px] text-[#B7C0CE] truncate max-w-[150px] font-medium">
             {currentLinePreview}
           </span>
         </div>
@@ -387,8 +387,8 @@ export const SpeakerNotesView: React.FC = () => {
               onClick={() => setIsPlaying(!isPlaying)}
               className={`p-1.5 rounded-full text-xs font-bold transition-all ${
                 isPlaying
-                  ? 'bg-[#FF5F6D] hover:bg-[#FF5F6D]/90 text-[#2B0E13]'
-                  : 'bg-[#3AD6C6] hover:bg-[#65E6D8] text-[#062B2A]'
+                  ? 'bg-[#FF647C] hover:bg-[#FF647C]/90 text-[#2B0E13]'
+                  : 'bg-[#78A5FF] hover:bg-[#9AB9FF] text-[#101A32]'
               }`}
               title={isPlaying ? 'Pausar (Espaço)' : 'Iniciar (Espaço)'}
             >
@@ -398,7 +398,7 @@ export const SpeakerNotesView: React.FC = () => {
 
           <button
             onClick={handleToggleCollapse}
-            className="p-1 rounded-lg bg-[#18242E] hover:bg-[#202E39] text-[#C0CDD6] hover:text-[#F4F7FA] transition-colors"
+            className="p-1 rounded-lg bg-[#191F2B] hover:bg-[#222B39] text-[#B7C0CE] hover:text-[#F3F5F9] transition-colors"
             title="Expandir Janela Completa"
           >
             <Maximize2 className="w-3.5 h-3.5" />
@@ -406,7 +406,7 @@ export const SpeakerNotesView: React.FC = () => {
 
           <button
             onClick={() => window.electronAPI?.toggleSpeakerNotes?.()}
-            className="p-1 rounded-lg hover:bg-[#FF5F6D]/20 text-[#92A2AE] hover:text-[#FF5F6D] transition-colors"
+            className="p-1 rounded-lg hover:bg-[#FF647C]/20 text-[#929CAF] hover:text-[#FF647C] transition-colors"
             title="Fechar"
           >
             <X className="w-3.5 h-3.5" />
@@ -421,7 +421,7 @@ export const SpeakerNotesView: React.FC = () => {
   // -------------------------------------------------------------
   return (
     <div
-      className="w-screen h-screen flex flex-col rounded-2xl border border-[#31414D] bg-[#0B1117]/95 backdrop-blur-2xl text-[#F4F7FA] shadow-2xl overflow-hidden select-none font-sans"
+      className="w-screen h-screen flex flex-col rounded-2xl border border-[#303A4B] bg-[#0B0E14]/95 backdrop-blur-2xl text-[#F3F5F9] shadow-2xl overflow-hidden select-none font-sans"
       style={{ opacity: opacity / 100 }}
     >
       {/* Hidden file input */}
@@ -435,22 +435,22 @@ export const SpeakerNotesView: React.FC = () => {
 
       {/* Top Header & Draggable Titlebar */}
       <div
-        className="flex items-center justify-between px-3.5 py-2 bg-[#111A22] border-b border-[#31414D] cursor-grab active:cursor-grabbing"
+        className="flex items-center justify-between px-3.5 py-2 bg-[#121722] border-b border-[#303A4B] cursor-grab active:cursor-grabbing"
         style={{ WebkitAppRegion: 'drag' } as any}
       >
         {/* Left Title and Status */}
         <div className="flex items-center space-x-2">
-          <div className="w-2 h-2 rounded-full bg-[#3AD6C6] shadow-sm shadow-[#3AD6C6]/50 animate-pulse" />
-          <span className="text-xs font-semibold tracking-tight text-[#F4F7FA] flex items-center gap-1.5 font-mono">
+          <div className="w-2 h-2 rounded-full bg-[#78A5FF] shadow-sm shadow-[#78A5FF]/50 animate-pulse" />
+          <span className="text-xs font-semibold tracking-tight text-[#F3F5F9] flex items-center gap-1.5 font-mono">
             Aura Prompter
           </span>
           {mode === 'prompt' && (
-            <span className="text-[10px] text-[#3AD6C6] bg-[#12312F] px-1.5 py-0.5 rounded border border-[#3AD6C6]/30 font-mono font-medium">
+            <span className="text-[10px] text-[#78A5FF] bg-[#1A2A47] px-1.5 py-0.5 rounded border border-[#78A5FF]/30 font-mono font-medium">
               {approximateWpm} WPM ({speed.toFixed(2)}x)
             </span>
           )}
           {mode === 'notes' && (
-            <span className="text-[10px] text-[#4CD6A0] bg-[#112d23] px-1.5 py-0.5 rounded border border-[#4CD6A0]/30 font-mono font-medium">
+            <span className="text-[10px] text-[#83B8FF] bg-[#1A2A47] px-1.5 py-0.5 rounded border border-[#83B8FF]/30 font-mono font-medium">
               {completedBullets}/{bulletNotes.length} Feito ({bulletProgressPct}%)
             </span>
           )}
@@ -461,31 +461,31 @@ export const SpeakerNotesView: React.FC = () => {
           {/* Quick Dock to Camera Center */}
           <button
             onClick={() => handleDock('top-center')}
-            className="p-1 rounded-lg bg-[#18242E] hover:bg-[#202E39] text-[#92A2AE] hover:text-[#3AD6C6] transition-colors"
+            className="p-1 rounded-lg bg-[#191F2B] hover:bg-[#222B39] text-[#929CAF] hover:text-[#78A5FF] transition-colors"
             title="Ancorar no Topo Central (Sob a Câmera)"
           >
             <Anchor className="w-3.5 h-3.5" />
           </button>
 
           {/* Preset Window Sizes */}
-          <div className="flex items-center bg-[#18242E] rounded-lg p-0.5 space-x-0.5 text-[9px] font-mono font-bold text-[#92A2AE] border border-[#31414D]">
+          <div className="flex items-center bg-[#191F2B] rounded-lg p-0.5 space-x-0.5 text-[9px] font-mono font-bold text-[#929CAF] border border-[#303A4B]">
             <button
               onClick={() => handleSetSize(360, 320)}
-              className="px-1.5 py-0.5 hover:text-[#3AD6C6] hover:bg-[#202E39] rounded transition-colors"
+              className="px-1.5 py-0.5 hover:text-[#78A5FF] hover:bg-[#222B39] rounded transition-colors"
               title="Tamanho Compacto (P)"
             >
               P
             </button>
             <button
               onClick={() => handleSetSize(440, 520)}
-              className="px-1.5 py-0.5 hover:text-[#3AD6C6] hover:bg-[#202E39] rounded transition-colors"
+              className="px-1.5 py-0.5 hover:text-[#78A5FF] hover:bg-[#222B39] rounded transition-colors"
               title="Tamanho Padrão (M)"
             >
               M
             </button>
             <button
               onClick={() => handleSetSize(540, 660)}
-              className="px-1.5 py-0.5 hover:text-[#3AD6C6] hover:bg-[#202E39] rounded transition-colors"
+              className="px-1.5 py-0.5 hover:text-[#78A5FF] hover:bg-[#222B39] rounded transition-colors"
               title="Tamanho Expandido (G)"
             >
               G
@@ -499,7 +499,7 @@ export const SpeakerNotesView: React.FC = () => {
               const next = opacities[(opacities.indexOf(opacity) + 1) % opacities.length];
               setOpacity(next);
             }}
-            className="px-1.5 py-1 rounded-lg bg-[#18242E] hover:bg-[#202E39] text-[10px] font-mono text-[#92A2AE] hover:text-[#F4F7FA] border border-[#31414D]"
+            className="px-1.5 py-1 rounded-lg bg-[#191F2B] hover:bg-[#222B39] text-[10px] font-mono text-[#929CAF] hover:text-[#F3F5F9] border border-[#303A4B]"
             title="Alternar Transparência da Janela"
           >
             {opacity}%
@@ -508,7 +508,7 @@ export const SpeakerNotesView: React.FC = () => {
           {/* Minimize into Pill */}
           <button
             onClick={handleToggleCollapse}
-            className="p-1.5 rounded-lg bg-[#18242E] hover:bg-[#202E39] text-[#92A2AE] hover:text-[#F4F7FA] transition-colors border border-[#31414D]"
+            className="p-1.5 rounded-lg bg-[#191F2B] hover:bg-[#222B39] text-[#929CAF] hover:text-[#F3F5F9] transition-colors border border-[#303A4B]"
             title="Colapsar em Pílula Flutuante"
           >
             <Minimize2 className="w-3.5 h-3.5" />
@@ -517,7 +517,7 @@ export const SpeakerNotesView: React.FC = () => {
           {/* Close Window */}
           <button
             onClick={() => window.electronAPI?.toggleSpeakerNotes?.()}
-            className="p-1.5 rounded-lg hover:bg-[#FF5F6D]/20 text-[#92A2AE] hover:text-[#FF5F6D] transition-colors ml-0.5"
+            className="p-1.5 rounded-lg hover:bg-[#FF647C]/20 text-[#929CAF] hover:text-[#FF647C] transition-colors ml-0.5"
             title="Fechar (Esc)"
           >
             <X className="w-3.5 h-3.5" />
@@ -526,15 +526,15 @@ export const SpeakerNotesView: React.FC = () => {
       </div>
 
       {/* Mode Navigation Tabs */}
-      <div className="flex items-center justify-between px-3.5 py-1.5 bg-[#111A22] border-b border-[#31414D]">
+      <div className="flex items-center justify-between px-3.5 py-1.5 bg-[#121722] border-b border-[#303A4B]">
         <div className="flex items-center space-x-1.5">
           <button
             onClick={() => setMode('prompt')}
             title="Modo Teleprompter (Tecla 1)"
             className={`flex items-center space-x-1.5 px-3 py-1 rounded-lg text-xs font-bold transition-all ${
               mode === 'prompt'
-                ? 'bg-[#3AD6C6] text-[#062B2A] shadow-sm'
-                : 'text-[#92A2AE] hover:text-[#F4F7FA] hover:bg-[#18242E]'
+                ? 'bg-[#78A5FF] text-[#101A32] shadow-sm'
+                : 'text-[#929CAF] hover:text-[#F3F5F9] hover:bg-[#191F2B]'
             }`}
           >
             <Tv className="w-3.5 h-3.5" />
@@ -546,8 +546,8 @@ export const SpeakerNotesView: React.FC = () => {
             title="Tópicos & Checklist (Tecla 2) • Espaço ou Enter marca próximo item"
             className={`flex items-center space-x-1.5 px-3 py-1 rounded-lg text-xs font-bold transition-all ${
               mode === 'notes'
-                ? 'bg-[#3AD6C6] text-[#062B2A] shadow-sm'
-                : 'text-[#92A2AE] hover:text-[#F4F7FA] hover:bg-[#18242E]'
+                ? 'bg-[#78A5FF] text-[#101A32] shadow-sm'
+                : 'text-[#929CAF] hover:text-[#F3F5F9] hover:bg-[#191F2B]'
             }`}
           >
             <ListChecks className="w-3.5 h-3.5" />
@@ -559,8 +559,8 @@ export const SpeakerNotesView: React.FC = () => {
             title="Editor & Roteiro (Tecla 3)"
             className={`flex items-center space-x-1.5 px-3 py-1 rounded-lg text-xs font-bold transition-all ${
               mode === 'edit'
-                ? 'bg-[#3AD6C6] text-[#062B2A] shadow-sm'
-                : 'text-[#92A2AE] hover:text-[#F4F7FA] hover:bg-[#18242E]'
+                ? 'bg-[#78A5FF] text-[#101A32] shadow-sm'
+                : 'text-[#929CAF] hover:text-[#F3F5F9] hover:bg-[#191F2B]'
             }`}
           >
             <Edit3 className="w-3.5 h-3.5" />
@@ -572,14 +572,14 @@ export const SpeakerNotesView: React.FC = () => {
         <div className="flex items-center space-x-1">
           <button
             onClick={() => fileInputRef.current?.click()}
-            className="p-1 rounded text-[#92A2AE] hover:text-[#3AD6C6] hover:bg-[#18242E] transition-colors"
+            className="p-1 rounded text-[#929CAF] hover:text-[#78A5FF] hover:bg-[#191F2B] transition-colors"
             title="Importar Roteiro (.txt ou .md)"
           >
             <Upload className="w-3 h-3" />
           </button>
           <button
             onClick={handleExportScript}
-            className="p-1 rounded text-[#92A2AE] hover:text-[#3AD6C6] hover:bg-[#18242E] transition-colors"
+            className="p-1 rounded text-[#929CAF] hover:text-[#78A5FF] hover:bg-[#191F2B] transition-colors"
             title="Exportar Roteiro para Arquivo"
           >
             <Download className="w-3 h-3" />
@@ -593,15 +593,15 @@ export const SpeakerNotesView: React.FC = () => {
       {mode === 'prompt' && (
         <div className="relative flex-1 flex flex-col overflow-hidden">
           {/* Prompter Control Bar */}
-          <div className="flex items-center justify-between px-3.5 py-1.5 bg-[#111A22]/90 border-b border-[#31414D] text-xs">
+          <div className="flex items-center justify-between px-3.5 py-1.5 bg-[#121722]/90 border-b border-[#303A4B] text-xs">
             {/* Play / Pause / Reset */}
             <div className="flex items-center space-x-1.5">
               <button
                 onClick={() => setIsPlaying(!isPlaying)}
                 className={`flex items-center space-x-1.5 px-3 py-1 rounded-lg text-xs font-bold transition-all shadow-sm ${
                   isPlaying
-                    ? 'bg-[#FF5F6D] hover:bg-[#FF5F6D]/90 text-[#2B0E13]'
-                    : 'bg-[#3AD6C6] hover:bg-[#65E6D8] text-[#062B2A]'
+                    ? 'bg-[#FF647C] hover:bg-[#FF647C]/90 text-[#2B0E13]'
+                    : 'bg-[#78A5FF] hover:bg-[#9AB9FF] text-[#101A32]'
                 }`}
                 title={isPlaying ? 'Pausar Rolagem (Espaço)' : 'Iniciar Rolagem (Espaço)'}
               >
@@ -611,7 +611,7 @@ export const SpeakerNotesView: React.FC = () => {
 
               <button
                 onClick={handleReset}
-                className="p-1.5 rounded-lg bg-[#18242E] hover:bg-[#202E39] text-[#92A2AE] hover:text-[#F4F7FA] border border-[#31414D] transition-colors"
+                className="p-1.5 rounded-lg bg-[#191F2B] hover:bg-[#222B39] text-[#929CAF] hover:text-[#F3F5F9] border border-[#303A4B] transition-colors"
                 title="Reiniciar Roteiro para o Início (R)"
               >
                 <RotateCcw className="w-3.5 h-3.5" />
@@ -621,20 +621,20 @@ export const SpeakerNotesView: React.FC = () => {
             {/* Speed & Tuning */}
             <div className="flex items-center space-x-2">
               {/* Speed Decrease / Increase */}
-              <div className="flex items-center bg-[#18242E] rounded-lg p-0.5 border border-[#31414D]">
+              <div className="flex items-center bg-[#191F2B] rounded-lg p-0.5 border border-[#303A4B]">
                 <button
                   onClick={() => setSpeed(prev => Math.max(0.25, Math.round((prev - 0.25) * 100) / 100))}
-                  className="p-1 hover:text-[#3AD6C6] text-[#92A2AE] transition-colors"
+                  className="p-1 hover:text-[#78A5FF] text-[#929CAF] transition-colors"
                   title="Diminuir velocidade (Seta Baixo)"
                 >
                   <ChevronDown className="w-3 h-3" />
                 </button>
-                <span className="text-[11px] font-mono font-medium px-1.5 text-[#3AD6C6]">
+                <span className="text-[11px] font-mono font-medium px-1.5 text-[#78A5FF]">
                   {speed.toFixed(2)}x
                 </span>
                 <button
                   onClick={() => setSpeed(prev => Math.min(4.0, Math.round((prev + 0.25) * 100) / 100))}
-                  className="p-1 hover:text-[#3AD6C6] text-[#92A2AE] transition-colors"
+                  className="p-1 hover:text-[#78A5FF] text-[#929CAF] transition-colors"
                   title="Aumentar velocidade (Seta Cima)"
                 >
                   <ChevronUp className="w-3 h-3" />
@@ -642,18 +642,18 @@ export const SpeakerNotesView: React.FC = () => {
               </div>
 
               {/* Font Size (+ / -) */}
-              <div className="flex items-center bg-[#18242E] rounded-lg p-0.5 border border-[#31414D]">
+              <div className="flex items-center bg-[#191F2B] rounded-lg p-0.5 border border-[#303A4B]">
                 <button
                   onClick={() => setFontSize(prev => Math.max(14, prev - 2))}
-                  className="px-1.5 py-0.5 hover:text-[#3AD6C6] text-[11px] font-medium text-[#92A2AE] transition-colors"
+                  className="px-1.5 py-0.5 hover:text-[#78A5FF] text-[11px] font-medium text-[#929CAF] transition-colors"
                   title="Diminuir tamanho da fonte"
                 >
                   A-
                 </button>
-                <span className="text-[10px] font-mono px-1 text-[#C0CDD6]">{fontSize}px</span>
+                <span className="text-[10px] font-mono px-1 text-[#B7C0CE]">{fontSize}px</span>
                 <button
                   onClick={() => setFontSize(prev => Math.min(38, prev + 2))}
-                  className="px-1.5 py-0.5 hover:text-[#3AD6C6] text-[11px] font-medium text-[#92A2AE] transition-colors"
+                  className="px-1.5 py-0.5 hover:text-[#78A5FF] text-[11px] font-medium text-[#929CAF] transition-colors"
                   title="Aumentar tamanho da fonte"
                 >
                   A+
@@ -665,8 +665,8 @@ export const SpeakerNotesView: React.FC = () => {
                 onClick={() => setPauseOnHover(!pauseOnHover)}
                 className={`p-1.5 rounded-lg transition-all ${
                   pauseOnHover
-                    ? 'bg-[#FFBD66]/20 text-[#FFBD66] border border-[#FFBD66]/40'
-                    : 'bg-[#18242E] border border-[#31414D] hover:bg-[#202E39] text-[#92A2AE] hover:text-[#F4F7FA]'
+                    ? 'bg-[#F2B66D]/20 text-[#F2B66D] border border-[#F2B66D]/40'
+                    : 'bg-[#191F2B] border border-[#303A4B] hover:bg-[#222B39] text-[#929CAF] hover:text-[#F3F5F9]'
                 }`}
                 title={pauseOnHover ? 'Pausar rolagem ao passar o mouse: ATIVADO' : 'Pausar rolagem ao passar o mouse: DESATIVADO'}
               >
@@ -678,8 +678,8 @@ export const SpeakerNotesView: React.FC = () => {
                 onClick={() => setIsMirrored(!isMirrored)}
                 className={`p-1.5 rounded-lg transition-all ${
                   isMirrored
-                    ? 'bg-[#12312F] text-[#3AD6C6] border border-[#3AD6C6]/40'
-                    : 'bg-[#18242E] border border-[#31414D] hover:bg-[#202E39] text-[#92A2AE] hover:text-[#F4F7FA]'
+                    ? 'bg-[#1A2A47] text-[#78A5FF] border border-[#78A5FF]/40'
+                    : 'bg-[#191F2B] border border-[#303A4B] hover:bg-[#222B39] text-[#929CAF] hover:text-[#F3F5F9]'
                 }`}
                 title="Espelhar Horizontalmente (Para teleprompters ópticos com vidro)"
               >
@@ -690,25 +690,25 @@ export const SpeakerNotesView: React.FC = () => {
 
           {/* Eyeline Visual Indicator Bar (Linha do Olhar) */}
           <div className="absolute top-28 inset-x-0 pointer-events-none z-20 flex items-center px-4">
-            <div className="h-[1px] flex-1 bg-gradient-to-r from-transparent via-[#3AD6C6]/40 to-transparent" />
-            <div className="bg-[#111A22]/95 border border-[#3AD6C6]/40 text-[9px] font-mono font-medium text-[#3AD6C6] px-2.5 py-0.5 rounded-full shadow-lg flex items-center space-x-1.5 mx-2 backdrop-blur-md">
-              <Eye className="w-3 h-3 text-[#3AD6C6]" />
+            <div className="h-[1px] flex-1 bg-gradient-to-r from-transparent via-[#78A5FF]/40 to-transparent" />
+            <div className="bg-[#121722]/95 border border-[#78A5FF]/40 text-[9px] font-mono font-medium text-[#78A5FF] px-2.5 py-0.5 rounded-full shadow-lg flex items-center space-x-1.5 mx-2 backdrop-blur-md">
+              <Eye className="w-3 h-3 text-[#78A5FF]" />
               <span>Linha do Olhar</span>
             </div>
-            <div className="h-[1px] flex-1 bg-gradient-to-r from-transparent via-[#3AD6C6]/40 to-transparent" />
+            <div className="h-[1px] flex-1 bg-gradient-to-r from-transparent via-[#78A5FF]/40 to-transparent" />
           </div>
 
           {/* Temporary Pause Badge when hovered */}
           {pauseOnHover && isHovered && isPlaying && (
-            <div className="absolute top-20 left-1/2 -translate-x-1/2 bg-[#FFBD66] text-[#2B0E13] font-bold text-[10px] px-2.5 py-0.5 rounded-full shadow-lg z-30 tracking-wide uppercase flex items-center space-x-1 animate-in fade-in zoom-in-95">
+            <div className="absolute top-20 left-1/2 -translate-x-1/2 bg-[#F2B66D] text-[#2B0E13] font-bold text-[10px] px-2.5 py-0.5 rounded-full shadow-lg z-30 tracking-wide uppercase flex items-center space-x-1 animate-in fade-in zoom-in-95">
               <Pause className="w-2.5 h-2.5 fill-current" />
               <span>Pausa por Mouse</span>
             </div>
           )}
 
           {/* Soft Vignette / Gradient Mask (Top & Bottom focus mask) */}
-          <div className="absolute top-10 inset-x-0 h-10 bg-gradient-to-b from-[#0B1117] to-transparent pointer-events-none z-10" />
-          <div className="absolute bottom-6 inset-x-0 h-12 bg-gradient-to-t from-[#0B1117] to-transparent pointer-events-none z-10" />
+          <div className="absolute top-10 inset-x-0 h-10 bg-gradient-to-b from-[#0B0E14] to-transparent pointer-events-none z-10" />
+          <div className="absolute bottom-6 inset-x-0 h-12 bg-gradient-to-t from-[#0B0E14] to-transparent pointer-events-none z-10" />
 
           {/* Scrollable Prompter Container (No scroll-smooth to prevent jitter) */}
           <div
@@ -725,7 +725,7 @@ export const SpeakerNotesView: React.FC = () => {
             <div className="h-24" />
 
             <div
-              className="font-normal text-[#F4F7FA] tracking-wide select-text transition-none"
+              className="font-normal text-[#F3F5F9] tracking-wide select-text transition-none"
               style={{ fontSize: `${fontSize}px`, lineHeight: 1.65 }}
             >
               {text}
@@ -736,15 +736,15 @@ export const SpeakerNotesView: React.FC = () => {
           </div>
 
           {/* Footer Status Bar */}
-          <div className="px-3.5 py-1.5 bg-[#111A22] border-t border-[#31414D] flex items-center justify-between text-[11px] text-[#92A2AE]">
+          <div className="px-3.5 py-1.5 bg-[#121722] border-t border-[#303A4B] flex items-center justify-between text-[11px] text-[#929CAF]">
             <div className="flex items-center space-x-2">
-              <Clock className="w-3 h-3 text-[#3AD6C6]" />
+              <Clock className="w-3 h-3 text-[#78A5FF]" />
               <span>
                 {estimatedMinutes > 0 ? `${estimatedMinutes}m ` : ''}
                 {remainingSeconds}s de fala estimada (~{wordCount} palavras)
               </span>
             </div>
-            <span className="text-[10px] text-[#92A2AE] font-mono">
+            <span className="text-[10px] text-[#929CAF] font-mono">
               [Espaço] Play • [Setas] Vel. • [R] Reiniciar
             </span>
           </div>
@@ -759,10 +759,10 @@ export const SpeakerNotesView: React.FC = () => {
           {/* Header & Actions */}
           <div className="flex items-center justify-between">
             <div>
-              <h3 className="text-xs font-semibold text-[#F4F7FA] uppercase tracking-wider font-mono">
+              <h3 className="text-xs font-semibold text-[#F3F5F9] uppercase tracking-wider font-mono">
                 Tópicos da Apresentação
               </h3>
-              <p className="text-[11px] text-[#92A2AE]">
+              <p className="text-[11px] text-[#929CAF]">
                 Marque os pontos conforme for falando no vídeo
               </p>
             </div>
@@ -770,26 +770,26 @@ export const SpeakerNotesView: React.FC = () => {
             <div className="flex items-center space-x-1.5">
               <button
                 onClick={handleResetChecklist}
-                className="px-2 py-1 rounded bg-[#18242E] border border-[#31414D] hover:bg-[#202E39] text-[10px] text-[#C0CDD6] hover:text-[#F4F7FA] font-mono transition-colors"
+                className="px-2 py-1 rounded bg-[#191F2B] border border-[#303A4B] hover:bg-[#222B39] text-[10px] text-[#B7C0CE] hover:text-[#F3F5F9] font-mono transition-colors"
                 title="Desmarcar todos os itens"
               >
                 Desmarcar Todos
               </button>
               <button
                 onClick={handleConvertScriptToBullets}
-                className="flex items-center space-x-1 px-2.5 py-1 rounded-lg bg-[#3AD6C6] hover:bg-[#65E6D8] text-[#062B2A] text-[11px] font-bold transition-colors shadow-sm"
+                className="flex items-center space-x-1 px-2.5 py-1 rounded-lg bg-[#78A5FF] hover:bg-[#9AB9FF] text-[#101A32] text-[11px] font-bold transition-colors shadow-sm"
                 title="Importar linhas do roteiro para tópicos"
               >
-                <Sparkles className="w-3 h-3 text-[#062B2A]" />
+                <Sparkles className="w-3 h-3 text-[#101A32]" />
                 <span>Gerar do Roteiro</span>
               </button>
             </div>
           </div>
 
           {/* Progress bar */}
-          <div className="w-full bg-[#18242E] rounded-full h-1.5 overflow-hidden border border-[#31414D]">
+          <div className="w-full bg-[#191F2B] rounded-full h-1.5 overflow-hidden border border-[#303A4B]">
             <div
-              className="bg-[#3AD6C6] h-full transition-all duration-300"
+              className="bg-[#78A5FF] h-full transition-all duration-300"
               style={{ width: `${bulletProgressPct}%` }}
             />
           </div>
@@ -802,22 +802,22 @@ export const SpeakerNotesView: React.FC = () => {
                 onClick={() => handleToggleBullet(item.id)}
                 className={`flex items-start justify-between p-3 rounded-xl border transition-all cursor-pointer group ${
                   item.done
-                    ? 'bg-[#112d23] border-[#4CD6A0]/40 text-[#92A2AE]'
-                    : 'bg-[#111A22] border-[#31414D] hover:border-[#3AD6C6]/40 text-[#F4F7FA] shadow-sm'
+                    ? 'bg-[#1A2A47] border-[#83B8FF]/40 text-[#929CAF]'
+                    : 'bg-[#121722] border-[#303A4B] hover:border-[#78A5FF]/40 text-[#F3F5F9] shadow-sm'
                 }`}
               >
                 <div className="flex items-start space-x-2.5 flex-1 pr-2">
-                  <button className="mt-0.5 text-[#3AD6C6] shrink-0">
+                  <button className="mt-0.5 text-[#78A5FF] shrink-0">
                     {item.done ? (
-                      <CheckSquare className="w-4 h-4 text-[#4CD6A0]" />
+                      <CheckSquare className="w-4 h-4 text-[#83B8FF]" />
                     ) : (
-                      <Square className="w-4 h-4 text-[#92A2AE] group-hover:text-[#3AD6C6]" />
+                      <Square className="w-4 h-4 text-[#929CAF] group-hover:text-[#78A5FF]" />
                     )}
                   </button>
                   <div className="flex-1">
                     <span
                       className={`text-xs leading-relaxed ${
-                        item.done ? 'line-through text-[#92A2AE]' : 'font-medium'
+                        item.done ? 'line-through text-[#929CAF]' : 'font-medium'
                       }`}
                     >
                       {item.text}
@@ -830,7 +830,7 @@ export const SpeakerNotesView: React.FC = () => {
                     e.stopPropagation();
                     handleDeleteBullet(item.id);
                   }}
-                  className="p-1 rounded text-[#92A2AE] hover:text-[#FF5F6D] opacity-0 group-hover:opacity-100 transition-opacity"
+                  className="p-1 rounded text-[#929CAF] hover:text-[#FF647C] opacity-0 group-hover:opacity-100 transition-opacity"
                   title="Excluir tópico"
                 >
                   <Trash2 className="w-3.5 h-3.5" />
@@ -839,25 +839,25 @@ export const SpeakerNotesView: React.FC = () => {
             ))}
 
             {bulletNotes.length === 0 && (
-              <div className="text-center py-10 text-[#92A2AE] text-xs">
+              <div className="text-center py-10 text-[#929CAF] text-xs">
                 Nenhum tópico adicionado. Digite abaixo ou clique em "Gerar do Roteiro".
               </div>
             )}
           </div>
 
           {/* Add new bullet note input */}
-          <div className="flex items-center space-x-2 pt-1 border-t border-[#31414D]">
+          <div className="flex items-center space-x-2 pt-1 border-t border-[#303A4B]">
             <input
               type="text"
               value={newBulletText}
               onChange={(e) => setNewBulletText(e.target.value)}
               onKeyDown={(e) => e.key === 'Enter' && handleAddBullet()}
               placeholder="Adicionar novo tópico (pressione Enter)..."
-              className="flex-1 bg-[#111A22] border border-[#31414D] rounded-xl px-3 py-2 text-xs text-[#F4F7FA] placeholder-[#92A2AE] focus:outline-none focus:border-[#3AD6C6]"
+              className="flex-1 bg-[#121722] border border-[#303A4B] rounded-xl px-3 py-2 text-xs text-[#F3F5F9] placeholder-[#929CAF] focus:outline-none focus:border-[#78A5FF]"
             />
             <button
               onClick={handleAddBullet}
-              className="p-2 rounded-xl bg-[#3AD6C6] hover:bg-[#65E6D8] text-[#062B2A] font-bold transition-all shadow-sm"
+              className="p-2 rounded-xl bg-[#78A5FF] hover:bg-[#9AB9FF] text-[#101A32] font-bold transition-all shadow-sm"
               title="Adicionar"
             >
               <Plus className="w-4 h-4 stroke-[3]" />
@@ -873,15 +873,15 @@ export const SpeakerNotesView: React.FC = () => {
         <div className="flex-1 flex flex-col p-4 space-y-3 overflow-hidden" style={{ WebkitAppRegion: 'no-drag' } as any}>
           {/* Preset Buttons */}
           <div className="flex items-center space-x-1.5 overflow-x-auto pb-1">
-            <span className="text-[11px] text-[#92A2AE] flex items-center gap-1 font-semibold whitespace-nowrap">
-              <Sparkles className="w-3 h-3 text-[#3AD6C6]" />
+            <span className="text-[11px] text-[#929CAF] flex items-center gap-1 font-semibold whitespace-nowrap">
+              <Sparkles className="w-3 h-3 text-[#78A5FF]" />
               Modelos:
             </span>
             {PRESET_SCRIPTS.map((preset, idx) => (
               <button
                 key={idx}
                 onClick={() => setText(preset.text)}
-                className="px-2.5 py-1 rounded-lg bg-[#18242E] hover:bg-[#202E39] text-[11px] text-[#C0CDD6] hover:text-[#F4F7FA] whitespace-nowrap transition-colors border border-[#31414D]"
+                className="px-2.5 py-1 rounded-lg bg-[#191F2B] hover:bg-[#222B39] text-[11px] text-[#B7C0CE] hover:text-[#F3F5F9] whitespace-nowrap transition-colors border border-[#303A4B]"
               >
                 {preset.title}
               </button>
@@ -893,12 +893,12 @@ export const SpeakerNotesView: React.FC = () => {
             value={text}
             onChange={(e) => setText(e.target.value)}
             placeholder="Escreva ou cole seu roteiro aqui..."
-            className="flex-1 w-full bg-[#111A22] border border-[#31414D] rounded-xl p-3.5 text-sm text-[#F4F7FA] placeholder-[#92A2AE] focus:outline-none focus:border-[#3AD6C6] resize-none font-sans leading-relaxed"
+            className="flex-1 w-full bg-[#121722] border border-[#303A4B] rounded-xl p-3.5 text-sm text-[#F3F5F9] placeholder-[#929CAF] focus:outline-none focus:border-[#78A5FF] resize-none font-sans leading-relaxed"
           />
 
           {/* Footer Controls */}
           <div className="flex items-center justify-between pt-1">
-            <div className="text-xs text-[#92A2AE] space-x-2">
+            <div className="text-xs text-[#929CAF] space-x-2">
               <span>{wordCount} palavras</span>
               <span>•</span>
               <span>{text.length} caracteres</span>
@@ -909,9 +909,9 @@ export const SpeakerNotesView: React.FC = () => {
             <div className="flex items-center space-x-2">
               <button
                 onClick={handleConvertScriptToBullets}
-                className="flex items-center space-x-1.5 px-3 py-1.5 rounded-xl bg-[#18242E] hover:bg-[#202E39] text-xs font-medium text-[#C0CDD6] hover:text-[#F4F7FA] transition-all border border-[#31414D]"
+                className="flex items-center space-x-1.5 px-3 py-1.5 rounded-xl bg-[#191F2B] hover:bg-[#222B39] text-xs font-medium text-[#B7C0CE] hover:text-[#F3F5F9] transition-all border border-[#303A4B]"
               >
-                <ListChecks className="w-3.5 h-3.5 text-[#4CD6A0]" />
+                <ListChecks className="w-3.5 h-3.5 text-[#83B8FF]" />
                 <span>Converter em Tópicos</span>
               </button>
 
@@ -920,7 +920,7 @@ export const SpeakerNotesView: React.FC = () => {
                   setMode('prompt');
                   handleReset();
                 }}
-                className="flex items-center space-x-1.5 px-4 py-1.5 rounded-xl bg-[#3AD6C6] hover:bg-[#65E6D8] text-xs font-bold text-[#062B2A] shadow-sm transition-colors active:scale-95"
+                className="flex items-center space-x-1.5 px-4 py-1.5 rounded-xl bg-[#78A5FF] hover:bg-[#9AB9FF] text-xs font-bold text-[#101A32] shadow-sm transition-colors active:scale-95"
               >
                 <Tv className="w-3.5 h-3.5" />
                 <span>Apresentar no Prompter</span>

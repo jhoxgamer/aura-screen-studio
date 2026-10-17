@@ -49,11 +49,16 @@ export const PreviewView: React.FC = () => {
   const [isEditingTitle, setIsEditingTitle] = useState(false);
   const [editedTitle, setEditedTitle] = useState('');
 
-  // Trimming states
+  // Trimming states & controller
   const [trimStart, setTrimStart] = useState(0);
   const [trimEnd, setTrimEnd] = useState(0);
   const [isTrimming, setIsTrimming] = useState(false);
   const [isTrimmingSaving, setIsTrimmingSaving] = useState(false);
+  const [trimProgress, setTrimProgress] = useState(0);
+  const [trimStatusText, setTrimStatusText] = useState('');
+  const abortTrimRef = useRef<boolean>(false);
+  const trimWatchdogRef = useRef<any>(null);
+  const trimRecorderRef = useRef<MediaRecorder | null>(null);
 
   // Chapters & Audio Waveform state
   const [chapters, setChapters] = useState<ChapterItem[]>([]);
@@ -329,8 +334,8 @@ export const PreviewView: React.FC = () => {
       const cur = videoRef.current.currentTime;
       setCurrentTime(cur);
 
-      // Loop or stop if reached trimEnd
-      if (isTrimming && cur >= trimEnd) {
+      // Only loop if preview is actively playing in trim mode
+      if (isTrimming && isPlaying && cur >= trimEnd) {
         videoRef.current.currentTime = trimStart;
       }
     }
@@ -378,40 +383,133 @@ export const PreviewView: React.FC = () => {
     }
   };
 
+  const handleCancelTrim = () => {
+    abortTrimRef.current = true;
+    if (trimWatchdogRef.current) {
+      clearTimeout(trimWatchdogRef.current);
+      trimWatchdogRef.current = null;
+    }
+    if (trimRecorderRef.current && trimRecorderRef.current.state === 'recording') {
+      try {
+        trimRecorderRef.current.stop();
+      } catch {}
+    }
+    if (videoRef.current) {
+      videoRef.current.pause();
+    }
+    setIsTrimmingSaving(false);
+    setTrimProgress(0);
+    setTrimStatusText('');
+    showToast('Operação de corte cancelada.', 'info');
+  };
+
   const handleSaveTrim = async () => {
     if (!meta || !videoRef.current) return;
+    if (trimStart >= trimEnd || trimEnd <= 0) {
+      showToast('O ponto inicial deve ser anterior ao ponto final.', 'error');
+      return;
+    }
+
     setIsTrimmingSaving(true);
+    setTrimProgress(15);
+    setTrimStatusText('Iniciando processamento...');
+    abortTrimRef.current = false;
+
     const vid = videoRef.current;
     const prevPlaybackRate = vid.playbackRate;
+    const prevMuted = vid.muted;
+    const prevVolume = vid.volume;
+
     try {
+      // Step 1: Native High-Precision FFmpeg Trimming (instantaneous, lossless, perfect sync)
+      setTrimProgress(35);
+      setTrimStatusText('Executando corte frame-accurate (FFmpeg)...');
+
+      let updatedMeta: any = null;
+      try {
+        updatedMeta = await window.electronAPI.trimRecording(meta.id, {
+          startSec: trimStart,
+          endSec: trimEnd
+        });
+      } catch (nativeErr) {
+        console.warn('Native trimming error, falling back to client recorder:', nativeErr);
+      }
+
+      if (abortTrimRef.current) return;
+
+      if (updatedMeta && updatedMeta.id) {
+        setTrimProgress(100);
+        setTrimStatusText('Corte concluído com sucesso!');
+        setMeta(updatedMeta);
+        const newDurSec = (updatedMeta.durationMs || 1000) / 1000;
+        setDuration(newDurSec);
+        setTrimStart(0);
+        setTrimEnd(newDurSec);
+        setCurrentTime(0);
+        setIsTrimming(false);
+
+        if (vid) {
+          vid.pause();
+          vid.currentTime = 0;
+          const cleanSrc = vid.src.split('?')[0];
+          vid.src = `${cleanSrc}?t=${Date.now()}`;
+          vid.load();
+        }
+
+        showToast(`Vídeo cortado e salvo com sucesso! Nova duração: ${formatTime(newDurSec)}`, 'success');
+        return;
+      }
+
+      // Step 2: Fallback to client-side MediaRecorder capture
+      setTrimStatusText('Processando recorte via buffer de mídia...');
+      setTrimProgress(45);
+
       vid.pause();
       vid.playbackRate = 1.0;
       vid.currentTime = trimStart;
+      vid.muted = false;
+      vid.volume = Math.max(0.5, prevVolume);
+
       await new Promise((r) => setTimeout(r, 200));
+      if (abortTrimRef.current) return;
 
       const stream = (vid as any).captureStream ? (vid as any).captureStream() : null;
       if (!stream) {
         showToast('Corte direto não suportado pelo navegador.', 'error');
         setIsTrimmingSaving(false);
-        vid.playbackRate = prevPlaybackRate;
         return;
       }
 
       const recorder = new MediaRecorder(stream, { mimeType: 'video/webm' });
+      trimRecorderRef.current = recorder;
       const chunks: Blob[] = [];
       recorder.ondataavailable = (e) => {
         if (e.data.size > 0) chunks.push(e.data);
       };
 
       const durationToRecord = (trimEnd - trimStart) * 1000;
+      const safeRate = 1.0;
+      const watchdogMs = Math.max(durationToRecord + 3000, 5000);
+
       recorder.start();
       vid.play();
 
-      await new Promise<void>((resolve) => {
-        let watchdog: any = null;
+      await new Promise<void>((resolve, reject) => {
+        const startTime = Date.now();
         const check = () => {
-          if (vid.currentTime >= trimEnd || vid.ended) {
-            if (watchdog) clearTimeout(watchdog);
+          if (abortTrimRef.current) {
+            if (trimWatchdogRef.current) clearTimeout(trimWatchdogRef.current);
+            reject(new Error('Trim aborted by user'));
+            return;
+          }
+
+          const elapsed = Date.now() - startTime;
+          const progress = Math.min(95, 45 + Math.round((elapsed / durationToRecord) * 50));
+          setTrimProgress(progress);
+          setTrimStatusText(`Gravando trecho selecionado: ${Math.round((elapsed / durationToRecord) * 100)}%`);
+
+          if (vid.currentTime >= trimEnd || vid.ended || elapsed >= durationToRecord + 1000) {
+            if (trimWatchdogRef.current) clearTimeout(trimWatchdogRef.current);
             if (recorder.state === 'recording') recorder.stop();
             vid.pause();
             resolve();
@@ -420,34 +518,61 @@ export const PreviewView: React.FC = () => {
           }
         };
 
-        // Safety watchdog: stop even if timeupdate or requestAnimationFrame stalls
-        watchdog = setTimeout(() => {
+        trimWatchdogRef.current = setTimeout(() => {
           if (recorder.state === 'recording') {
             recorder.stop();
             vid.pause();
           }
           resolve();
-        }, Math.max(durationToRecord + 3000, 5000));
+        }, watchdogMs);
 
         check();
       });
+
+      if (abortTrimRef.current) return;
 
       await new Promise((r) => (recorder.onstop = r as any));
       const trimmedBlob = new Blob(chunks, { type: 'video/webm' });
       const buffer = await trimmedBlob.arrayBuffer();
 
+      setTrimProgress(95);
+      setTrimStatusText('Salvando arquivo final...');
+
       const updated = await window.electronAPI.trimRecording(meta.id, buffer, durationToRecord);
       if (updated) {
         setMeta(updated);
+        const newDurSec = (updated.durationMs || durationToRecord) / 1000;
+        setDuration(newDurSec);
+        setTrimStart(0);
+        setTrimEnd(newDurSec);
+        setCurrentTime(0);
         setIsTrimming(false);
+        if (vid) {
+          vid.pause();
+          vid.currentTime = 0;
+          const cleanSrc = vid.src.split('?')[0];
+          vid.src = `${cleanSrc}?t=${Date.now()}`;
+          vid.load();
+        }
         showToast('Vídeo cortado e salvo com sucesso!', 'success');
       }
-    } catch (e) {
-      console.error('Error saving trim:', e);
-      showToast('Erro ao salvar corte.', 'error');
+    } catch (e: any) {
+      if (!abortTrimRef.current) {
+        console.error('Error saving trim:', e);
+        showToast('Erro ao salvar corte do vídeo.', 'error');
+      }
     } finally {
       vid.playbackRate = prevPlaybackRate;
+      vid.muted = prevMuted;
+      vid.volume = prevVolume;
+      trimRecorderRef.current = null;
+      if (trimWatchdogRef.current) {
+        clearTimeout(trimWatchdogRef.current);
+        trimWatchdogRef.current = null;
+      }
       setIsTrimmingSaving(false);
+      setTrimProgress(0);
+      setTrimStatusText('');
     }
   };
 
@@ -501,13 +626,13 @@ export const PreviewView: React.FC = () => {
   const isPublicInternetLink = shareUrl.includes('trycloudflare.com');
 
   return (
-    <div className="w-full h-full min-h-screen bg-[#0B1117] text-[#F4F7FA] flex flex-col select-none overflow-hidden font-sans">
+    <div className="w-full h-full min-h-screen bg-[#0B0E14] text-[#F3F5F9] flex flex-col select-none overflow-hidden font-sans">
       {/* Top Header */}
-      <div className="h-16 bg-[#111A22] border-b border-[#31414D] px-6 flex items-center justify-between shrink-0">
+      <div className="h-16 bg-[#121722] border-b border-[#303A4B] px-6 flex items-center justify-between shrink-0">
         <div className="flex items-center space-x-3 min-w-0">
-          <div className="w-8 h-8 rounded-lg bg-[#18242E] border border-[#31414D] flex items-center justify-center shrink-0">
-            <div className="w-4 h-4 rounded-full border-2 border-[#3AD6C6] flex items-center justify-center">
-              <div className="w-1.5 h-1.5 rounded-full bg-[#FF5F6D]" />
+          <div className="w-8 h-8 rounded-lg bg-[#191F2B] border border-[#303A4B] flex items-center justify-center shrink-0">
+            <div className="w-4 h-4 rounded-full border-2 border-[#78A5FF] flex items-center justify-center">
+              <div className="w-1.5 h-1.5 rounded-full bg-[#FF647C]" />
             </div>
           </div>
 
@@ -523,35 +648,35 @@ export const PreviewView: React.FC = () => {
                     if (e.key === 'Escape') setIsEditingTitle(false);
                   }}
                   autoFocus
-                  className="bg-[#0B1117] border border-[#3AD6C6] rounded px-2 py-0.5 text-xs text-[#F4F7FA] font-semibold focus:outline-none"
+                  className="bg-[#0B0E14] border border-[#78A5FF] rounded px-2 py-0.5 text-xs text-[#F3F5F9] font-semibold focus:outline-none"
                 />
                 <button
                   onClick={handleSaveTitle}
-                  className="text-xs bg-[#3AD6C6] hover:bg-[#65E6D8] text-[#062B2A] font-bold px-2 py-0.5 rounded transition-colors"
+                  className="text-xs bg-[#78A5FF] hover:bg-[#9AB9FF] text-[#101A32] font-bold px-2 py-0.5 rounded transition-colors"
                 >
                   Salvar
                 </button>
               </div>
             ) : (
               <div className="flex items-center space-x-2 group cursor-pointer" onClick={() => setIsEditingTitle(true)}>
-                <h1 className="text-sm font-semibold text-[#F4F7FA] leading-tight truncate max-w-sm hover:text-[#3AD6C6] transition-colors">
+                <h1 className="text-sm font-semibold text-[#F3F5F9] leading-tight truncate max-w-sm hover:text-[#78A5FF] transition-colors">
                   {meta?.title || 'Gravação Concluída'}
                 </h1>
-                <Edit2 className="w-3 h-3 text-[#92A2AE] group-hover:text-[#3AD6C6] transition-colors shrink-0" />
+                <Edit2 className="w-3 h-3 text-[#929CAF] group-hover:text-[#78A5FF] transition-colors shrink-0" />
               </div>
             )}
 
-            <div className="flex items-center space-x-2 mt-0.5 text-[11px] text-[#92A2AE]">
+            <div className="flex items-center space-x-2 mt-0.5 text-[11px] text-[#929CAF]">
               <span>{meta ? `${formatFileSize(meta.fileSize)} • ${meta.resolution} • ${(duration).toFixed(0)}s` : ''}</span>
               <span>•</span>
               {isPublicInternetLink ? (
-                <span className="inline-flex items-center space-x-1 text-[#4CD6A0] font-medium">
-                  <span className="w-1.5 h-1.5 rounded-full bg-[#4CD6A0] inline-block" />
+                <span className="inline-flex items-center space-x-1 text-[#83B8FF] font-medium">
+                  <span className="w-1.5 h-1.5 rounded-full bg-[#83B8FF] inline-block" />
                   <span>Link Público Ativo</span>
                 </span>
               ) : (
-                <span className="inline-flex items-center space-x-1 text-[#3AD6C6] font-medium">
-                  <span className="w-1.5 h-1.5 rounded-full bg-[#3AD6C6] inline-block" />
+                <span className="inline-flex items-center space-x-1 text-[#78A5FF] font-medium">
+                  <span className="w-1.5 h-1.5 rounded-full bg-[#78A5FF] inline-block" />
                   <span>Conectando link global...</span>
                 </span>
               )}
@@ -565,7 +690,7 @@ export const PreviewView: React.FC = () => {
           <button
             onClick={handleShareLink}
             title={`Copiar Link Público (${getShortcutLabel('l')})`}
-            className="flex items-center space-x-1.5 bg-[#3AD6C6] hover:bg-[#65E6D8] active:scale-95 text-[#062B2A] px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all shadow-sm"
+            className="flex items-center space-x-1.5 bg-[#78A5FF] hover:bg-[#9AB9FF] active:scale-95 text-[#101A32] px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all shadow-sm"
           >
             {isLinkCopied ? <Check className="w-3.5 h-3.5" /> : <Share2 className="w-3.5 h-3.5" />}
             <span>{isLinkCopied ? 'Link Copiado!' : 'Copiar Link Público'}</span>
@@ -574,27 +699,27 @@ export const PreviewView: React.FC = () => {
           {/* Open in Browser */}
           <button
             onClick={handleOpenInBrowser}
-            className="flex items-center space-x-1.5 bg-[#18242E] hover:bg-[#202E39] border border-[#31414D] px-3 py-1.5 rounded-xl text-xs font-medium text-[#F4F7FA] transition-all shadow-sm"
+            className="flex items-center space-x-1.5 bg-[#191F2B] hover:bg-[#222B39] border border-[#303A4B] px-3 py-1.5 rounded-xl text-xs font-medium text-[#F3F5F9] transition-all shadow-sm"
             title="Abrir página pública no navegador"
           >
-            <ExternalLink className="w-3.5 h-3.5 text-[#3AD6C6]" />
+            <ExternalLink className="w-3.5 h-3.5 text-[#78A5FF]" />
             <span>Ver no Navegador</span>
           </button>
 
           {/* Download Video */}
           <button
             onClick={handleDownload}
-            className="flex items-center space-x-1.5 bg-[#18242E] hover:bg-[#202E39] border border-[#31414D] px-3 py-1.5 rounded-xl text-xs font-medium text-[#F4F7FA] transition-all shadow-sm"
+            className="flex items-center space-x-1.5 bg-[#191F2B] hover:bg-[#222B39] border border-[#303A4B] px-3 py-1.5 rounded-xl text-xs font-medium text-[#F3F5F9] transition-all shadow-sm"
             title="Salvar arquivo de vídeo no computador"
           >
-            <Download className="w-3.5 h-3.5 text-[#4CD6A0]" />
+            <Download className="w-3.5 h-3.5 text-[#83B8FF]" />
             <span>Baixar Vídeo</span>
           </button>
 
           {/* Open Folder */}
           <button
             onClick={handleOpenFolder}
-            className="p-2 rounded-xl bg-[#18242E] hover:bg-[#202E39] border border-[#31414D] text-[#C0CDD6] hover:text-[#F4F7FA] transition-all shadow-sm"
+            className="p-2 rounded-xl bg-[#191F2B] hover:bg-[#222B39] border border-[#303A4B] text-[#B7C0CE] hover:text-[#F3F5F9] transition-all shadow-sm"
             title="Abrir pasta no Windows Explorer"
           >
             <FolderOpen className="w-3.5 h-3.5" />
@@ -610,26 +735,26 @@ export const PreviewView: React.FC = () => {
                 setTimeout(() => setIsPathCopied(false), 2000);
               }
             }}
-            className="p-2 rounded-xl bg-[#18242E] hover:bg-[#202E39] border border-[#31414D] text-[#C0CDD6] hover:text-[#3AD6C6] transition-all shadow-sm"
+            className="p-2 rounded-xl bg-[#191F2B] hover:bg-[#222B39] border border-[#303A4B] text-[#B7C0CE] hover:text-[#78A5FF] transition-all shadow-sm"
             title="Copiar Caminho do Arquivo (C:\...)"
           >
-            {isPathCopied ? <Check className="w-3.5 h-3.5 text-[#4CD6A0]" /> : <Copy className="w-3.5 h-3.5" />}
+            {isPathCopied ? <Check className="w-3.5 h-3.5 text-[#83B8FF]" /> : <Copy className="w-3.5 h-3.5" />}
           </button>
 
           {/* New Recording */}
           <button
             onClick={handleNewRecording}
-            className="flex items-center space-x-1.5 bg-[#18242E] hover:bg-[#202E39] border border-[#31414D] px-3 py-1.5 rounded-xl text-xs font-medium text-[#F4F7FA] transition-all shadow-sm"
+            className="flex items-center space-x-1.5 bg-[#191F2B] hover:bg-[#222B39] border border-[#303A4B] px-3 py-1.5 rounded-xl text-xs font-medium text-[#F3F5F9] transition-all shadow-sm"
             title="Iniciar nova gravação"
           >
-            <PlusCircle className="w-3.5 h-3.5 text-[#3AD6C6]" />
+            <PlusCircle className="w-3.5 h-3.5 text-[#78A5FF]" />
             <span>Nova Gravação</span>
           </button>
 
           {/* Delete */}
           <button
             onClick={() => setIsConfirmingDelete(true)}
-            className="p-2 rounded-xl bg-[#18242E] hover:bg-[#B83A48]/30 border border-[#31414D] text-[#92A2AE] hover:text-[#FF5F6D] transition-all shadow-sm"
+            className="p-2 rounded-xl bg-[#191F2B] hover:bg-[#B83A48]/30 border border-[#303A4B] text-[#929CAF] hover:text-[#FF647C] transition-all shadow-sm"
             title="Excluir gravação"
           >
             <Trash2 className="w-3.5 h-3.5" />
@@ -638,18 +763,18 @@ export const PreviewView: React.FC = () => {
       </div>
 
       {/* Share Link Banner Alert */}
-      <div className="bg-[#111A22] border-b border-[#31414D] px-6 py-2 flex items-center justify-between text-xs">
+      <div className="bg-[#121722] border-b border-[#303A4B] px-6 py-2 flex items-center justify-between text-xs">
         <div className="flex items-center space-x-2 truncate">
-          <Globe className="w-3.5 h-3.5 text-[#3AD6C6] shrink-0" />
-          <span className="text-[#C0CDD6]">Link de compartilhamento para qualquer pessoa assistir:</span>
-          <span className="font-mono text-[#3AD6C6] font-semibold select-all truncate max-w-lg">
+          <Globe className="w-3.5 h-3.5 text-[#78A5FF] shrink-0" />
+          <span className="text-[#B7C0CE]">Link de compartilhamento para qualquer pessoa assistir:</span>
+          <span className="font-mono text-[#78A5FF] font-semibold select-all truncate max-w-lg">
             {shareUrl || 'Gerando link público...'}
           </span>
         </div>
         <button
           onClick={handleShareLink}
           title={`Copiar Link (${getShortcutLabel('l')})`}
-          className="text-xs text-[#3AD6C6] hover:text-[#65E6D8] hover:underline font-semibold shrink-0 ml-4"
+          className="text-xs text-[#78A5FF] hover:text-[#9AB9FF] hover:underline font-semibold shrink-0 ml-4"
         >
           {isLinkCopied ? 'Copiado!' : 'Copiar'}
         </button>
@@ -658,7 +783,7 @@ export const PreviewView: React.FC = () => {
       {/* Main Content Area: Video Player & Editor */}
       <div className="flex-1 flex flex-col p-6 items-center justify-start max-w-5xl mx-auto w-full overflow-y-auto">
         {/* Video Player Container */}
-        <div className="relative w-full aspect-video bg-black rounded-2xl overflow-hidden border border-[#31414D] shadow-2xl flex items-center justify-center group shrink-0">
+        <div className="relative w-full aspect-video bg-black rounded-2xl overflow-hidden border border-[#303A4B] shadow-2xl flex items-center justify-center group shrink-0">
           {meta?.filePath ? (
             <video
               ref={videoRef}
@@ -673,8 +798,8 @@ export const PreviewView: React.FC = () => {
               className="w-full h-full object-contain cursor-pointer"
             />
           ) : (
-            <div className="flex flex-col items-center justify-center text-[#92A2AE] space-y-2">
-              <Play className="w-12 h-12 text-[#92A2AE]" />
+            <div className="flex flex-col items-center justify-center text-[#929CAF] space-y-2">
+              <Play className="w-12 h-12 text-[#929CAF]" />
               <span className="text-sm">Carregando visualização do vídeo...</span>
             </div>
           )}
@@ -684,7 +809,7 @@ export const PreviewView: React.FC = () => {
             <button
               onClick={togglePlay}
               title="Reproduzir (Espaço)"
-              className="absolute w-16 h-16 rounded-full bg-[#3AD6C6] text-[#062B2A] flex items-center justify-center shadow-2xl hover:scale-110 active:scale-95 transition-all hover:bg-[#65E6D8]"
+              className="absolute w-16 h-16 rounded-full bg-[#78A5FF] text-[#101A32] flex items-center justify-center shadow-2xl hover:scale-110 active:scale-95 transition-all hover:bg-[#9AB9FF]"
             >
               <Play className="w-8 h-8 fill-current ml-1" />
             </button>
@@ -702,7 +827,7 @@ export const PreviewView: React.FC = () => {
                 value={currentTime}
                 onChange={handleSeek}
                 title="Barra de Navegação (Setas Esquerda / Direita)"
-                className="w-full h-1.5 bg-white/20 accent-[#3AD6C6] rounded-lg cursor-pointer appearance-none"
+                className="w-full h-1.5 bg-white/20 accent-[#78A5FF] rounded-lg cursor-pointer appearance-none"
               />
             </div>
 
@@ -717,7 +842,7 @@ export const PreviewView: React.FC = () => {
                   {isPlaying ? <Pause className="w-5 h-5" /> : <Play className="w-5 h-5 fill-current" />}
                 </button>
 
-                <span className="text-xs font-mono font-medium text-[#F4F7FA]">
+                <span className="text-xs font-mono font-medium text-[#F3F5F9]">
                   {formatTime(currentTime)} / {formatTime(duration)}
                 </span>
               </div>
@@ -728,7 +853,7 @@ export const PreviewView: React.FC = () => {
                 <button
                   onClick={handleSpeedChange}
                   title="Alternar Velocidade (1x, 1.25x, 1.5x, 2x) ou Teclas 1, 2, 3, 4"
-                  className="text-xs font-bold bg-[#18242E] hover:bg-[#202E39] border border-[#31414D] px-2 py-1 rounded-lg text-[#3AD6C6] transition-colors font-mono"
+                  className="text-xs font-bold bg-[#191F2B] hover:bg-[#222B39] border border-[#303A4B] px-2 py-1 rounded-lg text-[#78A5FF] transition-colors font-mono"
                 >
                   {playbackRate}x
                 </button>
@@ -741,7 +866,7 @@ export const PreviewView: React.FC = () => {
                     className="p-1.5 rounded-lg hover:bg-white/10 text-white transition-colors"
                   >
                     {isMuted || playerVolume === 0 ? (
-                      <VolumeX className="w-4 h-4 text-[#FF5F6D]" />
+                      <VolumeX className="w-4 h-4 text-[#FF647C]" />
                     ) : (
                       <Volume2 className="w-4 h-4" />
                     )}
@@ -765,7 +890,7 @@ export const PreviewView: React.FC = () => {
                       }
                     }}
                     title={`Volume: ${Math.round((isMuted ? 0 : playerVolume) * 100)}%`}
-                    className="w-16 h-1 bg-white/20 hover:bg-white/40 rounded-lg appearance-none cursor-pointer accent-[#3AD6C6] transition-opacity"
+                    className="w-16 h-1 bg-white/20 hover:bg-white/40 rounded-lg appearance-none cursor-pointer accent-[#78A5FF] transition-opacity"
                   />
                 </div>
 
@@ -787,29 +912,29 @@ export const PreviewView: React.FC = () => {
         </div>
 
         {/* Real Audio Waveform Timeline & Precision Scrubber */}
-        <div className="w-full mt-4 bg-[#111A22] border border-[#31414D] rounded-2xl p-4 shadow-xl flex flex-col space-y-3">
+        <div className="w-full mt-4 bg-[#121722] border border-[#303A4B] rounded-2xl p-4 shadow-xl flex flex-col space-y-3">
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-2">
-              <Activity className="w-4 h-4 text-[#3AD6C6]" />
-              <span className="text-xs font-bold text-[#F4F7FA] tracking-wide uppercase">
+              <Activity className="w-4 h-4 text-[#78A5FF]" />
+              <span className="text-xs font-bold text-[#F3F5F9] tracking-wide uppercase">
                 Linha do Tempo com Waveform Real
               </span>
               {isLoadingWaveform && (
-                <span className="text-[10px] text-[#92A2AE] animate-pulse">
+                <span className="text-[10px] text-[#929CAF] animate-pulse">
                   (decodificando áudio...)
                 </span>
               )}
             </div>
             <div className="flex items-center space-x-3 text-xs font-mono">
-              <span className="text-[#3AD6C6] font-bold">{formatTime(currentTime)}</span>
-              <span className="text-[#92A2AE]">/</span>
-              <span className="text-[#C0CDD6]">{formatTime(duration)}</span>
+              <span className="text-[#78A5FF] font-bold">{formatTime(currentTime)}</span>
+              <span className="text-[#929CAF]">/</span>
+              <span className="text-[#B7C0CE]">{formatTime(duration)}</span>
             </div>
           </div>
 
           {/* Interactive Waveform Canvas Container */}
           <div
-            className="relative h-16 w-full bg-[#0B1117] rounded-xl overflow-hidden border border-[#31414D] cursor-pointer flex items-center px-1"
+            className="relative h-16 w-full bg-[#0B0E14] rounded-xl overflow-hidden border border-[#303A4B] cursor-pointer flex items-center px-1"
             onClick={(e) => {
               const rect = e.currentTarget.getBoundingClientRect();
               const clickPct = (e.clientX - rect.left) / rect.width;
@@ -828,13 +953,13 @@ export const PreviewView: React.FC = () => {
                   barPct <= (duration > 0 ? trimEnd / duration : 1);
                 const barHeight = Math.max(8, Math.round(peak * 54));
 
-                let barColor = 'bg-[#18242E]';
+                let barColor = 'bg-[#191F2B]';
                 if (isInsideTrim) {
                   barColor = isPlayed
-                    ? 'bg-[#3AD6C6] shadow-sm shadow-[#3AD6C6]/30'
-                    : 'bg-[#31414D] hover:bg-[#202E39]';
+                    ? 'bg-[#78A5FF] shadow-sm shadow-[#78A5FF]/30'
+                    : 'bg-[#303A4B] hover:bg-[#222B39]';
                 } else {
-                  barColor = 'bg-[#18242E]/30';
+                  barColor = 'bg-[#191F2B]/30';
                 }
 
                 return (
@@ -849,10 +974,10 @@ export const PreviewView: React.FC = () => {
 
             {/* Playhead Vertical Line */}
             <div
-              className="absolute top-0 bottom-0 w-0.5 bg-[#3AD6C6] shadow-[0_0_8px_rgba(58,214,198,0.7)] pointer-events-none transition-all duration-75"
+              className="absolute top-0 bottom-0 w-0.5 bg-[#78A5FF] shadow-[0_0_8px_rgba(120,165,255,0.7)] pointer-events-none transition-all duration-75"
               style={{ left: `${duration > 0 ? (currentTime / duration) * 100 : 0}%` }}
             >
-              <div className="w-2.5 h-2.5 -ml-1 rounded-full bg-[#3AD6C6] shadow-sm" />
+              <div className="w-2.5 h-2.5 -ml-1 rounded-full bg-[#78A5FF] shadow-sm" />
             </div>
 
             {/* Chapter Markers Ticks on Waveform */}
@@ -869,10 +994,10 @@ export const PreviewView: React.FC = () => {
                       setCurrentTime(chap.time);
                     }
                   }}
-                  className="absolute top-0 bottom-0 w-1 bg-[#FFBD66] hover:bg-[#FFBD66] hover:w-1.5 transition-all z-20 group cursor-pointer"
+                  className="absolute top-0 bottom-0 w-1 bg-[#F2B66D] hover:bg-[#F2B66D] hover:w-1.5 transition-all z-20 group cursor-pointer"
                   style={{ left: `${leftPct}%` }}
                 >
-                  <div className="opacity-0 group-hover:opacity-100 absolute -top-6 left-1/2 -translate-x-1/2 bg-[#FFBD66] text-[#2B0E13] font-bold text-[10px] px-2 py-0.5 rounded shadow-lg whitespace-nowrap pointer-events-none transition-opacity">
+                  <div className="opacity-0 group-hover:opacity-100 absolute -top-6 left-1/2 -translate-x-1/2 bg-[#F2B66D] text-[#2B0E13] font-bold text-[10px] px-2 py-0.5 rounded shadow-lg whitespace-nowrap pointer-events-none transition-opacity">
                     {chap.title} ({formatTime(chap.time)})
                   </div>
                 </div>
@@ -883,11 +1008,11 @@ export const PreviewView: React.FC = () => {
             {isTrimming && (
               <>
                 <div
-                  className="absolute top-0 bottom-0 left-0 bg-black/60 pointer-events-none border-r-2 border-[#FF5F6D]"
+                  className="absolute top-0 bottom-0 left-0 bg-black/60 pointer-events-none border-r-2 border-[#78A5FF]"
                   style={{ width: `${duration > 0 ? (trimStart / duration) * 100 : 0}%` }}
                 />
                 <div
-                  className="absolute top-0 bottom-0 right-0 bg-black/60 pointer-events-none border-l-2 border-[#FF5F6D]"
+                  className="absolute top-0 bottom-0 right-0 bg-black/60 pointer-events-none border-l-2 border-[#78A5FF]"
                   style={{ width: `${duration > 0 ? Math.max(0, (1 - trimEnd / duration) * 100) : 0}%` }}
                 />
               </>
@@ -895,118 +1020,171 @@ export const PreviewView: React.FC = () => {
           </div>
         </div>
 
-        {/* Trimming & Video Editing Section */}
-        <div className="w-full mt-4 bg-[#111A22] border border-[#31414D] rounded-xl p-4 flex flex-col md:flex-row md:items-center justify-between gap-3 shrink-0">
-          <div className="flex items-center space-x-2">
-            <Scissors className="w-4 h-4 text-[#3AD6C6] shrink-0" />
-            <div>
-              <div className="flex items-center space-x-2">
-                <span className="text-xs font-bold text-[#F4F7FA] block">Ajustar e Cortar Vídeo (Trimming)</span>
-                <span className="text-[10px] bg-[#12312F] text-[#3AD6C6] border border-[#3AD6C6]/30 px-1.5 py-0.2 rounded font-mono font-medium">
-                  Final: {Math.max(0, trimEnd - trimStart).toFixed(1)}s
-                </span>
+        {/* Trimming & Video Editing Studio Controls */}
+        <div className="w-full mt-4 bg-[#121722] border border-[#303A4B] rounded-xl p-4 flex flex-col gap-3 shrink-0 shadow-lg">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+            <div className="flex items-center space-x-2.5">
+              <div className="w-8 h-8 rounded-lg bg-[#191F2B] border border-[#303A4B] flex items-center justify-center shrink-0">
+                <Scissors className="w-4 h-4 text-[#78A5FF]" />
               </div>
-              <span className="text-[11px] text-[#92A2AE]">Defina início e fim para remover partes indesejadas</span>
+              <div>
+                <div className="flex items-center space-x-2">
+                  <span className="text-xs font-bold text-[#F3F5F9]">Corte Preciso de Vídeo</span>
+                  <span className="text-[10px] bg-[#1A2A47] text-[#78A5FF] border border-[#78A5FF]/30 px-2 py-0.5 rounded-full font-mono font-bold">
+                    Duração: {Math.max(0, trimEnd - trimStart).toFixed(1)}s
+                  </span>
+                  {trimStart > 0 || trimEnd < duration ? (
+                    <span className="text-[10px] bg-[#FF647C]/10 text-[#FF647C] border border-[#FF647C]/30 px-1.5 py-0.5 rounded-full font-mono">
+                      -{Math.max(0, duration - (trimEnd - trimStart)).toFixed(1)}s removidos
+                    </span>
+                  ) : null}
+                </div>
+                <span className="text-[11px] text-[#929CAF]">Selecione os pontos inicial e final para recortar sem perda de qualidade</span>
+              </div>
             </div>
-          </div>
 
-          <div className="flex items-center space-x-3">
-            <div className="flex items-center space-x-1.5 text-xs">
-              <span className="text-[#92A2AE]">Início:</span>
-              <input
-                type="number"
-                min={0}
-                max={trimEnd}
-                step={0.5}
-                value={Number(trimStart.toFixed(1))}
-                onChange={(e) => {
-                  const val = Number(e.target.value);
-                  setTrimStart(val);
-                  if (videoRef.current) videoRef.current.currentTime = val;
-                }}
-                className="w-16 bg-[#18242E] border border-[#31414D] rounded px-2 py-1 text-[#F4F7FA] font-mono text-xs focus:border-[#3AD6C6] outline-none"
-              />
-              <span className="text-[#92A2AE]">s</span>
+            <div className="flex items-center flex-wrap gap-2">
+              <div className="flex items-center space-x-1.5 text-xs bg-[#191F2B] border border-[#303A4B] px-2 py-1 rounded-lg">
+                <span className="text-[#929CAF]">Início:</span>
+                <input
+                  type="number"
+                  min={0}
+                  max={Math.max(0, trimEnd - 0.1)}
+                  step={0.1}
+                  value={Number(trimStart.toFixed(1))}
+                  onChange={(e) => {
+                    const val = Math.max(0, Math.min(Number(e.target.value), trimEnd - 0.1));
+                    setTrimStart(val);
+                    if (videoRef.current) videoRef.current.currentTime = val;
+                  }}
+                  className="w-14 bg-[#0B0E14] border border-[#303A4B] rounded px-1.5 py-0.5 text-[#F3F5F9] font-mono text-xs focus:border-[#78A5FF] outline-none text-center"
+                />
+                <button
+                  type="button"
+                  onClick={() => {
+                    const point = Math.max(0, Math.min(currentTime, trimEnd - 0.1));
+                    setTrimStart(Number(point.toFixed(1)));
+                    showToast(`Início marcado em: ${formatTime(point)} (I)`, 'info');
+                  }}
+                  title="Marcar início no segundo atual do player (Atalho: Tecla I)"
+                  className="px-1.5 py-0.5 text-[10px] font-semibold bg-[#222B39] hover:bg-[#303A4B] text-[#78A5FF] hover:text-[#9AB9FF] rounded transition-colors"
+                >
+                  Cursor (I)
+                </button>
+              </div>
+
+              <div className="flex items-center space-x-1.5 text-xs bg-[#191F2B] border border-[#303A4B] px-2 py-1 rounded-lg">
+                <span className="text-[#929CAF]">Fim:</span>
+                <input
+                  type="number"
+                  min={Math.min(duration, trimStart + 0.1)}
+                  max={duration}
+                  step={0.1}
+                  value={Number(trimEnd.toFixed(1))}
+                  onChange={(e) => {
+                    const val = Math.min(duration, Math.max(Number(e.target.value), trimStart + 0.1));
+                    setTrimEnd(val);
+                  }}
+                  className="w-14 bg-[#0B0E14] border border-[#303A4B] rounded px-1.5 py-0.5 text-[#F3F5F9] font-mono text-xs focus:border-[#78A5FF] outline-none text-center"
+                />
+                <button
+                  type="button"
+                  onClick={() => {
+                    const point = Math.min(duration, Math.max(currentTime, trimStart + 0.1));
+                    setTrimEnd(Number(point.toFixed(1)));
+                    showToast(`Fim marcado em: ${formatTime(point)} (O)`, 'info');
+                  }}
+                  title="Marcar fim no segundo atual do player (Atalho: Tecla O)"
+                  className="px-1.5 py-0.5 text-[10px] font-semibold bg-[#222B39] hover:bg-[#303A4B] text-[#78A5FF] hover:text-[#9AB9FF] rounded transition-colors"
+                >
+                  Cursor (O)
+                </button>
+              </div>
+
               <button
                 type="button"
                 onClick={() => {
-                  const point = Math.min(currentTime, trimEnd);
-                  setTrimStart(Number(point.toFixed(1)));
-                  showToast(`Ponto Inicial: ${formatTime(point)} (I)`, 'info');
+                  setTrimStart(0);
+                  setTrimEnd(duration);
+                  showToast('Seleção de corte resetada para o vídeo inteiro.', 'info');
                 }}
-                title="Marcar início no segundo atual do player (Atalho: Tecla I)"
-                className="px-1.5 py-1 text-[10px] font-semibold bg-[#18242E] hover:bg-[#202E39] text-[#3AD6C6] hover:text-[#65E6D8] rounded border border-[#31414D] transition-colors"
+                title="Resetar seleção para todo o vídeo"
+                className="px-2.5 py-1.5 rounded-xl text-xs font-medium bg-[#191F2B] hover:bg-[#222B39] border border-[#303A4B] text-[#B7C0CE] hover:text-[#F3F5F9] transition-colors"
               >
-                Atual (I)
+                Resetar
               </button>
-            </div>
 
-            <div className="flex items-center space-x-1.5 text-xs">
-              <span className="text-[#92A2AE]">Fim:</span>
-              <input
-                type="number"
-                min={trimStart}
-                max={duration}
-                step={0.5}
-                value={Number(trimEnd.toFixed(1))}
-                onChange={(e) => {
-                  const val = Number(e.target.value);
-                  setTrimEnd(val);
-                }}
-                className="w-16 bg-[#18242E] border border-[#31414D] rounded px-2 py-1 text-[#F4F7FA] font-mono text-xs focus:border-[#3AD6C6] outline-none"
-              />
-              <span className="text-[#92A2AE]">s</span>
               <button
-                type="button"
                 onClick={() => {
-                  const point = Math.max(currentTime, trimStart);
-                  setTrimEnd(Number(point.toFixed(1)));
-                  showToast(`Ponto Final: ${formatTime(point)} (O)`, 'info');
+                  const nextState = !isTrimming;
+                  setIsTrimming(nextState);
+                  if (nextState && videoRef.current) {
+                    videoRef.current.currentTime = trimStart;
+                  }
                 }}
-                title="Marcar fim no segundo atual do player (Atalho: Tecla O)"
-                className="px-1.5 py-1 text-[10px] font-semibold bg-[#18242E] hover:bg-[#202E39] text-[#3AD6C6] hover:text-[#65E6D8] rounded border border-[#31414D] transition-colors"
+                className={`px-3 py-1.5 rounded-xl text-xs font-semibold transition-all ${
+                  isTrimming
+                    ? 'bg-[#F2B66D] text-[#2B0E13] font-bold shadow-md shadow-[#F2B66D]/20'
+                    : 'bg-[#191F2B] border border-[#303A4B] text-[#B7C0CE] hover:text-[#F3F5F9]'
+                }`}
               >
-                Atual (O)
+                {isTrimming ? 'Loop Trecho Ativo' : 'Testar Trecho'}
+              </button>
+
+              <button
+                onClick={handleSaveTrim}
+                disabled={isTrimmingSaving || (trimStart === 0 && trimEnd === duration)}
+                className="px-3.5 py-1.5 rounded-xl text-xs font-bold bg-[#FF647C] hover:bg-[#FF647C]/90 disabled:opacity-40 disabled:cursor-not-allowed text-[#2B0E13] shadow-sm transition-colors flex items-center space-x-1.5"
+              >
+                <span>{isTrimmingSaving ? 'Cortando...' : 'Salvar Corte'}</span>
               </button>
             </div>
-
-            <button
-              onClick={() => setIsTrimming(!isTrimming)}
-              className={`px-3 py-1.5 rounded-xl text-xs font-semibold transition-all ${
-                isTrimming
-                  ? 'bg-[#FFBD66] text-[#2B0E13] font-bold shadow-md shadow-[#FFBD66]/20'
-                  : 'bg-[#18242E] border border-[#31414D] text-[#C0CDD6] hover:text-[#F4F7FA]'
-              }`}
-            >
-              {isTrimming ? 'Prévia Ativa' : 'Testar Prévia'}
-            </button>
-
-            <button
-              onClick={handleSaveTrim}
-              disabled={isTrimmingSaving || (trimStart === 0 && trimEnd === duration)}
-              className="px-3.5 py-1.5 rounded-xl text-xs font-bold bg-[#FF5F6D] hover:bg-[#FF5F6D]/90 disabled:opacity-40 disabled:cursor-not-allowed text-[#2B0E13] shadow-sm transition-colors"
-            >
-              {isTrimmingSaving ? 'Cortando...' : 'Salvar Corte'}
-            </button>
           </div>
+
+          {/* Real-time Progress & Cancel Bar when saving */}
+          {isTrimmingSaving && (
+            <div className="w-full pt-3 mt-1 border-t border-[#303A4B] flex flex-col space-y-2 animate-in fade-in">
+              <div className="flex items-center justify-between text-xs">
+                <span className="text-[#83B8FF] font-medium flex items-center space-x-2">
+                  <span className="w-2 h-2 rounded-full bg-[#83B8FF] animate-pulse" />
+                  <span>{trimStatusText || 'Processando corte de vídeo com alta precisão...'}</span>
+                </span>
+                <span className="font-mono text-[#F3F5F9] font-bold">{trimProgress}%</span>
+              </div>
+              <div className="w-full h-1.5 bg-[#191F2B] rounded-full overflow-hidden border border-[#303A4B]">
+                <div
+                  className="h-full bg-gradient-to-r from-[#78A5FF] to-[#83B8FF] transition-all duration-300"
+                  style={{ width: `${trimProgress}%` }}
+                />
+              </div>
+              <div className="flex justify-end">
+                <button
+                  onClick={handleCancelTrim}
+                  className="px-3 py-1 text-xs text-[#FF647C] hover:text-[#FFFFFF] hover:bg-[#B83A48] rounded-lg border border-[#FF647C]/30 transition-colors font-medium"
+                >
+                  Cancelar Corte
+                </button>
+              </div>
+            </div>
+          )}
         </div>
 
         {/* AI Summary, Chapters & Transcript 3-Column Studio Grid */}
         <div className="w-full mt-4 grid grid-cols-1 md:grid-cols-3 gap-4 pb-6 shrink-0">
           {/* AI Summary Card */}
-          <div className="bg-[#111A22] border border-[#31414D] rounded-xl p-4 space-y-2">
-            <div className="flex items-center space-x-2 text-[#3AD6C6] text-xs font-bold uppercase tracking-wider">
+          <div className="bg-[#121722] border border-[#303A4B] rounded-xl p-4 space-y-2">
+            <div className="flex items-center space-x-2 text-[#78A5FF] text-xs font-bold uppercase tracking-wider">
               <Sparkles className="w-4 h-4" />
               <span>Resumo Inteligente</span>
             </div>
-            <p className="text-xs text-[#C0CDD6] leading-relaxed whitespace-pre-line max-h-48 overflow-y-auto">
+            <p className="text-xs text-[#B7C0CE] leading-relaxed whitespace-pre-line max-h-48 overflow-y-auto">
               {meta?.aiSummary || 'Explicação gravada com sucesso pelo Aura Screen Studio.'}
             </p>
           </div>
 
           {/* Interactive Chapters Card */}
-          <div className="bg-[#111A22] border border-[#31414D] rounded-xl p-4 space-y-3 flex flex-col max-h-56">
-            <div className="flex items-center justify-between text-[#3AD6C6] text-xs font-bold uppercase tracking-wider">
+          <div className="bg-[#121722] border border-[#303A4B] rounded-xl p-4 space-y-3 flex flex-col max-h-56">
+            <div className="flex items-center justify-between text-[#78A5FF] text-xs font-bold uppercase tracking-wider">
               <div className="flex items-center space-x-1.5">
                 <Bookmark className="w-4 h-4" />
                 <span>Capítulos ({chapters.length})</span>
@@ -1014,7 +1192,7 @@ export const PreviewView: React.FC = () => {
               <button
                 onClick={handleSaveChapters}
                 disabled={isSavingChapters}
-                className="text-[10px] bg-[#3AD6C6] hover:bg-[#65E6D8] text-[#062B2A] px-2 py-0.5 rounded-lg font-bold transition-colors shadow-sm"
+                className="text-[10px] bg-[#78A5FF] hover:bg-[#9AB9FF] text-[#101A32] px-2 py-0.5 rounded-lg font-bold transition-colors shadow-sm"
               >
                 {isSavingChapters ? 'Salvando...' : 'Salvar'}
               </button>
@@ -1030,11 +1208,11 @@ export const PreviewView: React.FC = () => {
                 onKeyDown={(e) => {
                   if (e.key === 'Enter') handleAddChapterAtCurrentTime();
                 }}
-                className="flex-1 bg-[#18242E] border border-[#31414D] rounded-lg px-2 py-1 text-xs text-[#F4F7FA] placeholder-[#92A2AE] outline-none focus:border-[#3AD6C6]"
+                className="flex-1 bg-[#191F2B] border border-[#303A4B] rounded-lg px-2 py-1 text-xs text-[#F3F5F9] placeholder-[#929CAF] outline-none focus:border-[#78A5FF]"
               />
               <button
                 onClick={handleAddChapterAtCurrentTime}
-                className="flex items-center space-x-1 bg-[#3AD6C6] hover:bg-[#65E6D8] text-[#062B2A] px-2 py-1 rounded-lg text-xs font-bold shrink-0 transition-colors"
+                className="flex items-center space-x-1 bg-[#78A5FF] hover:bg-[#9AB9FF] text-[#101A32] px-2 py-1 rounded-lg text-xs font-bold shrink-0 transition-colors"
                 title={`Adicionar no segundo ${formatTime(currentTime)}`}
               >
                 <Plus className="w-3.5 h-3.5" />
@@ -1048,7 +1226,7 @@ export const PreviewView: React.FC = () => {
                 chapters.map((chap) => (
                   <div
                     key={chap.id}
-                    className="flex items-center space-x-2 bg-[#18242E] hover:bg-[#202E39] border border-[#31414D] p-1.5 rounded-lg transition-colors group"
+                    className="flex items-center space-x-2 bg-[#191F2B] hover:bg-[#222B39] border border-[#303A4B] p-1.5 rounded-lg transition-colors group"
                   >
                     <button
                       onClick={() => {
@@ -1059,7 +1237,7 @@ export const PreviewView: React.FC = () => {
                           setIsPlaying(true);
                         }
                       }}
-                      className="font-mono text-[#3AD6C6] hover:text-[#062B2A] bg-[#12312F] hover:bg-[#3AD6C6] px-1.5 py-0.5 rounded text-[11px] font-bold shrink-0 transition-colors"
+                      className="font-mono text-[#78A5FF] hover:text-[#101A32] bg-[#1A2A47] hover:bg-[#78A5FF] px-1.5 py-0.5 rounded text-[11px] font-bold shrink-0 transition-colors"
                       title="Pular para este segundo"
                     >
                       {formatTime(chap.time)}
@@ -1068,11 +1246,11 @@ export const PreviewView: React.FC = () => {
                       type="text"
                       value={chap.title}
                       onChange={(e) => handleUpdateChapterTitle(chap.id, e.target.value)}
-                      className="flex-1 bg-transparent text-xs text-[#F4F7FA] focus:text-white outline-none border-b border-transparent focus:border-[#3AD6C6]"
+                      className="flex-1 bg-transparent text-xs text-[#F3F5F9] focus:text-white outline-none border-b border-transparent focus:border-[#78A5FF]"
                     />
                     <button
                       onClick={() => handleRemoveChapter(chap.id)}
-                      className="opacity-0 group-hover:opacity-100 text-[#92A2AE] hover:text-[#FF5F6D] p-1 transition-all"
+                      className="opacity-0 group-hover:opacity-100 text-[#929CAF] hover:text-[#FF647C] p-1 transition-all"
                       title="Remover capítulo"
                     >
                       <Trash2 className="w-3 h-3" />
@@ -1080,7 +1258,7 @@ export const PreviewView: React.FC = () => {
                   </div>
                 ))
               ) : (
-                <p className="text-xs text-[#92A2AE] italic pt-1">
+                <p className="text-xs text-[#929CAF] italic pt-1">
                   Nenhum capítulo salvo. Adicione marcadores no segundo desejado!
                 </p>
               )}
@@ -1088,10 +1266,10 @@ export const PreviewView: React.FC = () => {
           </div>
 
           {/* Transcript / Spoken Timeline */}
-          <div className="bg-[#111A22] border border-[#31414D] rounded-xl p-4 space-y-2 max-h-56 overflow-y-auto">
-            <div className="flex items-center justify-between text-[#3AD6C6] text-xs font-bold uppercase tracking-wider">
+          <div className="bg-[#121722] border border-[#303A4B] rounded-xl p-4 space-y-2 max-h-56 overflow-y-auto">
+            <div className="flex items-center justify-between text-[#78A5FF] text-xs font-bold uppercase tracking-wider">
               <span>Transcrição</span>
-              <span className="text-[10px] text-[#92A2AE] font-normal">
+              <span className="text-[10px] text-[#929CAF] font-normal">
                 {meta?.transcript?.length || 0} frases
               </span>
             </div>
@@ -1108,17 +1286,17 @@ export const PreviewView: React.FC = () => {
                         setIsPlaying(true);
                       }
                     }}
-                    className="p-1.5 rounded-lg hover:bg-[#18242E] cursor-pointer transition-colors flex items-start space-x-2 text-xs"
+                    className="p-1.5 rounded-lg hover:bg-[#191F2B] cursor-pointer transition-colors flex items-start space-x-2 text-xs"
                   >
-                    <span className="font-mono text-[#3AD6C6] font-bold shrink-0">
+                    <span className="font-mono text-[#78A5FF] font-bold shrink-0">
                       {formatTime(item.time)}
                     </span>
-                    <span className="text-[#C0CDD6]">{item.text}</span>
+                    <span className="text-[#B7C0CE]">{item.text}</span>
                   </div>
                 ))}
               </div>
             ) : (
-              <p className="text-xs text-[#92A2AE] italic pt-2">
+              <p className="text-xs text-[#929CAF] italic pt-2">
                 Nenhuma fala capturada durante esta gravação.
               </p>
             )}
@@ -1129,20 +1307,20 @@ export const PreviewView: React.FC = () => {
       {/* Non-blocking Delete Confirmation Modal */}
       {isConfirmingDelete && (
         <div className="fixed inset-0 z-50 bg-black/70 backdrop-blur-sm flex items-center justify-center p-4">
-          <div className="bg-[#111A22] border border-[#FF5F6D]/40 rounded-2xl p-5 max-w-sm w-full space-y-4 shadow-2xl text-center">
-            <div className="w-10 h-10 rounded-full bg-[#FF5F6D]/20 border border-[#FF5F6D]/40 flex items-center justify-center mx-auto text-[#FF5F6D]">
+          <div className="bg-[#121722] border border-[#FF647C]/40 rounded-2xl p-5 max-w-sm w-full space-y-4 shadow-2xl text-center">
+            <div className="w-10 h-10 rounded-full bg-[#FF647C]/20 border border-[#FF647C]/40 flex items-center justify-center mx-auto text-[#FF647C]">
               <Trash2 className="w-5 h-5" />
             </div>
             <div>
-              <h3 className="text-sm font-bold text-[#F4F7FA]">Excluir Gravação?</h3>
-              <p className="text-xs text-[#C0CDD6] mt-1">
+              <h3 className="text-sm font-bold text-[#F3F5F9]">Excluir Gravação?</h3>
+              <p className="text-xs text-[#B7C0CE] mt-1">
                 O arquivo de vídeo será removido permanentemente do disco. Esta ação não pode ser desfeita.
               </p>
             </div>
             <div className="flex items-center space-x-2 pt-1">
               <button
                 onClick={() => setIsConfirmingDelete(false)}
-                className="flex-1 py-2 px-3 bg-[#18242E] hover:bg-[#202E39] text-[#C0CDD6] text-xs font-semibold rounded-xl border border-[#31414D] transition-colors"
+                className="flex-1 py-2 px-3 bg-[#191F2B] hover:bg-[#222B39] text-[#B7C0CE] text-xs font-semibold rounded-xl border border-[#303A4B] transition-colors"
               >
                 Cancelar
               </button>
@@ -1159,10 +1337,10 @@ export const PreviewView: React.FC = () => {
 
       {/* Non-blocking Toast Notification */}
       {toast && (
-        <div className="fixed top-14 right-6 z-50 flex items-center space-x-2 px-4 py-2.5 rounded-xl shadow-2xl border text-xs font-medium bg-[#111A22]/95 backdrop-blur-md border-[#3AD6C6]/40 text-[#F4F7FA] animate-in fade-in">
-          {toast.type === 'success' && <Check className="w-4 h-4 text-[#4CD6A0] shrink-0" />}
-          {toast.type === 'error' && <Trash2 className="w-4 h-4 text-[#FF5F6D] shrink-0" />}
-          {toast.type === 'info' && <Sparkles className="w-4 h-4 text-[#3AD6C6] shrink-0" />}
+        <div className="fixed top-14 right-6 z-50 flex items-center space-x-2 px-4 py-2.5 rounded-xl shadow-2xl border text-xs font-medium bg-[#121722]/95 backdrop-blur-md border-[#78A5FF]/40 text-[#F3F5F9] animate-in fade-in">
+          {toast.type === 'success' && <Check className="w-4 h-4 text-[#83B8FF] shrink-0" />}
+          {toast.type === 'error' && <Trash2 className="w-4 h-4 text-[#FF647C] shrink-0" />}
+          {toast.type === 'info' && <Sparkles className="w-4 h-4 text-[#78A5FF] shrink-0" />}
           <span>{toast.message}</span>
         </div>
       )}

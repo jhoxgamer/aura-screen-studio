@@ -263,7 +263,7 @@ export const CameraBubbleView: React.FC = () => {
             const nextSize = size === 'small' ? 'medium' : size === 'medium' ? 'large' : 'small';
             handleSizeChange(nextSize);
           }}
-          className={`relative w-full h-full overflow-hidden transition-all duration-300 ring-2 ring-[#3AD6C6]/80 border border-[#31414D] shadow-2xl ${
+          className={`relative w-full h-full overflow-hidden transition-all duration-300 ring-2 ring-[#78A5FF]/80 border border-[#303A4B] shadow-2xl ${
             bubbleShape === 'circle' ? 'rounded-full' : 'rounded-[38px]'
           }`}
         >
@@ -271,7 +271,7 @@ export const CameraBubbleView: React.FC = () => {
           {isCameraActive ? (
             <div className="relative w-full h-full">
               {cameraFilter === 'blur' && (
-                <div className={`absolute inset-0 bg-[#3AD6C6]/10 backdrop-blur-xl pointer-events-none ${
+                <div className={`absolute inset-0 bg-[#78A5FF]/10 backdrop-blur-xl pointer-events-none ${
                   bubbleShape === 'circle' ? 'rounded-full' : 'rounded-[38px]'
                 }`} />
               )}
@@ -296,10 +296,10 @@ export const CameraBubbleView: React.FC = () => {
             </div>
           ) : (
             /* Avatar mode with audio voice pulse */
-            <div className="w-full h-full bg-[#0B1117] flex flex-col items-center justify-center text-[#92A2AE] relative overflow-hidden">
+            <div className="w-full h-full bg-[#0B0E14] flex flex-col items-center justify-center text-[#929CAF] relative overflow-hidden">
               {/* Voice pulse ring behind avatar */}
               <div
-                className="absolute rounded-full bg-[#3AD6C6]/20 transition-transform duration-100 pointer-events-none"
+                className="absolute rounded-full bg-[#78A5FF]/20 transition-transform duration-100 pointer-events-none"
                 style={{
                   width: '90px',
                   height: '90px',
@@ -307,24 +307,24 @@ export const CameraBubbleView: React.FC = () => {
                   opacity: 0.3 + audioLevel * 0.6
                 }}
               />
-              <div className="w-20 h-20 rounded-full bg-[#111A22] border border-[#3AD6C6]/40 flex items-center justify-center shadow-inner z-10">
-                <User className="w-10 h-10 text-[#3AD6C6]" />
+              <div className="w-20 h-20 rounded-full bg-[#121722] border border-[#78A5FF]/40 flex items-center justify-center shadow-inner z-10">
+                <User className="w-10 h-10 text-[#78A5FF]" />
               </div>
-              <span className="text-[11px] font-semibold text-[#C0CDD6] mt-2 z-10 flex items-center gap-1">
-                {audioLevel > 0.08 && <Volume2 className="w-3 h-3 text-[#3AD6C6]" />}
+              <span className="text-[11px] font-semibold text-[#B7C0CE] mt-2 z-10 flex items-center gap-1">
+                {audioLevel > 0.08 && <Volume2 className="w-3 h-3 text-[#78A5FF]" />}
                 {audioLevel > 0.08 ? 'Falando...' : 'Câmera Pausada'}
               </span>
             </div>
           )}
 
           {/* Active Recording Pulsing Ring Indicator */}
-          <div className={`absolute inset-0 border border-[#FF5F6D]/70 pointer-events-none ${
+          <div className={`absolute inset-0 border border-[#FF647C]/70 pointer-events-none ${
             bubbleShape === 'circle' ? 'rounded-full' : 'rounded-[38px]'
           }`} />
 
           {/* Filter change toast */}
           {filterToast && (
-            <div className="absolute top-4 left-1/2 -translate-x-1/2 bg-[#111A22]/95 backdrop-blur-md px-3 py-1 rounded-full border border-[#3AD6C6]/40 text-[10px] font-bold text-[#3AD6C6] tracking-wide uppercase shadow-lg z-20">
+            <div className="absolute top-4 left-1/2 -translate-x-1/2 bg-[#121722]/95 backdrop-blur-md px-3 py-1 rounded-full border border-[#78A5FF]/40 text-[10px] font-bold text-[#78A5FF] tracking-wide uppercase shadow-lg z-20">
               {filterToast}
             </div>
           )}
@@ -332,7 +332,7 @@ export const CameraBubbleView: React.FC = () => {
 
         {/* Hover Action Overlay & Controls */}
         <div
-          className={`absolute bottom-2 left-1/2 -translate-x-1/2 flex items-center space-x-1 px-3 py-1.5 rounded-full bg-[#0B1117]/95 backdrop-blur-xl border border-[#31414D] shadow-2xl transition-all duration-200 z-30 ${
+          className={`absolute bottom-2 left-1/2 -translate-x-1/2 flex items-center space-x-1 px-3 py-1.5 rounded-full bg-[#0B0E14]/95 backdrop-blur-xl border border-[#303A4B] shadow-2xl transition-all duration-200 z-30 ${
             showControls ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-2 pointer-events-none'
           }`}
           style={{ WebkitAppRegion: 'no-drag' } as any}
@@ -342,7 +342,7 @@ export const CameraBubbleView: React.FC = () => {
             onClick={() => handleSizeChange('small', true)}
             title="Tamanho Pequeno (Tecla 1)"
             className={`w-6 h-6 rounded-full text-xs font-bold transition-all flex items-center justify-center ${
-              size === 'small' ? 'bg-[#3AD6C6] text-[#062B2A] shadow-sm' : 'text-[#92A2AE] hover:text-[#F4F7FA]'
+              size === 'small' ? 'bg-[#78A5FF] text-[#101A32] shadow-sm' : 'text-[#929CAF] hover:text-[#F3F5F9]'
             }`}
           >
             P
@@ -352,7 +352,7 @@ export const CameraBubbleView: React.FC = () => {
             onClick={() => handleSizeChange('medium', true)}
             title="Tamanho Médio (Tecla 2)"
             className={`w-6 h-6 rounded-full text-xs font-bold transition-all flex items-center justify-center ${
-              size === 'medium' ? 'bg-[#3AD6C6] text-[#062B2A] shadow-sm' : 'text-[#92A2AE] hover:text-[#F4F7FA]'
+              size === 'medium' ? 'bg-[#78A5FF] text-[#101A32] shadow-sm' : 'text-[#929CAF] hover:text-[#F3F5F9]'
             }`}
           >
             M
@@ -362,13 +362,13 @@ export const CameraBubbleView: React.FC = () => {
             onClick={() => handleSizeChange('large', true)}
             title="Tamanho Grande (Tecla 3)"
             className={`w-6 h-6 rounded-full text-xs font-bold transition-all flex items-center justify-center ${
-              size === 'large' ? 'bg-[#3AD6C6] text-[#062B2A] shadow-sm' : 'text-[#92A2AE] hover:text-[#F4F7FA]'
+              size === 'large' ? 'bg-[#78A5FF] text-[#101A32] shadow-sm' : 'text-[#929CAF] hover:text-[#F3F5F9]'
             }`}
           >
             G
           </button>
 
-          <div className="w-px h-3.5 bg-[#31414D] mx-1" />
+          <div className="w-px h-3.5 bg-[#303A4B] mx-1" />
 
           {/* Flip Horizontal (Mirror) */}
           <button
@@ -378,7 +378,7 @@ export const CameraBubbleView: React.FC = () => {
             }}
             title="Espelhar Câmera (Tecla M)"
             className={`p-1.5 rounded-full transition-colors ${
-              isMirrored ? 'text-[#3AD6C6] bg-[#12312F]' : 'text-[#92A2AE] hover:text-[#F4F7FA]'
+              isMirrored ? 'text-[#78A5FF] bg-[#1A2A47]' : 'text-[#929CAF] hover:text-[#F3F5F9]'
             }`}
           >
             <FlipHorizontal className="w-3.5 h-3.5" />
@@ -388,9 +388,9 @@ export const CameraBubbleView: React.FC = () => {
           <button
             onClick={toggleCamera}
             title={isCameraActive ? 'Desativar Câmera (Tecla V)' : 'Ativar Câmera (Tecla V)'}
-            className="p-1.5 rounded-full text-[#92A2AE] hover:text-[#F4F7FA] transition-colors"
+            className="p-1.5 rounded-full text-[#929CAF] hover:text-[#F3F5F9] transition-colors"
           >
-            {isCameraActive ? <Video className="w-3.5 h-3.5" /> : <VideoOff className="w-3.5 h-3.5 text-[#FF5F6D]" />}
+            {isCameraActive ? <Video className="w-3.5 h-3.5" /> : <VideoOff className="w-3.5 h-3.5 text-[#FF647C]" />}
           </button>
 
           {/* Shape Toggle (Circle vs Squircle) */}
@@ -401,7 +401,7 @@ export const CameraBubbleView: React.FC = () => {
               showBubbleToast(next === 'circle' ? 'Formato: Círculo (S)' : 'Formato: Squircle (S)');
             }}
             title={bubbleShape === 'circle' ? 'Mudar para Squircle (Tecla S)' : 'Mudar para Círculo (Tecla S)'}
-            className="p-1.5 rounded-full text-[#92A2AE] hover:text-[#3AD6C6] transition-colors"
+            className="p-1.5 rounded-full text-[#929CAF] hover:text-[#78A5FF] transition-colors"
           >
             {bubbleShape === 'circle' ? <Square className="w-3.5 h-3.5" /> : <Circle className="w-3.5 h-3.5" />}
           </button>
@@ -411,10 +411,10 @@ export const CameraBubbleView: React.FC = () => {
             onClick={cycleFilter}
             title={`Filtro: ${cameraFilter.toUpperCase()} (Tecla F)`}
             className={`p-1.5 rounded-full transition-colors ${
-              cameraFilter !== 'none' ? 'bg-[#3AD6C6] text-[#062B2A] font-bold shadow-sm' : 'text-[#92A2AE] hover:text-[#F4F7FA]'
+              cameraFilter !== 'none' ? 'bg-[#78A5FF] text-[#101A32] font-bold shadow-sm' : 'text-[#929CAF] hover:text-[#F3F5F9]'
             }`}
           >
-            <Sparkles className="w-3.5 h-3.5 text-[#3AD6C6]" />
+            <Sparkles className="w-3.5 h-3.5 text-[#78A5FF]" />
           </button>
         </div>
       </div>

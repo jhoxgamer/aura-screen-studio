@@ -181,21 +181,21 @@ export const CropSelectorView: React.FC = () => {
 
       {/* Top Floating Control Toolbar */}
       <div className="absolute top-6 inset-x-0 flex justify-center pointer-events-none z-50">
-        <div className="no-drag-area pointer-events-auto bg-[#111A22]/95 backdrop-blur-xl border border-[#31414D] px-4 py-2 rounded-2xl shadow-2xl flex items-center space-x-3 text-xs text-[#F4F7FA] font-sans">
-          <div className="flex items-center space-x-2 text-[#3AD6C6] font-bold border-r border-[#31414D] pr-3">
+        <div className="no-drag-area pointer-events-auto bg-[#121722]/95 backdrop-blur-xl border border-[#303A4B] px-4 py-2 rounded-2xl shadow-2xl flex items-center space-x-3 text-xs text-[#F3F5F9] font-sans">
+          <div className="flex items-center space-x-2 text-[#78A5FF] font-bold border-r border-[#303A4B] pr-3">
             <Crop className="w-4 h-4" />
             <span>Recorte de Área</span>
           </div>
 
           {/* Aspect Ratio Presets */}
-          <div className="flex items-center space-x-1 border-r border-[#31414D] pr-3">
+          <div className="flex items-center space-x-1 border-r border-[#303A4B] pr-3">
             <button
               onClick={() => applyRatio('free')}
               title="Proporção Livre (Tecla 1)"
               className={`px-2.5 py-1 rounded-lg text-[11px] font-bold transition-all ${
                 aspectRatio === 'free'
-                  ? 'bg-[#3AD6C6] text-[#062B2A] shadow-sm'
-                  : 'text-[#92A2AE] hover:text-[#F4F7FA] hover:bg-[#18242E]'
+                  ? 'bg-[#78A5FF] text-[#101A32] shadow-sm'
+                  : 'text-[#929CAF] hover:text-[#F3F5F9] hover:bg-[#191F2B]'
               }`}
             >
               Livre (1)
@@ -205,8 +205,8 @@ export const CropSelectorView: React.FC = () => {
               title="Widescreen 16:9 (Tecla 2)"
               className={`flex items-center space-x-1 px-2.5 py-1 rounded-lg text-[11px] font-bold transition-all ${
                 aspectRatio === '16:9'
-                  ? 'bg-[#3AD6C6] text-[#062B2A] shadow-sm'
-                  : 'text-[#92A2AE] hover:text-[#F4F7FA] hover:bg-[#18242E]'
+                  ? 'bg-[#78A5FF] text-[#101A32] shadow-sm'
+                  : 'text-[#929CAF] hover:text-[#F3F5F9] hover:bg-[#191F2B]'
               }`}
             >
               <Monitor className="w-3 h-3" />
@@ -217,8 +217,8 @@ export const CropSelectorView: React.FC = () => {
               title="Vertical 9:16 Shorts/Reels (Tecla 3)"
               className={`flex items-center space-x-1 px-2.5 py-1 rounded-lg text-[11px] font-bold transition-all ${
                 aspectRatio === '9:16'
-                  ? 'bg-[#3AD6C6] text-[#062B2A] shadow-sm'
-                  : 'text-[#92A2AE] hover:text-[#F4F7FA] hover:bg-[#18242E]'
+                  ? 'bg-[#78A5FF] text-[#101A32] shadow-sm'
+                  : 'text-[#929CAF] hover:text-[#F3F5F9] hover:bg-[#191F2B]'
               }`}
             >
               <Smartphone className="w-3 h-3" />
@@ -229,8 +229,8 @@ export const CropSelectorView: React.FC = () => {
               title="Quadrado 1:1 (Tecla 4)"
               className={`flex items-center space-x-1 px-2.5 py-1 rounded-lg text-[11px] font-bold transition-all ${
                 aspectRatio === '1:1'
-                  ? 'bg-[#3AD6C6] text-[#062B2A] shadow-sm'
-                  : 'text-[#92A2AE] hover:text-[#F4F7FA] hover:bg-[#18242E]'
+                  ? 'bg-[#78A5FF] text-[#101A32] shadow-sm'
+                  : 'text-[#929CAF] hover:text-[#F3F5F9] hover:bg-[#191F2B]'
               }`}
             >
               <Square className="w-3 h-3" />
@@ -241,8 +241,8 @@ export const CropSelectorView: React.FC = () => {
               title="Clássico 4:3 (Tecla 5)"
               className={`flex items-center space-x-1 px-2.5 py-1 rounded-lg text-[11px] font-bold transition-all ${
                 aspectRatio === '4:3'
-                  ? 'bg-[#3AD6C6] text-[#062B2A] shadow-sm'
-                  : 'text-[#92A2AE] hover:text-[#F4F7FA] hover:bg-[#18242E]'
+                  ? 'bg-[#78A5FF] text-[#101A32] shadow-sm'
+                  : 'text-[#929CAF] hover:text-[#F3F5F9] hover:bg-[#191F2B]'
               }`}
             >
               <Tv className="w-3 h-3" />
@@ -250,13 +250,13 @@ export const CropSelectorView: React.FC = () => {
             </button>
           </div>
 
-          <div className="text-[11px] text-[#92A2AE]">
-            Arraste ou use as <span className="text-[#3AD6C6] font-medium">Setas</span> para ajuste fino <span className="text-[#C0CDD6] font-mono">(ESC cancela)</span>
+          <div className="text-[11px] text-[#929CAF]">
+            Arraste ou use as <span className="text-[#78A5FF] font-medium">Setas</span> para ajuste fino <span className="text-[#B7C0CE] font-mono">(ESC cancela)</span>
           </div>
 
           <button
             onClick={handleCancel}
-            className="p-1 rounded-lg text-[#92A2AE] hover:text-[#FF5F6D] hover:bg-[#FF5F6D]/10 transition-colors"
+            className="p-1 rounded-lg text-[#929CAF] hover:text-[#FF647C] hover:bg-[#FF647C]/10 transition-colors"
             title="Cancelar seleção (Esc)"
           >
             <X className="w-4 h-4" />
@@ -267,7 +267,7 @@ export const CropSelectorView: React.FC = () => {
       {/* Selected Box cutout */}
       {area && area.width > 5 && area.height > 5 && (
         <div
-          className="absolute border-2 border-[#3AD6C6] bg-transparent rounded-lg shadow-[0_0_0_9999px_rgba(4,6,11,0.7)] pointer-events-auto transition-shadow"
+          className="absolute border-2 border-[#78A5FF] bg-transparent rounded-lg shadow-[0_0_0_9999px_rgba(4,6,11,0.7)] pointer-events-auto transition-shadow"
           style={{
             left: `${area.x}px`,
             top: `${area.y}px`,
@@ -276,27 +276,27 @@ export const CropSelectorView: React.FC = () => {
           }}
         >
           {/* Studio Corner Handles */}
-          <div className="absolute -top-1.5 -left-1.5 w-3 h-3 rounded-full bg-[#3AD6C6] border border-white/50 shadow-sm" />
-          <div className="absolute -top-1.5 -right-1.5 w-3 h-3 rounded-full bg-[#3AD6C6] border border-white/50 shadow-sm" />
-          <div className="absolute -bottom-1.5 -left-1.5 w-3 h-3 rounded-full bg-[#3AD6C6] border border-white/50 shadow-sm" />
-          <div className="absolute -bottom-1.5 -right-1.5 w-3 h-3 rounded-full bg-[#3AD6C6] border border-white/50 shadow-sm" />
+          <div className="absolute -top-1.5 -left-1.5 w-3 h-3 rounded-full bg-[#78A5FF] border border-white/50 shadow-sm" />
+          <div className="absolute -top-1.5 -right-1.5 w-3 h-3 rounded-full bg-[#78A5FF] border border-white/50 shadow-sm" />
+          <div className="absolute -bottom-1.5 -left-1.5 w-3 h-3 rounded-full bg-[#78A5FF] border border-white/50 shadow-sm" />
+          <div className="absolute -bottom-1.5 -right-1.5 w-3 h-3 rounded-full bg-[#78A5FF] border border-white/50 shadow-sm" />
 
           {/* Center Move Handle */}
           <div
             onMouseDown={startMovingBox}
-            className="absolute inset-0 flex items-center justify-center cursor-move group opacity-0 hover:opacity-100 transition-opacity bg-[#3AD6C6]/10"
+            className="absolute inset-0 flex items-center justify-center cursor-move group opacity-0 hover:opacity-100 transition-opacity bg-[#78A5FF]/10"
           >
-            <div className="bg-[#111A22]/95 px-3 py-1.5 rounded-xl border border-[#31414D] shadow-lg text-xs font-medium text-[#3AD6C6] flex items-center space-x-1.5">
+            <div className="bg-[#121722]/95 px-3 py-1.5 rounded-xl border border-[#303A4B] shadow-lg text-xs font-medium text-[#78A5FF] flex items-center space-x-1.5">
               <Move className="w-3.5 h-3.5" />
               <span>Arraste para Mover</span>
             </div>
           </div>
 
           {/* Dimension Tag */}
-          <div className="absolute -top-8 left-0 flex items-center space-x-1.5 bg-[#111A22] border border-[#31414D] text-[#3AD6C6] text-[11px] font-mono font-medium px-2.5 py-0.5 rounded-lg shadow-lg">
+          <div className="absolute -top-8 left-0 flex items-center space-x-1.5 bg-[#121722] border border-[#303A4B] text-[#78A5FF] text-[11px] font-mono font-medium px-2.5 py-0.5 rounded-lg shadow-lg">
             <span>{Math.round(area.width)} × {Math.round(area.height)} px</span>
             {aspectRatio !== 'free' && (
-              <span className="bg-[#18242E] text-[#C0CDD6] px-1 rounded text-[10px] font-sans uppercase">
+              <span className="bg-[#191F2B] text-[#B7C0CE] px-1 rounded text-[10px] font-sans uppercase">
                 {aspectRatio}
               </span>
             )}
@@ -305,7 +305,7 @@ export const CropSelectorView: React.FC = () => {
           {/* Action Confirmation Bar below the box */}
           {!selecting && (
             <div
-              className="no-drag-area absolute -bottom-14 right-0 flex items-center space-x-2 bg-[#111A22]/95 border border-[#31414D] p-2 rounded-2xl shadow-2xl"
+              className="no-drag-area absolute -bottom-14 right-0 flex items-center space-x-2 bg-[#121722]/95 border border-[#303A4B] p-2 rounded-2xl shadow-2xl"
               style={{ zIndex: 100 }}
             >
               <button
@@ -313,7 +313,7 @@ export const CropSelectorView: React.FC = () => {
                   e.stopPropagation();
                   handleCancel();
                 }}
-                className="px-3 py-1.5 rounded-xl bg-[#18242E] hover:bg-[#202E39] text-xs font-medium text-[#C0CDD6] hover:text-[#F4F7FA] transition-colors"
+                className="px-3 py-1.5 rounded-xl bg-[#191F2B] hover:bg-[#222B39] text-xs font-medium text-[#B7C0CE] hover:text-[#F3F5F9] transition-colors"
               >
                 Cancelar
               </button>
@@ -322,7 +322,7 @@ export const CropSelectorView: React.FC = () => {
                   e.stopPropagation();
                   handleConfirm();
                 }}
-                className="flex items-center space-x-1.5 px-4 py-1.5 rounded-xl bg-[#3AD6C6] hover:bg-[#65E6D8] text-xs font-bold text-[#062B2A] shadow-sm transition-all active:scale-95"
+                className="flex items-center space-x-1.5 px-4 py-1.5 rounded-xl bg-[#78A5FF] hover:bg-[#9AB9FF] text-xs font-bold text-[#101A32] shadow-sm transition-all active:scale-95"
               >
                 <Check className="w-4 h-4 stroke-[3]" />
                 <span>Gravar Esta Área</span>

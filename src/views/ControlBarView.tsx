@@ -200,17 +200,17 @@ export const ControlBarView: React.FC = () => {
     <div className="w-full h-full flex flex-col items-center justify-center p-1 select-none relative">
       {/* Toast Notice for Scene Retake / New Scene */}
       {retakeNotice && (
-        <div className="absolute -top-7 px-3 py-0.5 rounded-full bg-[#12312F] text-[#3AD6C6] font-bold text-[11px] shadow-lg flex items-center space-x-1.5 border border-[#3AD6C6]/40">
+        <div className="absolute -top-7 px-3 py-0.5 rounded-full bg-[#1A2A47] text-[#78A5FF] font-bold text-[11px] shadow-lg flex items-center space-x-1.5 border border-[#78A5FF]/40">
           <span>{retakeNotice}</span>
         </div>
       )}
 
       <div
-        className="flex items-center space-x-1.5 bg-[#0B1117]/95 backdrop-blur-xl px-2.5 py-1.5 rounded-2xl border border-[#31414D] shadow-2xl"
+        className="flex items-center space-x-1.5 bg-[#0B0E14]/95 backdrop-blur-xl px-2.5 py-1.5 rounded-2xl border border-[#303A4B] shadow-2xl"
         style={{ WebkitAppRegion: 'drag' } as any}
       >
         {/* Drag Handle */}
-        <div className="cursor-grab active:cursor-grabbing text-[#92A2AE] hover:text-[#F4F7FA] transition-colors pl-0.5">
+        <div className="cursor-grab active:cursor-grabbing text-[#929CAF] hover:text-[#F3F5F9] transition-colors pl-0.5">
           <GripVertical className="w-3.5 h-3.5" />
         </div>
 
@@ -220,12 +220,12 @@ export const ControlBarView: React.FC = () => {
             onClick={handleStopRecording}
             disabled={isStopping}
             title={`Concluir e Salvar Gravação (${getShortcutLabel('a')})`}
-            className="flex items-center space-x-2 bg-[#FF5F6D] hover:bg-[#FF5F6D]/90 active:scale-95 text-[#2B0E13] px-3 py-1.5 rounded-xl font-bold text-xs transition-all shadow-sm group"
+            className="flex items-center space-x-2 bg-[#FF647C] hover:bg-[#FF647C]/90 active:scale-95 text-[#2B0E13] px-3 py-1.5 rounded-xl font-bold text-xs transition-all shadow-sm group"
           >
             <div className="w-2.5 h-2.5 rounded-sm bg-[#2B0E13] group-hover:scale-105 transition-transform" />
             <span className="font-mono text-xs tracking-tight font-black">{formatTime(seconds)}</span>
             {isPaused && (
-              <span className="text-[10px] bg-[#18242E] text-[#FFBD66] border border-[#FFBD66]/50 px-1 py-0.2 rounded font-bold uppercase">
+              <span className="text-[10px] bg-[#191F2B] text-[#F2B66D] border border-[#F2B66D]/50 px-1 py-0.2 rounded font-bold uppercase">
                 Pausa
               </span>
             )}
@@ -235,10 +235,10 @@ export const ControlBarView: React.FC = () => {
         {/* Scene Pill */}
         <div style={{ WebkitAppRegion: 'no-drag' } as any} className="flex items-center space-x-1">
           <div
-            className="flex items-center space-x-1 bg-[#111A22] border border-[#31414D] px-2 py-1 rounded-xl text-[11px] font-semibold text-[#C0CDD6]"
+            className="flex items-center space-x-1 bg-[#121722] border border-[#303A4B] px-2 py-1 rounded-xl text-[11px] font-semibold text-[#B7C0CE]"
             title={`Cena atual ${sceneNumber}: ${formatTime(sceneSeconds)}`}
           >
-            <span className="w-1.5 h-1.5 rounded-full bg-[#3AD6C6]" />
+            <span className="w-1.5 h-1.5 rounded-full bg-[#78A5FF]" />
             <span>Cena {sceneNumber}</span>
           </div>
 
@@ -248,8 +248,8 @@ export const ControlBarView: React.FC = () => {
             title="Regravar apenas esta cena (descarta o take atual e reinicia esta cena)"
             className={`p-1.5 rounded-xl transition-all flex items-center space-x-1 ${
               isPaused
-                ? 'bg-[#18242E] text-[#FFBD66] border border-[#FFBD66]/50 hover:bg-[#202E39]'
-                : 'text-[#92A2AE] hover:text-[#FFBD66] hover:bg-[#202E39]'
+                ? 'bg-[#191F2B] text-[#F2B66D] border border-[#F2B66D]/50 hover:bg-[#222B39]'
+                : 'text-[#929CAF] hover:text-[#F2B66D] hover:bg-[#222B39]'
             }`}
           >
             <RotateCcw className="w-3.5 h-3.5" />
@@ -261,7 +261,7 @@ export const ControlBarView: React.FC = () => {
             <button
               onClick={handleNewScene}
               title="Nova Cena (finaliza este take e inicia a próxima cena/capítulo)"
-              className="px-2 py-1 rounded-xl bg-[#12312F] text-[#3AD6C6] border border-[#3AD6C6]/40 hover:bg-[#18242E] text-[10px] font-bold transition-all flex items-center space-x-1"
+              className="px-2 py-1 rounded-xl bg-[#1A2A47] text-[#78A5FF] border border-[#78A5FF]/40 hover:bg-[#191F2B] text-[10px] font-bold transition-all flex items-center space-x-1"
             >
               <Plus className="w-3 h-3" />
               <span>Nova Cena</span>
@@ -276,8 +276,8 @@ export const ControlBarView: React.FC = () => {
             title={isPaused ? `Retomar Gravação (${getShortcutLabel('p')})` : `Pausar Gravação (${getShortcutLabel('p')})`}
             className={`p-2 rounded-xl transition-all ${
               isPaused
-                ? 'bg-[#FFBD66] text-[#0B1117] font-bold shadow-sm'
-                : 'text-[#92A2AE] hover:text-[#F4F7FA] hover:bg-[#202E39]'
+                ? 'bg-[#F2B66D] text-[#0B0E14] font-bold shadow-sm'
+                : 'text-[#929CAF] hover:text-[#F3F5F9] hover:bg-[#222B39]'
             }`}
           >
             {isPaused ? <Play className="w-3.5 h-3.5 fill-current" /> : <Pause className="w-3.5 h-3.5" />}
@@ -291,41 +291,41 @@ export const ControlBarView: React.FC = () => {
             title={isMicMuted ? `Ativar Microfone (${getShortcutLabel('m')})` : `Microfone Ativo (${Math.round(micLevel * 100)}%) • Silenciar (${getShortcutLabel('m')})`}
             className={`px-2 py-1.5 rounded-xl transition-all flex items-center space-x-1.5 ${
               isMicMuted
-                ? 'bg-[#B83A48]/20 text-[#FF5F6D] border border-[#B83A48]/40 shadow-sm'
-                : 'text-[#92A2AE] hover:text-[#F4F7FA] hover:bg-[#202E39]'
+                ? 'bg-[#B83A48]/20 text-[#FF647C] border border-[#B83A48]/40 shadow-sm'
+                : 'text-[#929CAF] hover:text-[#F3F5F9] hover:bg-[#222B39]'
             }`}
           >
-            {isMicMuted ? <MicOff className="w-3.5 h-3.5 text-[#FF5F6D]" /> : <Mic className="w-3.5 h-3.5 text-[#3AD6C6]" />}
+            {isMicMuted ? <MicOff className="w-3.5 h-3.5 text-[#FF647C]" /> : <Mic className="w-3.5 h-3.5 text-[#78A5FF]" />}
 
             {/* Live 3-bar Audio VU Indicator */}
             <div className="flex items-end space-x-0.5 h-3.5 pl-0.5">
               <span
                 className={`w-0.5 rounded-full transition-all duration-75 ${
                   isMicMuted
-                    ? 'bg-[#FF5F6D]/30'
+                    ? 'bg-[#FF647C]/30'
                     : micLevel > 0.04
-                    ? 'bg-[#4CD6A0] shadow-sm shadow-[#4CD6A0]/50'
-                    : 'bg-[#31414D]'
+                    ? 'bg-[#83B8FF] shadow-sm shadow-[#83B8FF]/50'
+                    : 'bg-[#303A4B]'
                 }`}
                 style={{ height: '6px' }}
               />
               <span
                 className={`w-0.5 rounded-full transition-all duration-75 ${
                   isMicMuted
-                    ? 'bg-[#FF5F6D]/30'
+                    ? 'bg-[#FF647C]/30'
                     : micLevel > 0.20
-                    ? 'bg-[#4CD6A0] shadow-sm shadow-[#4CD6A0]/50'
-                    : 'bg-[#31414D]'
+                    ? 'bg-[#83B8FF] shadow-sm shadow-[#83B8FF]/50'
+                    : 'bg-[#303A4B]'
                 }`}
                 style={{ height: '9px' }}
               />
               <span
                 className={`w-0.5 rounded-full transition-all duration-75 ${
                   isMicMuted
-                    ? 'bg-[#FF5F6D]/30'
+                    ? 'bg-[#FF647C]/30'
                     : micLevel > 0.50
-                    ? 'bg-[#FFBD66] shadow-sm shadow-[#FFBD66]/50'
-                    : 'bg-[#31414D]'
+                    ? 'bg-[#F2B66D] shadow-sm shadow-[#F2B66D]/50'
+                    : 'bg-[#303A4B]'
                 }`}
                 style={{ height: '12px' }}
               />
@@ -338,7 +338,7 @@ export const ControlBarView: React.FC = () => {
           <button
             onClick={handleRestart}
             title="Reiniciar Gravação Inteira do Zero"
-            className="p-2 rounded-xl text-[#92A2AE] hover:text-[#F4F7FA] hover:bg-[#202E39] transition-all"
+            className="p-2 rounded-xl text-[#929CAF] hover:text-[#F3F5F9] hover:bg-[#222B39] transition-all"
           >
             <RotateCcw className="w-3.5 h-3.5" />
           </button>
@@ -351,8 +351,8 @@ export const ControlBarView: React.FC = () => {
             title={`Anotações na Tela (${getShortcutLabel('d')})`}
             className={`p-2 rounded-xl transition-all ${
               isDrawing
-                ? 'bg-[#12312F] text-[#3AD6C6] border border-[#3AD6C6]/50 font-bold shadow-sm'
-                : 'text-[#92A2AE] hover:text-[#F4F7FA] hover:bg-[#202E39]'
+                ? 'bg-[#1A2A47] text-[#78A5FF] border border-[#78A5FF]/50 font-bold shadow-sm'
+                : 'text-[#929CAF] hover:text-[#F3F5F9] hover:bg-[#222B39]'
             }`}
           >
             <PenTool className="w-3.5 h-3.5" />
@@ -366,8 +366,8 @@ export const ControlBarView: React.FC = () => {
             title={`Teleprompter / Roteiro (${getShortcutLabel('t')})`}
             className={`p-2 rounded-xl transition-all ${
               isSpeakerNotesOpen
-                ? 'bg-[#12312F] text-[#3AD6C6] border border-[#3AD6C6]/50 font-bold shadow-sm'
-                : 'text-[#92A2AE] hover:text-[#F4F7FA] hover:bg-[#202E39]'
+                ? 'bg-[#1A2A47] text-[#78A5FF] border border-[#78A5FF]/50 font-bold shadow-sm'
+                : 'text-[#929CAF] hover:text-[#F3F5F9] hover:bg-[#222B39]'
             }`}
           >
             <FileText className="w-3.5 h-3.5" />
@@ -381,8 +381,8 @@ export const ControlBarView: React.FC = () => {
             title={isConfirmingCancel ? "Confirmar descarte definitivo da gravação" : "Descartar Gravação"}
             className={`p-2 rounded-xl transition-all ${
               isConfirmingCancel
-                ? 'bg-[#B83A48] hover:bg-[#A83240] text-white font-bold ring-2 ring-[#FF5F6D] animate-pulse'
-                : 'text-[#92A2AE] hover:text-[#FF5F6D] hover:bg-[#B83A48]/15'
+                ? 'bg-[#B83A48] hover:bg-[#A83240] text-white font-bold ring-2 ring-[#FF647C] animate-pulse'
+                : 'text-[#929CAF] hover:text-[#FF647C] hover:bg-[#B83A48]/15'
             }`}
           >
             <Trash2 className="w-3.5 h-3.5" />

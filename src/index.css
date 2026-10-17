@@ -3,21 +3,42 @@
 @tailwind utilities;
 
 :root {
-  --midnight-bg: #0B1117;
-  --midnight-surface: #111A22;
-  --midnight-panel: #18242E;
-  --midnight-hover: #202E39;
-  --midnight-border: #31414D;
-  --midnight-text: #F4F7FA;
-  --midnight-secondary: #C0CDD6;
-  --midnight-muted: #92A2AE;
-  --midnight-mint: #3AD6C6;
-  --midnight-mint-hover: #65E6D8;
-  --midnight-mint-text: #062B2A;
-  --midnight-selection: #12312F;
-  --midnight-amber: #FFBD66;
-  --midnight-green: #4CD6A0;
-  --midnight-coral: #FF5F6D;
+  --nocturne-bg: #0B0E14;
+  --nocturne-surface: #121722;
+  --nocturne-panel: #191F2B;
+  --nocturne-hover: #222B39;
+  --nocturne-border: #303A4B;
+  --nocturne-text: #F3F5F9;
+  --nocturne-secondary: #B7C0CE;
+  --nocturne-muted: #929CAF;
+  --nocturne-blue: #78A5FF;
+  --nocturne-blue-hover: #9AB9FF;
+  --nocturne-blue-text: #101A32;
+  --nocturne-selection: #1A2A47;
+  --nocturne-amber: #F2B66D;
+  --nocturne-light-blue: #83B8FF;
+  --nocturne-coral: #FF647C;
+  --nocturne-coral-text: #2B0E13;
+  --nocturne-destructive: #B83A48;
+  --nocturne-destructive-hover: #A83240;
+  --nocturne-destructive-text: #FFFFFF;
+
+  /* Legacy mappings mapped to Nocturne Blue */
+  --midnight-bg: #0B0E14;
+  --midnight-surface: #121722;
+  --midnight-panel: #191F2B;
+  --midnight-hover: #222B39;
+  --midnight-border: #303A4B;
+  --midnight-text: #F3F5F9;
+  --midnight-secondary: #B7C0CE;
+  --midnight-muted: #929CAF;
+  --midnight-mint: #78A5FF;
+  --midnight-mint-hover: #9AB9FF;
+  --midnight-mint-text: #101A32;
+  --midnight-selection: #1A2A47;
+  --midnight-amber: #F2B66D;
+  --midnight-green: #83B8FF;
+  --midnight-coral: #FF647C;
   --midnight-coral-text: #2B0E13;
   --midnight-destructive: #B83A48;
   --midnight-destructive-hover: #A83240;
@@ -28,13 +49,13 @@
   body {
     user-select: none;
     -webkit-user-select: none;
-    background-color: var(--midnight-bg);
-    color: var(--midnight-text);
+    background-color: var(--nocturne-bg);
+    color: var(--nocturne-text);
     font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
   }
 }
 
-/* Custom sleek Midnight Signal scrollbar */
+/* Custom sleek Nocturne Blue scrollbar */
 ::-webkit-scrollbar {
   width: 6px;
   height: 6px;
@@ -45,10 +66,10 @@
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #31414D;
+  background: #303A4B;
   border-radius: 9999px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: #3AD6C6;
+  background: #78A5FF;
 }

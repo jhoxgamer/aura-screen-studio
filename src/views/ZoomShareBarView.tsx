@@ -144,63 +144,63 @@ export const ZoomShareBarView: React.FC = () => {
   return (
     <div className="w-screen h-screen flex flex-col items-center justify-start select-none pt-1">
       {/* Floating Aura Screen Sharing Bar */}
-      <div className="flex items-center space-x-2 bg-[#0B1117]/95 border border-[#31414D] shadow-[0_12px_36px_rgba(0,0,0,0.7)] backdrop-blur-2xl rounded-2xl px-3 py-1.5 text-xs text-[#F4F7FA]">
+      <div className="flex items-center space-x-2 bg-[#0B0E14]/95 border border-[#303A4B] shadow-[0_12px_36px_rgba(0,0,0,0.8)] backdrop-blur-2xl rounded-2xl px-3 py-1.5 text-xs text-[#F3F5F9]">
         
-        {/* Status Pill (Signal Mint when live, Amber when paused) */}
+        {/* Status Pill (Nocturne Blue when live, Amber when paused) */}
         <div
-          className={`flex items-center space-x-2 px-3 py-1 rounded-xl font-bold text-xs shadow-sm transition-colors ${
+          className={`flex items-center space-x-2 px-3 py-1 rounded-xl font-bold text-xs shadow-sm transition-colors shrink-0 whitespace-nowrap ${
             isPaused
-              ? 'bg-[#18242E] border border-[#FFBD66]/60 text-[#FFBD66]'
-              : 'bg-[#12312F] border border-[#3AD6C6]/50 text-[#3AD6C6]'
+              ? 'bg-[#191F2B] border border-[#F2B66D]/60 text-[#F2B66D]'
+              : 'bg-[#1A2A47] border border-[#78A5FF]/50 text-[#78A5FF]'
           }`}
         >
           <span
-            className={`w-2 h-2 rounded-full ${
-              isPaused ? 'bg-[#FFBD66]' : 'bg-[#3AD6C6] animate-ping'
+            className={`w-2 h-2 rounded-full shrink-0 ${
+              isPaused ? 'bg-[#F2B66D]' : 'bg-[#78A5FF] animate-ping'
             }`}
           />
-          <span>{isPaused ? 'Transmissão Pausada' : 'Você está transmitindo a tela'}</span>
+          <span className="shrink-0">{isPaused ? 'Transmissão Pausada' : 'Você está transmitindo a tela'}</span>
         </div>
 
         {/* 60 FPS Ultra-Smooth Mode Badge */}
         <button
           onClick={handleToggleFps}
           title={`Taxa de quadros: ${targetFps} FPS. Clique para alternar entre 60 FPS Ultra e 30 FPS.`}
-          className="flex items-center space-x-1.5 bg-[#18242E] hover:bg-[#202E39] border border-[#31414D] px-2.5 py-1 rounded-xl text-[#F4F7FA] font-mono text-[11px] transition-all active:scale-95"
+          className="flex items-center space-x-1.5 bg-[#191F2B] hover:bg-[#222B39] border border-[#303A4B] px-2.5 py-1 rounded-xl text-[#F3F5F9] font-mono text-[11px] transition-all active:scale-95 shrink-0 whitespace-nowrap"
         >
-          <Zap className="w-3.5 h-3.5 text-[#3AD6C6]" />
-          <span className="font-bold text-[#3AD6C6]">{targetFps} FPS</span>
-          <span className="text-[9px] text-[#92A2AE]">({currentFps} real)</span>
+          <Zap className="w-3.5 h-3.5 text-[#78A5FF] shrink-0" />
+          <span className="font-bold text-[#78A5FF] shrink-0">{targetFps} FPS</span>
+          <span className="text-[10px] text-[#929CAF] shrink-0">({currentFps} real)</span>
         </button>
 
         {/* Viewers Counter */}
         <div
-          className="flex items-center space-x-1.5 bg-[#111A22] border border-[#31414D] px-2.5 py-1 rounded-xl text-[#C0CDD6] font-medium"
+          className="flex items-center space-x-1.5 bg-[#121722] border border-[#303A4B] px-2.5 py-1 rounded-xl text-[#B7C0CE] font-medium shrink-0 whitespace-nowrap"
           title="Espectadores conectados na transmissão ao vivo"
         >
-          <Users className="w-3.5 h-3.5 text-[#3AD6C6]" />
-          <span className="font-bold text-[#F4F7FA]">{viewersCount}</span>
-          <span className="text-[11px] text-[#92A2AE] hidden sm:inline">ao vivo</span>
+          <Users className="w-3.5 h-3.5 text-[#78A5FF] shrink-0" />
+          <span className="font-bold text-[#F3F5F9] shrink-0">{viewersCount}</span>
+          <span className="text-[11px] text-[#929CAF] hidden sm:inline shrink-0">ao vivo</span>
         </div>
 
         {/* Copy Link Button */}
         <button
           onClick={handleCopyLink}
           title="Copiar Link de Visualização ao Vivo"
-          className="flex items-center space-x-1.5 px-2.5 py-1 rounded-xl bg-[#111A22] hover:bg-[#202E39] border border-[#31414D] text-[#C0CDD6] hover:text-[#F4F7FA] transition-all active:scale-95"
+          className="flex items-center space-x-1.5 px-2.5 py-1 rounded-xl bg-[#121722] hover:bg-[#222B39] border border-[#303A4B] text-[#B7C0CE] hover:text-[#F3F5F9] transition-all active:scale-95 shrink-0 whitespace-nowrap"
         >
-          {isCopied ? <Check className="w-3.5 h-3.5 text-[#4CD6A0]" /> : <Copy className="w-3.5 h-3.5 text-[#3AD6C6]" />}
-          <span>{isCopied ? 'Link Copiado!' : 'Copiar Link'}</span>
+          {isCopied ? <Check className="w-3.5 h-3.5 text-[#83B8FF] shrink-0" /> : <Copy className="w-3.5 h-3.5 text-[#78A5FF] shrink-0" />}
+          <span className="shrink-0">{isCopied ? 'Link Copiado!' : 'Copiar Link'}</span>
         </button>
 
         {/* QR Code Button */}
         <button
           onClick={() => setShowQrModal(!showQrModal)}
           title="Exibir QR Code para Conectar no Celular"
-          className={`p-1.5 rounded-xl border transition-all active:scale-95 ${
+          className={`p-1.5 rounded-xl border transition-all active:scale-95 shrink-0 ${
             showQrModal
-              ? 'bg-[#3AD6C6] text-[#062B2A] border-[#65E6D8]'
-              : 'bg-[#111A22] hover:bg-[#202E39] border-[#31414D] text-[#C0CDD6] hover:text-[#F4F7FA]'
+              ? 'bg-[#78A5FF] text-[#101A32] border-[#9AB9FF]'
+              : 'bg-[#121722] hover:bg-[#222B39] border-[#303A4B] text-[#B7C0CE] hover:text-[#F3F5F9]'
           }`}
         >
           <QrCode className="w-3.5 h-3.5" />
@@ -210,34 +210,34 @@ export const ZoomShareBarView: React.FC = () => {
         <button
           onClick={handleToggleDrawing}
           title="Abrir Ferramentas de Anotação em Tela (S, Z, M, W...)"
-          className="flex items-center space-x-1.5 px-2.5 py-1 rounded-xl bg-[#12312F] hover:bg-[#18242E] border border-[#3AD6C6]/50 text-[#3AD6C6] hover:text-[#65E6D8] font-medium transition-all active:scale-95"
+          className="flex items-center space-x-1.5 px-2.5 py-1 rounded-xl bg-[#1A2A47] hover:bg-[#191F2B] border border-[#78A5FF]/50 text-[#78A5FF] hover:text-[#9AB9FF] font-medium transition-all active:scale-95 shrink-0 whitespace-nowrap"
         >
-          <PenTool className="w-3.5 h-3.5 text-[#3AD6C6]" />
-          <span>Anotar</span>
+          <PenTool className="w-3.5 h-3.5 text-[#78A5FF] shrink-0" />
+          <span className="shrink-0">Anotar</span>
         </button>
 
         {/* Pause / Resume Sharing */}
         <button
           onClick={handleTogglePause}
           title={isPaused ? 'Retomar Transmissão' : 'Pausar Transmissão'}
-          className={`flex items-center space-x-1.5 px-2.5 py-1 rounded-xl border transition-all active:scale-95 font-medium ${
+          className={`flex items-center space-x-1.5 px-2.5 py-1 rounded-xl border transition-all active:scale-95 font-medium shrink-0 whitespace-nowrap ${
             isPaused
-              ? 'bg-[#FFBD66] hover:bg-[#FFBD66]/90 text-[#0B1117] border-[#FFBD66]'
-              : 'bg-[#111A22] hover:bg-[#202E39] border-[#31414D] text-[#C0CDD6] hover:text-[#F4F7FA]'
+              ? 'bg-[#F2B66D] hover:bg-[#F2B66D]/90 text-[#0B0E14] border-[#F2B66D]'
+              : 'bg-[#121722] hover:bg-[#222B39] border-[#303A4B] text-[#B7C0CE] hover:text-[#F3F5F9]'
           }`}
         >
-          {isPaused ? <Play className="w-3.5 h-3.5 fill-current" /> : <Pause className="w-3.5 h-3.5" />}
-          <span>{isPaused ? 'Retomar' : 'Pausar'}</span>
+          {isPaused ? <Play className="w-3.5 h-3.5 fill-current shrink-0" /> : <Pause className="w-3.5 h-3.5 shrink-0" />}
+          <span className="shrink-0">{isPaused ? 'Retomar' : 'Pausar'}</span>
         </button>
 
         {/* Stop Sharing Button */}
         <button
           onClick={handleStopSharing}
           title="Parar Compartilhamento de Tela"
-          className="flex items-center space-x-1.5 px-3 py-1 rounded-xl bg-[#B83A48] hover:bg-[#A83240] text-white font-bold transition-all active:scale-95 shadow-md shadow-[#B83A48]/30"
+          className="flex items-center space-x-1.5 px-3 py-1 rounded-xl bg-[#B83A48] hover:bg-[#A83240] text-white font-bold transition-all active:scale-95 shadow-md shadow-[#B83A48]/30 shrink-0 whitespace-nowrap"
         >
-          <Square className="w-3 h-3 fill-current" />
-          <span>Parar Transmissão</span>
+          <Square className="w-3 h-3 fill-current shrink-0" />
+          <span className="shrink-0">Parar Transmissão</span>
         </button>
       </div>
 
@@ -259,27 +259,27 @@ export const ZoomShareBarView: React.FC = () => {
 
       {/* Live Question Notification Toast */}
       {activeQuestion && (
-        <div className="mt-2 bg-[#18242E]/95 border border-[#3AD6C6]/50 shadow-[0_8px_30px_rgba(0,0,0,0.8)] rounded-2xl px-4 py-2.5 max-w-md flex items-start space-x-3 animate-in fade-in slide-in-from-top-3 backdrop-blur-xl">
-          <div className="w-8 h-8 rounded-xl bg-[#12312F] flex items-center justify-center text-[#3AD6C6] shrink-0 mt-0.5">
+        <div className="mt-2 bg-[#191F2B]/95 border border-[#78A5FF]/50 shadow-[0_8px_30px_rgba(0,0,0,0.8)] rounded-2xl px-4 py-2.5 max-w-md flex items-start space-x-3 animate-in fade-in slide-in-from-top-3 backdrop-blur-xl">
+          <div className="w-8 h-8 rounded-xl bg-[#1A2A47] flex items-center justify-center text-[#78A5FF] shrink-0 mt-0.5">
             <Sparkles className="w-4 h-4" />
           </div>
           <div className="flex-1 min-w-0">
             <div className="flex items-center justify-between">
-              <span className="text-[11px] font-bold text-[#3AD6C6] uppercase tracking-wider">
+              <span className="text-[11px] font-bold text-[#78A5FF] uppercase tracking-wider">
                 Pergunta da Audiência
               </span>
-              <span className="text-[10px] text-[#92A2AE]">{activeQuestion.author || 'Espectador'}</span>
+              <span className="text-[10px] text-[#929CAF]">{activeQuestion.author || 'Espectador'}</span>
             </div>
-            <p className="text-xs text-[#F4F7FA] font-medium mt-0.5 truncate">{activeQuestion.text}</p>
+            <p className="text-xs text-[#F3F5F9] font-medium mt-0.5 truncate">{activeQuestion.text}</p>
           </div>
         </div>
       )}
 
       {/* QR Code Modal Overlay */}
       {showQrModal && (
-        <div className="mt-3 bg-[#111A22]/95 border border-[#31414D] shadow-[0_16px_48px_rgba(0,0,0,0.8)] rounded-2xl p-4 flex flex-col items-center backdrop-blur-2xl animate-in fade-in zoom-in-95 text-center">
-          <h3 className="font-bold text-sm text-[#F4F7FA] mb-1">Acessar no Celular ou Tablet</h3>
-          <p className="text-[11px] text-[#92A2AE] max-w-xs mb-3">
+        <div className="mt-3 bg-[#121722]/95 border border-[#303A4B] shadow-[0_16px_48px_rgba(0,0,0,0.8)] rounded-2xl p-4 flex flex-col items-center backdrop-blur-2xl animate-in fade-in zoom-in-95 text-center">
+          <h3 className="font-bold text-sm text-[#F3F5F9] mb-1">Acessar no Celular ou Tablet</h3>
+          <p className="text-[11px] text-[#929CAF] max-w-xs mb-3">
             Aponte a câmera do seu celular para assistir à tela ao vivo a 60 FPS:
           </p>
 
@@ -291,16 +291,16 @@ export const ZoomShareBarView: React.FC = () => {
             />
           </div>
 
-          <div className="flex items-center space-x-2 w-full max-w-xs bg-[#18242E] px-2.5 py-1.5 rounded-xl border border-[#31414D] mb-3">
+          <div className="flex items-center space-x-2 w-full max-w-xs bg-[#191F2B] px-2.5 py-1.5 rounded-xl border border-[#303A4B] mb-3">
             <input
               type="text"
               readOnly
               value={shareUrl}
-              className="bg-transparent text-[11px] text-[#C0CDD6] outline-none flex-1 truncate font-mono"
+              className="bg-transparent text-[11px] text-[#B7C0CE] outline-none flex-1 truncate font-mono"
             />
             <button
               onClick={handleCopyLink}
-              className="text-[#3AD6C6] hover:text-[#65E6D8] text-xs font-semibold shrink-0"
+              className="text-[#78A5FF] hover:text-[#9AB9FF] text-xs font-semibold shrink-0"
             >
               {isCopied ? 'Copiado!' : 'Copiar'}
             </button>
@@ -309,15 +309,15 @@ export const ZoomShareBarView: React.FC = () => {
           <div className="flex items-center space-x-2">
             <button
               onClick={() => window.electronAPI?.openExternalUrl?.(shareUrl)}
-              className="flex items-center space-x-1 text-xs text-[#92A2AE] hover:text-[#F4F7FA] transition-colors"
+              className="flex items-center space-x-1 text-xs text-[#929CAF] hover:text-[#F3F5F9] transition-colors"
             >
               <ExternalLink className="w-3 h-3" />
               <span>Abrir no Navegador</span>
             </button>
-            <span className="text-[#31414D]">•</span>
+            <span className="text-[#303A4B]">•</span>
             <button
               onClick={() => setShowQrModal(false)}
-              className="text-xs text-[#92A2AE] hover:text-[#FF5F6D] transition-colors"
+              className="text-xs text-[#929CAF] hover:text-[#FF647C] transition-colors"
             >
               Fechar
             </button>

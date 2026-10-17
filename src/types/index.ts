@@ -126,7 +126,7 @@ declare global {
       updateTitle: (id: string, newTitle: string) => Promise<boolean>;
       updateChapters: (id: string, chapters: ChapterItem[]) => Promise<boolean>;
       downloadRecording: (id: string) => Promise<boolean>;
-      trimRecording: (id: string, buffer: ArrayBuffer, newDurationMs: number) => Promise<any>;
+      trimRecording: (id: string, bufferOrOptions: any, newDurationMs?: number) => Promise<any>;
       openPreview: (idOrMeta: string | RecordingMeta) => void;
       openPreRecording: () => void;
       openExternalUrl: (url: string) => void;
