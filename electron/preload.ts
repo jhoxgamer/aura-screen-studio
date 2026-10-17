@@ -173,6 +173,11 @@ export const electronAPI = {
     ipcRenderer.on('recording:state-changed', handler);
     return () => ipcRenderer.removeListener('recording:state-changed', handler);
   },
+  onToggleMic: (callback: () => void) => {
+    const handler = () => callback();
+    ipcRenderer.on('recording:toggle-mic', handler);
+    return () => ipcRenderer.removeListener('recording:toggle-mic', handler);
+  },
   onCountdownTick: (callback: (count: number) => void) => {
     const handler = (_: any, count: number) => callback(count);
     ipcRenderer.on('countdown:tick', handler);

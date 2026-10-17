@@ -26,9 +26,14 @@ export class RecorderService {
   private micAnalyser: AnalyserNode | null = null;
   private micLevelInterval: any = null;
   private onMicLevelUpdate?: (level: number) => void;
+  private onTrackEnded?: () => void;
 
   setMicLevelListener(callback: ((level: number) => void) | undefined) {
     this.onMicLevelUpdate = callback;
+  }
+
+  setOnTrackEnded(callback: (() => void) | undefined) {
+    this.onTrackEnded = callback;
   }
 
   async start(
@@ -229,6 +234,10 @@ export class RecorderService {
       const videoTrack = this.screenStream.getVideoTracks()[0];
       if (videoTrack) {
         tracks.push(videoTrack);
+        videoTrack.onended = () => {
+          console.warn('Screen video track ended (window closed or monitor disconnected). Gracefully completing recording.');
+          this.onTrackEnded?.();
+        };
       }
     }
 

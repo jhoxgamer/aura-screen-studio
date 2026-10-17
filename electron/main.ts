@@ -1234,6 +1234,12 @@ app.whenReady().then(() => {
     }
   });
 
+  globalShortcut.register('CommandOrControl+Shift+M', () => {
+    if (isRecording && controlBarWindow && !controlBarWindow.isDestroyed()) {
+      controlBarWindow.webContents.send('recording:toggle-mic');
+    }
+  });
+
   globalShortcut.register('CommandOrControl+Shift+D', () => {
     if (isRecording) {
       broadcastDrawingState(!isDrawingActive);

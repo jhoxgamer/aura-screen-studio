@@ -87,6 +87,7 @@ export interface IpcEvents {
   'recording:restart': () => void;
   'recording:cancel': () => void;
   'recording:state-changed': (state: 'idle' | 'countdown' | 'recording' | 'paused' | 'stopped') => void;
+  'recording:toggle-mic': () => void;
   'bubble:set-size': (size: BubbleSize) => void;
   'bubble:set-visible': (visible: boolean) => void;
   'drawing:toggle': () => void;

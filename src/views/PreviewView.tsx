@@ -26,6 +26,7 @@ import {
   Plus
 } from 'lucide-react';
 import { RecordingMeta, ChapterItem } from '../types';
+import confetti from 'canvas-confetti';
 
 export const PreviewView: React.FC = () => {
   const [meta, setMeta] = useState<RecordingMeta | null>(null);
@@ -124,6 +125,16 @@ export const PreviewView: React.FC = () => {
         ? `http://localhost:${port}/video/${receivedMeta.id}`
         : `file://${receivedMeta.filePath}`;
       extractWaveform(videoSrc);
+
+      // Celebratory studio completion feedback
+      try {
+        confetti({
+          particleCount: 45,
+          spread: 55,
+          origin: { y: 0.7 },
+          colors: ['#6366f1', '#f43f5e', '#10b981', '#f59e0b']
+        });
+      } catch (confettiErr) {}
     });
 
     // Check public URL periodically until ready
@@ -190,18 +201,22 @@ export const PreviewView: React.FC = () => {
         e.preventDefault();
         setPlaybackRate(2);
         if (videoRef.current) videoRef.current.playbackRate = 2;
+      } else if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'l') {
+        e.preventDefault();
+        handleShareLink();
       }
     };
 
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [isPlaying, isMuted, duration, isEditingTitle]);
+  }, [isPlaying, isMuted, duration, isEditingTitle, meta, shareUrl]);
 
   const handleShareLink = async () => {
     if (!meta) return;
     const url = shareUrl || await window.electronAPI.getShareUrl(meta.id);
     navigator.clipboard.writeText(url);
     setIsLinkCopied(true);
+    showToast('Link do vídeo copiado para a área de transferência!', 'success');
     setTimeout(() => setIsLinkCopied(false), 2500);
   };
 
@@ -304,9 +319,11 @@ export const PreviewView: React.FC = () => {
   const handleSaveTrim = async () => {
     if (!meta || !videoRef.current) return;
     setIsTrimmingSaving(true);
+    const vid = videoRef.current;
+    const prevPlaybackRate = vid.playbackRate;
     try {
-      const vid = videoRef.current;
       vid.pause();
+      vid.playbackRate = 1.0;
       vid.currentTime = trimStart;
       await new Promise((r) => setTimeout(r, 200));
 
@@ -314,6 +331,7 @@ export const PreviewView: React.FC = () => {
       if (!stream) {
         showToast('Corte direto não suportado pelo navegador.', 'error');
         setIsTrimmingSaving(false);
+        vid.playbackRate = prevPlaybackRate;
         return;
       }
 
@@ -328,15 +346,27 @@ export const PreviewView: React.FC = () => {
       vid.play();
 
       await new Promise<void>((resolve) => {
+        let watchdog: any = null;
         const check = () => {
           if (vid.currentTime >= trimEnd || vid.ended) {
-            recorder.stop();
+            if (watchdog) clearTimeout(watchdog);
+            if (recorder.state === 'recording') recorder.stop();
             vid.pause();
             resolve();
           } else {
             requestAnimationFrame(check);
           }
         };
+
+        // Safety watchdog: stop even if timeupdate or requestAnimationFrame stalls
+        watchdog = setTimeout(() => {
+          if (recorder.state === 'recording') {
+            recorder.stop();
+            vid.pause();
+          }
+          resolve();
+        }, Math.max(durationToRecord + 3000, 5000));
+
         check();
       });
 
@@ -354,6 +384,7 @@ export const PreviewView: React.FC = () => {
       console.error('Error saving trim:', e);
       showToast('Erro ao salvar corte.', 'error');
     } finally {
+      vid.playbackRate = prevPlaybackRate;
       setIsTrimmingSaving(false);
     }
   };

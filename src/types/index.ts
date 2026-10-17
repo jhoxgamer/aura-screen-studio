@@ -129,6 +129,7 @@ declare global {
       closeCurrentWindow: () => void;
       minimizeCurrentWindow: () => void;
       onRecordingStateChanged: (callback: (state: string) => void) => () => void;
+      onToggleMic?: (callback: () => void) => () => void;
       onCountdownTick: (callback: (count: number) => void) => () => void;
       onBubbleSizeChanged: (callback: (size: BubbleSize) => void) => () => void;
       onDrawingToggled: (callback: (active: boolean) => void) => () => void;

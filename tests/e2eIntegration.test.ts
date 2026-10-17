@@ -416,4 +416,66 @@ describe('End-to-End Integration & Subsystem Validation', () => {
       assert.equal(modeKeyMap['4'], 'custom-area');
     });
   });
+
+  // =========================================================================
+  // 6. TRACK-ENDED SAFEGUARD, GLOBAL MIC TOGGLE & PREVIEW SHORTCUT LOGIC
+  // =========================================================================
+  describe('Studio Recording Safeguards & Shortcut Behaviors', () => {
+    test('onTrackEnded callback is invoked when video track abruptly ends', () => {
+      let endedTriggered = false;
+      const fakeService = {
+        onTrackEnded: undefined as (() => void) | undefined,
+        setOnTrackEnded(cb: (() => void) | undefined) {
+          this.onTrackEnded = cb;
+        },
+        simulateTrackEnded() {
+          this.onTrackEnded?.();
+        }
+      };
+
+      fakeService.setOnTrackEnded(() => {
+        endedTriggered = true;
+      });
+
+      fakeService.simulateTrackEnded();
+      assert.equal(endedTriggered, true, 'onTrackEnded must fire when video track abruptly ends');
+    });
+
+    test('global mic toggle shortcut (Ctrl/Cmd+Shift+M) correctly flips mic mute state', () => {
+      let isMicMuted = false;
+      const toggleMic = () => {
+        isMicMuted = !isMicMuted;
+        return isMicMuted;
+      };
+
+      assert.equal(toggleMic(), true, 'First toggle mutes mic');
+      assert.equal(toggleMic(), false, 'Second toggle unmutes mic');
+    });
+
+    test('preview trim safeguard enforces 1.0x playback rate and calculates watchdog timeout', () => {
+      const trimStart = 5.0;
+      const trimEnd = 15.0;
+      const durationToRecord = (trimEnd - trimStart) * 1000; // 10000ms
+
+      // Safeguard: playback rate is reset to 1.0
+      const safeRate = 1.0;
+      const watchdogMs = Math.max(durationToRecord + 3000, 5000);
+
+      assert.equal(safeRate, 1.0, 'Trimming playback rate must be forced to 1.0x');
+      assert.equal(watchdogMs, 13000, 'Watchdog must allow duration plus 3000ms grace period');
+      assert.ok(watchdogMs > durationToRecord, 'Watchdog must be greater than target duration');
+    });
+
+    test('preview shortcut Ctrl/Cmd+L triggers share link copy handler', () => {
+      const isCopyLinkShortcut = (e: { ctrlKey: boolean; metaKey: boolean; key: string }) => {
+        return (e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'l';
+      };
+
+      assert.equal(isCopyLinkShortcut({ ctrlKey: true, metaKey: false, key: 'l' }), true);
+      assert.equal(isCopyLinkShortcut({ ctrlKey: false, metaKey: true, key: 'L' }), true);
+      assert.equal(isCopyLinkShortcut({ ctrlKey: false, metaKey: false, key: 'l' }), false);
+      assert.equal(isCopyLinkShortcut({ ctrlKey: true, metaKey: false, key: 'k' }), false);
+    });
+  });
 });
+

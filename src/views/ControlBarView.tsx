@@ -65,14 +65,24 @@ export const ControlBarView: React.FC = () => {
       if (state === 'stopped') handleStopRecording();
     });
 
+    recorderService.setOnTrackEnded(() => {
+      handleStopRecording();
+    });
+
+    const cleanupToggleMic = window.electronAPI.onToggleMic?.(() => {
+      handleToggleMic();
+    });
+
     return () => {
       recorderService.setMicLevelListener(undefined);
+      recorderService.setOnTrackEnded(undefined);
+      cleanupToggleMic?.();
       cleanupOptions();
       cleanupDrawing();
       cleanupSpeakerNotes?.();
       cleanupState();
     };
-  }, []);
+  }, [isMicMuted]);
 
   const handleStopRecording = async () => {
     if (isStopping) return;
@@ -156,6 +166,8 @@ export const ControlBarView: React.FC = () => {
     const nextMuted = !isMicMuted;
     recorderService.setMicMuted(nextMuted);
     setIsMicMuted(nextMuted);
+    setRetakeNotice(nextMuted ? 'Microfone Silenciado (Alt+Shift+M)' : 'Microfone Ativado (Alt+Shift+M)');
+    setTimeout(() => setRetakeNotice(null), 2000);
   };
 
   const handleToggleDrawing = () => {
@@ -260,7 +272,7 @@ export const ControlBarView: React.FC = () => {
         <div style={{ WebkitAppRegion: 'no-drag' } as any}>
           <button
             onClick={handleToggleMic}
-            title={isMicMuted ? 'Ativar Microfone' : `Microfone Ativo (Nível: ${Math.round(micLevel * 100)}%)`}
+            title={isMicMuted ? 'Ativar Microfone (Alt+Shift+M)' : `Microfone Ativo (${Math.round(micLevel * 100)}%) • Silenciar (Alt+Shift+M)`}
             className={`px-2 py-1.5 rounded-xl transition-all flex items-center space-x-1.5 ${
               isMicMuted
                 ? 'bg-rose-500/20 text-rose-400 border border-rose-500/40 shadow-sm'
