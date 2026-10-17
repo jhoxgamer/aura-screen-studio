@@ -787,6 +787,30 @@ function setupIpcHandlers() {
     setBubbleSize(size);
   });
 
+  // Camera Bubble Visibility Toggle
+  ipcMain.on('bubble:set-visible', (_, visible: boolean) => {
+    if (cameraBubbleWindow && !cameraBubbleWindow.isDestroyed()) {
+      if (visible) {
+        cameraBubbleWindow.show();
+      } else {
+        cameraBubbleWindow.hide();
+      }
+      controlBarWindow?.webContents.send('bubble:visibility-changed', visible);
+    }
+  });
+
+  ipcMain.on('bubble:toggle-visible', () => {
+    if (cameraBubbleWindow && !cameraBubbleWindow.isDestroyed()) {
+      const isVisible = cameraBubbleWindow.isVisible();
+      if (isVisible) {
+        cameraBubbleWindow.hide();
+      } else {
+        cameraBubbleWindow.show();
+      }
+      controlBarWindow?.webContents.send('bubble:visibility-changed', !isVisible);
+    }
+  });
+
   // Drawing mode toggle with synchronized multi-window broadcast
 
   ipcMain.on('drawing:toggle', () => {

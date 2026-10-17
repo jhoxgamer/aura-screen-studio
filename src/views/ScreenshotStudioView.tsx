@@ -13,7 +13,8 @@ import {
   Download,
   X,
   Sparkles,
-  Crop
+  Crop,
+  Camera
 } from 'lucide-react';
 
 type Tool = 'select' | 'crop' | 'arrow' | 'rect' | 'step' | 'blur' | 'pen' | 'text';
@@ -437,6 +438,20 @@ export const ScreenshotStudioView: React.FC = () => {
         onMouseUp={handleMouseUp}
         className="w-full h-full cursor-crosshair"
       />
+
+      {/* Top Context HUD Pill */}
+      {!toastMessage && (
+        <div className="absolute top-4 left-1/2 -translate-x-1/2 pointer-events-none z-30 animate-in fade-in">
+          <div className="bg-[#121722]/90 border border-[#303A4B] text-[#B7C0CE] px-3.5 py-1 rounded-full shadow-lg flex items-center space-x-2 text-[11px] font-medium backdrop-blur-md">
+            <Camera className="w-3.5 h-3.5 text-[#78A5FF]" />
+            <span className="font-semibold text-[#F3F5F9]">Estúdio de Screenshot</span>
+            <span className="text-[#929CAF]">•</span>
+            <span className="font-mono text-[#78A5FF]">[ESC] Fechar</span>
+            <span className="text-[#929CAF]">•</span>
+            <span className="font-mono text-[#78A5FF]">[Ctrl+C] Copiar</span>
+          </div>
+        </div>
+      )}
 
       {/* Toast Notification */}
       {toastMessage && (

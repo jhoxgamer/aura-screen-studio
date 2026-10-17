@@ -112,6 +112,8 @@ declare global {
       cancelRecording: () => void;
       setBubbleSize: (size: BubbleSize) => void;
       setBubbleVisible: (visible: boolean) => void;
+      toggleBubbleVisible?: () => void;
+      onBubbleVisibilityChanged?: (callback: (visible: boolean) => void) => () => void;
       toggleDrawing: () => void;
       setDrawingActive: (active: boolean) => void;
       clearDrawing: () => void;

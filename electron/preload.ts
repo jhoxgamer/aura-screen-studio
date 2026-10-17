@@ -34,6 +34,14 @@ export const electronAPI = {
   setBubbleVisible: (visible: boolean) => {
     ipcRenderer.send('bubble:set-visible', visible);
   },
+  toggleBubbleVisible: () => {
+    ipcRenderer.send('bubble:toggle-visible');
+  },
+  onBubbleVisibilityChanged: (callback: (visible: boolean) => void) => {
+    const handler = (_: any, visible: boolean) => callback(visible);
+    ipcRenderer.on('bubble:visibility-changed', handler);
+    return () => ipcRenderer.removeListener('bubble:visibility-changed', handler);
+  },
 
   // Drawing overlay controls
   toggleDrawing: () => {

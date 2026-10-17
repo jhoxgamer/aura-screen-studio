@@ -198,7 +198,7 @@ export const LibraryView: React.FC<LibraryViewProps> = ({ onNavigateToRecord, is
       </div>
 
       {/* Videos List */}
-      <div className="flex-1 overflow-y-auto space-y-2 pr-1">
+      <div className="flex-1 overflow-y-auto space-y-2 pr-1" role="region" aria-label="Lista de Gravações">
         {sortedAndFiltered.length === 0 ? (
           <div className="h-64 flex flex-col items-center justify-center text-[#929CAF] space-y-2 text-center p-4">
             <Film className="w-10 h-10 text-[#303A4B] stroke-[1.5]" />
@@ -235,9 +235,17 @@ export const LibraryView: React.FC<LibraryViewProps> = ({ onNavigateToRecord, is
           sortedAndFiltered.map((rec) => (
             <div
               key={rec.id}
+              tabIndex={0}
+              role="button"
+              aria-label={`Assistir gravação ${rec.title}`}
               onClick={() => window.electronAPI.openPreview(rec)}
-              className="bg-[#121722] border border-[#303A4B] hover:border-[#78A5FF]/50 rounded-xl p-3 flex items-center justify-between transition-all group shadow-sm cursor-pointer hover:bg-[#191F2B]"
-              title="Clique para assistir e editar este vídeo no Studio"
+              onKeyDown={(e) => {
+                if (e.key === 'Enter') {
+                  window.electronAPI.openPreview(rec);
+                }
+              }}
+              className="bg-[#121722] border border-[#303A4B] hover:border-[#78A5FF]/50 rounded-xl p-3 flex items-center justify-between transition-all group shadow-sm cursor-pointer hover:bg-[#191F2B] focus:outline-none focus:ring-1 focus:ring-[#78A5FF]"
+              title="Clique para assistir e editar este vídeo no Studio (Enter)"
             >
               <div className="flex items-center space-x-3 min-w-0">
                 <div className="w-10 h-10 rounded-xl bg-[#191F2B] border border-[#303A4B] flex items-center justify-center shrink-0 group-hover:border-[#78A5FF]/60 group-hover:bg-[#78A5FF] transition-colors">
@@ -275,7 +283,7 @@ export const LibraryView: React.FC<LibraryViewProps> = ({ onNavigateToRecord, is
                     </div>
                   ) : (
                     <div className="flex items-center space-x-1.5 group/title">
-                      <h3 className="text-xs font-semibold text-[#F3F5F9] truncate max-w-[190px] group-hover:text-[#78A5FF] transition-colors" title={rec.title}>
+                      <h3 className="text-xs font-semibold text-[#F3F5F9] truncate max-w-xs sm:max-w-md group-hover:text-[#78A5FF] transition-colors" title={rec.title}>
                         {rec.title}
                       </h3>
                       <button

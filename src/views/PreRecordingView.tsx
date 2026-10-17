@@ -688,8 +688,10 @@ export const PreRecordingView: React.FC<PreRecordingViewProps> = ({ initialTab =
       </div>
 
       {/* Navigation Tabs */}
-      <div className="flex border-b border-[#303A4B] px-4 bg-[#121722] pt-2 shrink-0">
+      <div className="flex border-b border-[#303A4B] px-4 bg-[#121722] pt-2 shrink-0" role="tablist" aria-label="Navegação Principal Aura">
         <button
+          role="tab"
+          aria-selected={activeTab === 'record'}
           onClick={() => setActiveTab('record')}
           className={`flex items-center space-x-2 px-4 py-2 font-semibold text-xs rounded-t-lg transition-all ${
             activeTab === 'record'
@@ -701,6 +703,8 @@ export const PreRecordingView: React.FC<PreRecordingViewProps> = ({ initialTab =
           <span>Nova Gravação</span>
         </button>
         <button
+          role="tab"
+          aria-selected={activeTab === 'library'}
           onClick={() => setActiveTab('library')}
           className={`flex items-center space-x-2 px-4 py-2 font-semibold text-xs rounded-t-lg transition-all ${
             activeTab === 'library'
@@ -716,7 +720,7 @@ export const PreRecordingView: React.FC<PreRecordingViewProps> = ({ initialTab =
       {activeTab === 'library' ? (
         <LibraryView onNavigateToRecord={() => setActiveTab('record')} />
       ) : (
-        <div className="flex-1 p-4 overflow-y-auto space-y-4">
+        <div className="flex-1 p-4 overflow-y-auto space-y-4" role="tabpanel" aria-label="Nova Gravação">
           {/* In-App Auto-Update Notification Banner */}
           {updaterStatus.state === 'downloading' && (
             <div className="p-3 bg-[#191F2B] border border-[#78A5FF]/40 rounded-xl space-y-1.5">
@@ -758,9 +762,9 @@ export const PreRecordingView: React.FC<PreRecordingViewProps> = ({ initialTab =
 
           {/* Mode Selector */}
           <div>
-            <label className="text-[11px] font-bold text-[#929CAF] uppercase tracking-wider block mb-2">
+            <h2 className="text-[11px] font-bold text-[#929CAF] uppercase tracking-wider block mb-2">
               Modo de Gravação
-            </label>
+            </h2>
             <div className="grid grid-cols-4 gap-1.5">
               <button
                 onClick={() => setMode('screen-cam')}
@@ -851,9 +855,9 @@ export const PreRecordingView: React.FC<PreRecordingViewProps> = ({ initialTab =
           {mode !== 'cam-only' && (
             <div>
               <div className="flex items-center justify-between mb-2">
-                <label className="text-[11px] font-semibold text-[#929CAF] uppercase tracking-wider block">
+                <h2 className="text-[11px] font-bold text-[#929CAF] uppercase tracking-wider block">
                   Fonte de Vídeo
-                </label>
+                </h2>
                 <button
                   type="button"
                   onClick={refreshSources}
@@ -902,9 +906,9 @@ export const PreRecordingView: React.FC<PreRecordingViewProps> = ({ initialTab =
           {mode !== 'screen-only' && (
             <div className="space-y-2">
               <div className="flex items-center justify-between">
-                <label className="text-[11px] font-semibold text-[#929CAF] uppercase tracking-wider block">
+                <h2 className="text-[11px] font-bold text-[#929CAF] uppercase tracking-wider block">
                   Câmera / Webcam
-                </label>
+                </h2>
                 <button
                   type="button"
                   onClick={() => setShowLiveCamPreview(!showLiveCamPreview)}
@@ -968,9 +972,9 @@ export const PreRecordingView: React.FC<PreRecordingViewProps> = ({ initialTab =
           {/* ========================================================================= */}
           <div className="space-y-2">
             <div className="flex items-center justify-between">
-              <label className="text-[11px] font-semibold text-slate-400 uppercase tracking-wider block">
+              <h2 className="text-[11px] font-bold text-[#929CAF] uppercase tracking-wider block">
                 Microfone & Áudio de Estúdio
-              </label>
+              </h2>
               {isClipping ? (
                 <span className="text-[10px] text-[#FF647C] font-bold bg-[#FF647C]/20 border border-[#FF647C]/40 px-1.5 py-0.5 rounded flex items-center gap-1 animate-pulse">
                   <AlertTriangle className="w-3 h-3 text-[#FF647C]" />
@@ -1171,7 +1175,11 @@ export const PreRecordingView: React.FC<PreRecordingViewProps> = ({ initialTab =
           </div>
 
           {/* Advanced Recording Settings (Resolution, FPS, System Audio) */}
-          <div className="bg-[#121722] border border-[#303A4B] rounded-xl p-3 space-y-2.5">
+          <div className="space-y-2">
+            <h2 className="text-[11px] font-bold text-[#929CAF] uppercase tracking-wider block">
+              Preferências de Gravação & Saída
+            </h2>
+            <div className="bg-[#121722] border border-[#303A4B] rounded-xl p-3 space-y-2.5">
             <div className="flex items-center justify-between">
               <div className="flex items-center space-x-2">
                 <Volume2 className="w-4 h-4 text-[#78A5FF]" />
@@ -1274,6 +1282,7 @@ export const PreRecordingView: React.FC<PreRecordingViewProps> = ({ initialTab =
               </div>
             </div>
           </div>
+          </div>
 
           {/* Global Share Link Status Pill */}
           <div className="bg-[#121722] border border-[#303A4B] rounded-xl px-3 py-2 flex items-center justify-between text-xs">
@@ -1341,7 +1350,7 @@ export const PreRecordingView: React.FC<PreRecordingViewProps> = ({ initialTab =
             {/* App Version & Manual Update Check */}
             <div className="flex items-center justify-between pt-2 border-t border-[#303A4B] text-[11px] text-[#929CAF]">
               <span className="font-mono flex items-center gap-1.5">
-                <span>v{appVersion || '2.2.0'}</span>
+                <span>v{appVersion || '2.3.0'}</span>
                 {updateFeedback && (
                   <span className="text-[#83B8FF] font-sans font-medium text-[10px] bg-[#1A2A47] border border-[#83B8FF]/40 px-1.5 py-0.5 rounded">
                     {updateFeedback}

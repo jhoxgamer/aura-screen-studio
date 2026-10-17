@@ -10,6 +10,8 @@ import {
   FileText,
   Mic,
   MicOff,
+  Camera,
+  CameraOff,
   Plus,
   Layers,
   Sparkles
@@ -26,6 +28,7 @@ export const ControlBarView: React.FC = () => {
   const [isPaused, setIsPaused] = useState(false);
   const [isDrawing, setIsDrawing] = useState(false);
   const [isSpeakerNotesOpen, setIsSpeakerNotesOpen] = useState(false);
+  const [isCameraVisible, setIsCameraVisible] = useState(true);
   const [isMicMuted, setIsMicMuted] = useState(false);
   const [micLevel, setMicLevel] = useState(0);
   const [isStopping, setIsStopping] = useState(false);
@@ -76,11 +79,16 @@ export const ControlBarView: React.FC = () => {
       handleToggleMic();
     });
 
+    const cleanupCamera = window.electronAPI.onBubbleVisibilityChanged?.((visible) => {
+      setIsCameraVisible(visible);
+    });
+
     return () => {
       recorderService.setMicLevelListener(undefined);
       recorderService.setOnTrackEnded(undefined);
       if (confirmTimerRef.current) clearTimeout(confirmTimerRef.current);
       cleanupToggleMic?.();
+      cleanupCamera?.();
       cleanupOptions();
       cleanupDrawing();
       cleanupSpeakerNotes?.();
@@ -332,6 +340,23 @@ export const ControlBarView: React.FC = () => {
             </div>
           </button>
         </div>
+
+        {/* Camera Bubble Toggle (when recording mode includes camera) */}
+        {optionsRef.current?.mode !== 'screen-only' && (
+          <div style={{ WebkitAppRegion: 'no-drag' } as any}>
+            <button
+              onClick={() => window.electronAPI.toggleBubbleVisible?.()}
+              title={isCameraVisible ? "Ocultar Câmera Flutuante" : "Exibir Câmera Flutuante"}
+              className={`p-2 rounded-xl transition-all ${
+                !isCameraVisible
+                  ? 'bg-[#191F2B] text-[#929CAF] hover:text-[#F3F5F9]'
+                  : 'text-[#78A5FF] hover:text-[#9AB9FF] hover:bg-[#222B39]'
+              }`}
+            >
+              {isCameraVisible ? <Camera className="w-3.5 h-3.5" /> : <CameraOff className="w-3.5 h-3.5 text-[#FF647C]" />}
+            </button>
+          </div>
+        )}
 
         {/* Restart Recording Entirely */}
         <div style={{ WebkitAppRegion: 'no-drag' } as any}>

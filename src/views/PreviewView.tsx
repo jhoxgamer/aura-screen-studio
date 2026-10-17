@@ -177,6 +177,26 @@ export const PreviewView: React.FC = () => {
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if (isEditingTitle) return;
+
+      if (isConfirmingDelete) {
+        if (e.key === 'Escape') {
+          e.preventDefault();
+          setIsConfirmingDelete(false);
+          return;
+        }
+        if (e.key === 'Enter') {
+          e.preventDefault();
+          handleDelete();
+          return;
+        }
+      }
+
+      if (showMoreMenu && e.key === 'Escape') {
+        e.preventDefault();
+        setShowMoreMenu(false);
+        return;
+      }
+
       const target = e.target as HTMLElement;
       if (target && (target.tagName === 'INPUT' || target.tagName === 'TEXTAREA')) return;
 
