@@ -59,6 +59,12 @@ export const DrawingOverlayView: React.FC = () => {
   const [mouseSpotlight, setMouseSpotlight] = useState(false);
   const [backgroundDimmer, setBackgroundDimmer] = useState(false);
   const [nextStampNumber, setNextStampNumber] = useState(1);
+  const [toolToast, setToolToast] = useState<string | null>(null);
+
+  const showToolToast = (msg: string) => {
+    setToolToast(msg);
+    setTimeout(() => setToolToast((prev) => (prev === msg ? null : prev)), 1200);
+  };
 
   useEffect(() => {
     localStorage.setItem('aura_draw_tool', tool);
@@ -121,18 +127,25 @@ export const DrawingOverlayView: React.FC = () => {
         handleClose();
       } else if (e.key === 'c' || e.key === 'C') {
         handleClear();
+        showToolToast('Quadro Limpo (C)');
       } else if (e.key === 'p' || e.key === 'P') {
         setTool('pen');
+        showToolToast('Caneta Livre (P)');
       } else if (e.key === 'a' || e.key === 'A') {
         setTool('arrow');
+        showToolToast('Seta Direcional (A)');
       } else if (e.key === 'r' || e.key === 'R') {
         setTool('rectangle');
+        showToolToast('Caixa de Destaque (R)');
       } else if (e.key === 's' || e.key === 'S') {
         setTool('stamp');
+        showToolToast(`Selo #${nextStampRef.current} (S)`);
       } else if (e.key === 'h' || e.key === 'H') {
         setTool('highlighter');
+        showToolToast('Marca-texto (H)');
       } else if (e.key === 'e' || e.key === 'E') {
         setTool('eraser');
+        showToolToast('Borracha (E)');
       }
     };
 
@@ -649,6 +662,16 @@ export const DrawingOverlayView: React.FC = () => {
           <X className="w-3.5 h-3.5" />
         </button>
       </div>
+
+      {/* Floating Shortcut HUD Toast */}
+      {toolToast && (
+        <div
+          className="absolute top-16 left-1/2 -translate-x-1/2 bg-[#0e111a]/90 backdrop-blur-xl border border-indigo-500/40 text-indigo-200 text-xs font-semibold px-4 py-1.5 rounded-full shadow-2xl z-40 pointer-events-none animate-in fade-in zoom-in-95"
+          style={{ WebkitAppRegion: 'no-drag' } as any}
+        >
+          <span>{toolToast}</span>
+        </div>
+      )}
     </div>
   );
 };

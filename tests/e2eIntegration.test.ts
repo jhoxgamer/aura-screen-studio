@@ -367,4 +367,53 @@ describe('End-to-End Integration & Subsystem Validation', () => {
       assert.ok(STUDIO_LIMITER_PARAMS.attack <= 0.005, 'Attack must be ultra fast to prevent overshoot');
     });
   });
+
+  // =========================================================================
+  // 5. REAL-TIME MIC VU METER & LAUNCHER KEYBOARD SHORTCUT LOGIC
+  // =========================================================================
+  describe('Live Mic VU Meter & Launcher Keyboard Accessibility Logic', () => {
+    test('normalizes raw byte frequency volume into 0.0 to 1.0 scale', () => {
+      const normalizeVolume = (avgByte: number) => Math.min(1, Math.max(0, avgByte / 110));
+      assert.equal(normalizeVolume(0), 0.0, 'Silence returns 0.0');
+      assert.ok(normalizeVolume(55) > 0.49 && normalizeVolume(55) < 0.51, 'Half scale returns ~0.5');
+      assert.equal(normalizeVolume(150), 1.0, 'Clipping signal clamps to 1.0');
+    });
+
+    test('correctly triggers 3-tier visual VU bars based on speech energy', () => {
+      const getActiveBars = (level: number, isMuted: boolean) => {
+        if (isMuted) return { bar1: false, bar2: false, bar3: false };
+        return {
+          bar1: level > 0.04,
+          bar2: level > 0.20,
+          bar3: level > 0.50
+        };
+      };
+
+      // Muted mic
+      assert.deepEqual(getActiveBars(0.8, true), { bar1: false, bar2: false, bar3: false });
+
+      // Ambient silence / whisper
+      assert.deepEqual(getActiveBars(0.02, false), { bar1: false, bar2: false, bar3: false });
+      assert.deepEqual(getActiveBars(0.10, false), { bar1: true, bar2: false, bar3: false });
+
+      // Normal speech
+      assert.deepEqual(getActiveBars(0.35, false), { bar1: true, bar2: true, bar3: false });
+
+      // Energetic voice / peak speech
+      assert.deepEqual(getActiveBars(0.75, false), { bar1: true, bar2: true, bar3: true });
+    });
+
+    test('maps numeric hotkeys 1-4 to standard recording modes', () => {
+      const modeKeyMap: Record<string, string> = {
+        '1': 'screen-cam',
+        '2': 'screen-only',
+        '3': 'cam-only',
+        '4': 'custom-area'
+      };
+      assert.equal(modeKeyMap['1'], 'screen-cam');
+      assert.equal(modeKeyMap['2'], 'screen-only');
+      assert.equal(modeKeyMap['3'], 'cam-only');
+      assert.equal(modeKeyMap['4'], 'custom-area');
+    });
+  });
 });

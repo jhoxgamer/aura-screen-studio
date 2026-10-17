@@ -533,6 +533,55 @@ export const PreRecordingView: React.FC = () => {
     window.electronAPI.startRecording(options);
   };
 
+  // Keyboard navigation & quick shortcuts
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (activeTab !== 'record') return;
+      const target = e.target as HTMLElement;
+      if (target && (target.tagName === 'INPUT' || target.tagName === 'SELECT' || target.tagName === 'TEXTAREA')) {
+        return;
+      }
+
+      if (e.key === 'Enter') {
+        e.preventDefault();
+        handleStart();
+      } else if (e.key === '1') {
+        e.preventDefault();
+        setMode('screen-cam');
+      } else if (e.key === '2') {
+        e.preventDefault();
+        setMode('screen-only');
+      } else if (e.key === '3') {
+        e.preventDefault();
+        setMode('cam-only');
+      } else if (e.key === '4') {
+        e.preventDefault();
+        setMode('custom-area');
+      } else if (e.key === 'm' || e.key === 'M') {
+        e.preventDefault();
+        setIsMonitoringAudio((prev) => !prev);
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [
+    activeTab,
+    mode,
+    selectedSourceId,
+    selectedAudioId,
+    selectedVideoId,
+    includeSystemAudio,
+    resolution,
+    fps,
+    speakerNotesEnabled,
+    highlightCursor,
+    micVolume,
+    noiseSuppressionLevel,
+    cropArea,
+    isMonitoringAudio
+  ]);
+
   const selectedSource = sources.find((s) => s.id === selectedSourceId);
 
   // Formatter for dB gain readout
@@ -1180,16 +1229,20 @@ export const PreRecordingView: React.FC = () => {
               <div className="w-2.5 h-2.5 rounded-full bg-white" />
               <span className="tracking-wide">INICIAR GRAVAÇÃO</span>
             </button>
-            <div className="text-center mt-2 mb-2">
-              <span className="text-[11px] text-slate-400">
-                Ou use o atalho global <kbd className="bg-[#131620] px-1.5 py-0.5 rounded border border-[#222838] text-white font-mono text-[10px]">Alt + Shift + A</kbd>
-              </span>
+            <div className="text-center mt-2.5 mb-1.5 flex items-center justify-center space-x-2 text-[10px] text-slate-400 font-mono">
+              <span title="Pressione 1 a 4 para alternar modos">[1-4] Modos</span>
+              <span>•</span>
+              <span title="Pressione M para testar retorno de áudio">[M] Teste Áudio</span>
+              <span>•</span>
+              <span title="Pressione Enter para iniciar gravação">[Enter] Gravar</span>
+              <span>•</span>
+              <span title="Atalho global do sistema" className="text-slate-500">Alt+Shift+A</span>
             </div>
 
             {/* App Version & Manual Update Check */}
             <div className="flex items-center justify-between pt-2 border-t border-[#202534] text-[11px] text-slate-500">
               <span className="font-mono flex items-center gap-1.5">
-                <span>v{appVersion || '1.7.2'}</span>
+                <span>v{appVersion || '1.7.3'}</span>
                 {updateFeedback && (
                   <span className="text-emerald-400 font-sans font-medium text-[10px] bg-emerald-950/60 border border-emerald-500/40 px-1.5 py-0.5 rounded">
                     {updateFeedback}

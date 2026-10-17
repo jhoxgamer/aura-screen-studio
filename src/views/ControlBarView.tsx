@@ -26,11 +26,16 @@ export const ControlBarView: React.FC = () => {
   const [isDrawing, setIsDrawing] = useState(false);
   const [isSpeakerNotesOpen, setIsSpeakerNotesOpen] = useState(false);
   const [isMicMuted, setIsMicMuted] = useState(false);
+  const [micLevel, setMicLevel] = useState(0);
   const [isStopping, setIsStopping] = useState(false);
   const [retakeNotice, setRetakeNotice] = useState<string | null>(null);
   const optionsRef = useRef<RecordingOptions | null>(null);
 
   useEffect(() => {
+    recorderService.setMicLevelListener((lvl) => {
+      setMicLevel(lvl);
+    });
+
     // Listen for recording options to start the actual recorder
     const cleanupOptions = window.electronAPI.onRecordingOptions(async (options: RecordingOptions) => {
       optionsRef.current = options;
@@ -61,6 +66,7 @@ export const ControlBarView: React.FC = () => {
     });
 
     return () => {
+      recorderService.setMicLevelListener(undefined);
       cleanupOptions();
       cleanupDrawing();
       cleanupSpeakerNotes?.();
@@ -250,18 +256,52 @@ export const ControlBarView: React.FC = () => {
           </button>
         </div>
 
-        {/* Microphone Mute / Unmute Button */}
+        {/* Microphone Mute / Unmute & Live Audio VU Meter */}
         <div style={{ WebkitAppRegion: 'no-drag' } as any}>
           <button
             onClick={handleToggleMic}
-            title={isMicMuted ? 'Ativar Microfone' : 'Silenciar Microfone'}
-            className={`p-2 rounded-xl transition-all ${
+            title={isMicMuted ? 'Ativar Microfone' : `Microfone Ativo (Nível: ${Math.round(micLevel * 100)}%)`}
+            className={`px-2 py-1.5 rounded-xl transition-all flex items-center space-x-1.5 ${
               isMicMuted
                 ? 'bg-rose-500/20 text-rose-400 border border-rose-500/40 shadow-sm'
                 : 'text-slate-400 hover:text-white hover:bg-[#1a1f2e]'
             }`}
           >
-            {isMicMuted ? <MicOff className="w-3.5 h-3.5 text-rose-400" /> : <Mic className="w-3.5 h-3.5" />}
+            {isMicMuted ? <MicOff className="w-3.5 h-3.5 text-rose-400" /> : <Mic className="w-3.5 h-3.5 text-indigo-400" />}
+
+            {/* Live 3-bar Audio VU Indicator */}
+            <div className="flex items-end space-x-0.5 h-3.5 pl-0.5">
+              <span
+                className={`w-0.5 rounded-full transition-all duration-75 ${
+                  isMicMuted
+                    ? 'bg-rose-500/30'
+                    : micLevel > 0.04
+                    ? 'bg-emerald-400 shadow-sm shadow-emerald-400/50'
+                    : 'bg-slate-700'
+                }`}
+                style={{ height: '6px' }}
+              />
+              <span
+                className={`w-0.5 rounded-full transition-all duration-75 ${
+                  isMicMuted
+                    ? 'bg-rose-500/30'
+                    : micLevel > 0.20
+                    ? 'bg-emerald-400 shadow-sm shadow-emerald-400/50'
+                    : 'bg-slate-700'
+                }`}
+                style={{ height: '9px' }}
+              />
+              <span
+                className={`w-0.5 rounded-full transition-all duration-75 ${
+                  isMicMuted
+                    ? 'bg-rose-500/30'
+                    : micLevel > 0.50
+                    ? 'bg-amber-400 shadow-sm shadow-amber-400/50'
+                    : 'bg-slate-700'
+                }`}
+                style={{ height: '12px' }}
+              />
+            </div>
           </button>
         </div>
 

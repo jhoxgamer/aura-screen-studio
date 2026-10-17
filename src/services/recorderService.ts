@@ -23,6 +23,13 @@ export class RecorderService {
   private cropVideoElement: HTMLVideoElement | null = null;
   private cropAnimFrame: number | null = null;
   private rawScreenStream: MediaStream | null = null;
+  private micAnalyser: AnalyserNode | null = null;
+  private micLevelInterval: any = null;
+  private onMicLevelUpdate?: (level: number) => void;
+
+  setMicLevelListener(callback: ((level: number) => void) | undefined) {
+    this.onMicLevelUpdate = callback;
+  }
 
   async start(
     options: RecordingOptions,
@@ -233,6 +240,30 @@ export class RecorderService {
     if (this.micStream && this.micStream.getAudioTracks().length > 0) {
       const micSource = this.audioContext.createMediaStreamSource(this.micStream);
       let currentNode: AudioNode = micSource;
+
+      // Real-time audio activity analyser for floating control bar
+      try {
+        const analyser = this.audioContext.createAnalyser();
+        analyser.fftSize = 64;
+        analyser.smoothingTimeConstant = 0.8;
+        micSource.connect(analyser);
+        this.micAnalyser = analyser;
+
+        const dataArray = new Uint8Array(analyser.frequencyBinCount);
+        this.micLevelInterval = setInterval(() => {
+          if (!this.micAnalyser || !this.onMicLevelUpdate) return;
+          this.micAnalyser.getByteFrequencyData(dataArray);
+          let sum = 0;
+          for (let i = 0; i < dataArray.length; i++) {
+            sum += dataArray[i];
+          }
+          const avg = sum / dataArray.length;
+          const normalized = Math.min(1, avg / 110);
+          this.onMicLevelUpdate(normalized);
+        }, 100);
+      } catch (analyserErr) {
+        console.warn('Could not initialize mic analyser for control bar:', analyserErr);
+      }
 
       // Real noise filtering stages
       if (noiseLevel === 'low') {
@@ -497,6 +528,11 @@ export class RecorderService {
         }
         this.screenStream?.getTracks().forEach((t) => t.stop());
         this.micStream?.getTracks().forEach((t) => t.stop());
+        if (this.micLevelInterval) {
+          clearInterval(this.micLevelInterval);
+          this.micLevelInterval = null;
+        }
+        this.micAnalyser = null;
         this.audioContext?.close().catch(() => {});
 
         resolve({ blob, buffer, durationMs: totalDurationMs, chapters });
@@ -512,6 +548,11 @@ export class RecorderService {
 
   cleanup() {
     clearInterval(this.durationInterval);
+    if (this.micLevelInterval) {
+      clearInterval(this.micLevelInterval);
+      this.micLevelInterval = null;
+    }
+    this.micAnalyser = null;
     this.isCroppingActive = false;
     if (this.cropAnimFrame) {
       cancelAnimationFrame(this.cropAnimFrame);
