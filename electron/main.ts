@@ -342,14 +342,26 @@ function createPreviewWindow(meta: RecordingMeta) {
   });
 }
 
+// Helper: Broadcast Speaker Notes state
+function broadcastSpeakerNotesState(isOpen: boolean) {
+  const windows = [preRecordingWindow, controlBarWindow, speakerNotesWindow];
+  windows.forEach((win) => {
+    if (win && !win.isDestroyed()) {
+      win.webContents.send('speaker-notes:state-changed', isOpen);
+    }
+  });
+}
+
 // 7. Toggle Speaker Notes / Teleprompter Window
 function toggleSpeakerNotesWindow() {
   if (speakerNotesWindow && !speakerNotesWindow.isDestroyed()) {
     if (speakerNotesWindow.isVisible()) {
       speakerNotesWindow.hide();
+      broadcastSpeakerNotesState(false);
     } else {
       speakerNotesWindow.show();
       speakerNotesWindow.focus();
+      broadcastSpeakerNotesState(true);
     }
     return;
   }
@@ -358,10 +370,12 @@ function toggleSpeakerNotesWindow() {
   const { width } = primaryDisplay.workAreaSize;
 
   speakerNotesWindow = new BrowserWindow({
-    width: 380,
-    height: 480,
-    x: Math.round(width / 2 - 190),
-    y: 50,
+    width: 440,
+    height: 520,
+    minWidth: 300,
+    minHeight: 46,
+    x: Math.round(width / 2 - 220),
+    y: 35,
     frame: false,
     transparent: true,
     alwaysOnTop: true,
@@ -376,9 +390,11 @@ function toggleSpeakerNotesWindow() {
 
   speakerNotesWindow.setAlwaysOnTop(true, 'screen-saver');
   loadView(speakerNotesWindow, 'speaker-notes');
+  broadcastSpeakerNotesState(true);
 
   speakerNotesWindow.on('closed', () => {
     speakerNotesWindow = null;
+    broadcastSpeakerNotesState(false);
   });
 }
 
@@ -672,6 +688,53 @@ function setupIpcHandlers() {
 
   ipcMain.on('speaker-notes:toggle', () => {
     toggleSpeakerNotesWindow();
+  });
+
+  ipcMain.on('speaker-notes:resize', (_, width: number, height: number) => {
+    if (speakerNotesWindow && !speakerNotesWindow.isDestroyed()) {
+      const bounds = speakerNotesWindow.getBounds();
+      speakerNotesWindow.setBounds({
+        x: bounds.x,
+        y: bounds.y,
+        width: Math.max(260, Math.round(width)),
+        height: Math.max(46, Math.round(height))
+      });
+    }
+  });
+
+  ipcMain.on('speaker-notes:dock', (_, target: 'top-center' | 'near-camera') => {
+    if (!speakerNotesWindow || speakerNotesWindow.isDestroyed()) return;
+    const primaryDisplay = screen.getPrimaryDisplay();
+    const { width: screenWidth, height: screenHeight } = primaryDisplay.workAreaSize;
+    const bounds = speakerNotesWindow.getBounds();
+
+    if (target === 'near-camera' && cameraBubbleWindow && !cameraBubbleWindow.isDestroyed()) {
+      const camBounds = cameraBubbleWindow.getBounds();
+      let targetX = camBounds.x + camBounds.width + 16;
+      let targetY = camBounds.y;
+      if (targetX + bounds.width > screenWidth) {
+        targetX = Math.max(10, camBounds.x - bounds.width - 16);
+      }
+      speakerNotesWindow.setBounds({
+        x: targetX,
+        y: Math.max(10, Math.min(screenHeight - bounds.height - 10, targetY)),
+        width: bounds.width,
+        height: bounds.height
+      });
+    } else {
+      speakerNotesWindow.setBounds({
+        x: Math.round((screenWidth - bounds.width) / 2),
+        y: 35,
+        width: bounds.width,
+        height: bounds.height
+      });
+    }
+  });
+
+  ipcMain.on('speaker-notes:set-ignore-mouse', (_, ignore: boolean) => {
+    if (speakerNotesWindow && !speakerNotesWindow.isDestroyed()) {
+      speakerNotesWindow.setIgnoreMouseEvents(ignore, { forward: true });
+    }
   });
 
   ipcMain.on('crop:start-selection', () => {

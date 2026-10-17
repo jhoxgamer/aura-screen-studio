@@ -88,6 +88,20 @@ export const electronAPI = {
   toggleSpeakerNotes: () => {
     ipcRenderer.send('speaker-notes:toggle');
   },
+  resizeSpeakerNotes: (width: number, height: number) => {
+    ipcRenderer.send('speaker-notes:resize', width, height);
+  },
+  dockSpeakerNotes: (target: 'top-center' | 'near-camera') => {
+    ipcRenderer.send('speaker-notes:dock', target);
+  },
+  setSpeakerNotesIgnoreMouse: (ignore: boolean) => {
+    ipcRenderer.send('speaker-notes:set-ignore-mouse', ignore);
+  },
+  onSpeakerNotesStateChanged: (callback: (isOpen: boolean) => void) => {
+    const handler = (_: any, isOpen: boolean) => callback(isOpen);
+    ipcRenderer.on('speaker-notes:state-changed', handler);
+    return () => ipcRenderer.removeListener('speaker-notes:state-changed', handler);
+  },
   startCropSelection: () => {
     ipcRenderer.send('crop:start-selection');
   },

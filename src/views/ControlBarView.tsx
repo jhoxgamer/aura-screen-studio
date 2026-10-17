@@ -19,6 +19,7 @@ export const ControlBarView: React.FC = () => {
   const [seconds, setSeconds] = useState(0);
   const [isPaused, setIsPaused] = useState(false);
   const [isDrawing, setIsDrawing] = useState(false);
+  const [isSpeakerNotesOpen, setIsSpeakerNotesOpen] = useState(false);
   const [isMicMuted, setIsMicMuted] = useState(false);
   const [isStopping, setIsStopping] = useState(false);
   const optionsRef = useRef<RecordingOptions | null>(null);
@@ -41,6 +42,10 @@ export const ControlBarView: React.FC = () => {
       setIsDrawing(active);
     });
 
+    const cleanupSpeakerNotes = window.electronAPI.onSpeakerNotesStateChanged?.((isOpen) => {
+      setIsSpeakerNotesOpen(isOpen);
+    });
+
     const cleanupState = window.electronAPI.onRecordingStateChanged((state) => {
       if (state === 'paused') setIsPaused(true);
       if (state === 'recording') setIsPaused(false);
@@ -50,6 +55,7 @@ export const ControlBarView: React.FC = () => {
     return () => {
       cleanupOptions();
       cleanupDrawing();
+      cleanupSpeakerNotes?.();
       cleanupState();
     };
   }, []);
@@ -217,7 +223,11 @@ export const ControlBarView: React.FC = () => {
           <button
             onClick={() => window.electronAPI.toggleSpeakerNotes()}
             title="Teleprompter / Roteiro do Apresentador"
-            className="p-2 rounded-xl text-slate-400 hover:text-white hover:bg-slate-800/60 transition-all"
+            className={`p-2 rounded-xl transition-all ${
+              isSpeakerNotesOpen
+                ? 'bg-cyan-500 text-slate-950 font-bold shadow-md shadow-cyan-500/30 scale-105'
+                : 'text-slate-400 hover:text-white hover:bg-slate-800/60'
+            }`}
           >
             <FileText className="w-3.5 h-3.5" />
           </button>

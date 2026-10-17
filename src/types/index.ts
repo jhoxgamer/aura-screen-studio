@@ -97,6 +97,10 @@ declare global {
       openPreRecording: () => void;
       openExternalUrl: (url: string) => void;
       toggleSpeakerNotes: () => void;
+      resizeSpeakerNotes: (width: number, height: number) => void;
+      dockSpeakerNotes: (target: 'top-center' | 'near-camera') => void;
+      setSpeakerNotesIgnoreMouse: (ignore: boolean) => void;
+      onSpeakerNotesStateChanged: (callback: (isOpen: boolean) => void) => () => void;
       startCropSelection: () => void;
       sendCropArea: (area: CropArea) => void;
       cancelCropSelection: () => void;

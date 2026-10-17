@@ -35,6 +35,7 @@ export const PreRecordingView: React.FC = () => {
 
   // Advanced feature toggles
   const [speakerNotesEnabled, setSpeakerNotesEnabled] = useState(false);
+  const [isSpeakerNotesOpen, setIsSpeakerNotesOpen] = useState(false);
   const [highlightCursor, setHighlightCursor] = useState(true);
   const [cropArea, setCropArea] = useState<CropArea | null>(null);
   const [showLiveCamPreview, setShowLiveCamPreview] = useState(true);
@@ -73,10 +74,15 @@ export const PreRecordingView: React.FC = () => {
       setUpdaterStatus((prev) => ({ ...prev, percent: pct, state: 'downloading' }));
     });
 
+    const cleanupNotes = window.electronAPI?.onSpeakerNotesStateChanged?.((isOpen) => {
+      setIsSpeakerNotesOpen(isOpen);
+    });
+
     return () => {
       cleanupCrop();
       cleanupUpdaterStatus?.();
       cleanupUpdaterProgress?.();
+      cleanupNotes?.();
     };
   }, []);
 
@@ -602,14 +608,28 @@ export const PreRecordingView: React.FC = () => {
             <div className="flex items-center justify-between pt-1 border-t border-loom-border/60">
               <div className="flex items-center space-x-2">
                 <FileText className="w-4 h-4 text-loom-primary" />
-                <span className="text-xs font-medium text-white">Teleprompter / Notas do Orador</span>
+                <span className="text-xs font-medium text-white">Teleprompter & Tópicos</span>
               </div>
-              <input
-                type="checkbox"
-                checked={speakerNotesEnabled}
-                onChange={(e) => setSpeakerNotesEnabled(e.target.checked)}
-                className="w-4 h-4 accent-loom-primary rounded cursor-pointer"
-              />
+              <div className="flex items-center space-x-2">
+                <button
+                  type="button"
+                  onClick={() => window.electronAPI.toggleSpeakerNotes()}
+                  className={`text-[10px] px-2 py-0.5 rounded font-semibold transition-all ${
+                    isSpeakerNotesOpen
+                      ? 'bg-cyan-500 text-slate-950 font-bold shadow-sm'
+                      : 'bg-slate-800 text-slate-300 hover:text-white hover:bg-slate-700 border border-slate-700'
+                  }`}
+                >
+                  {isSpeakerNotesOpen ? 'Prompter Aberto' : 'Abrir / Editar'}
+                </button>
+                <input
+                  type="checkbox"
+                  checked={speakerNotesEnabled}
+                  onChange={(e) => setSpeakerNotesEnabled(e.target.checked)}
+                  className="w-4 h-4 accent-loom-primary rounded cursor-pointer"
+                  title="Abrir automaticamente ao iniciar gravação"
+                />
+              </div>
             </div>
 
             <div className="flex items-center justify-between pt-1 border-t border-loom-border/60">
