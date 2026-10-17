@@ -29,6 +29,8 @@ export interface RecordingOptions {
   highlightCursor?: boolean;
   blurBackground?: boolean;
   cropArea?: CropArea;
+  micVolume?: number;
+  noiseSuppressionLevel?: 'off' | 'low' | 'medium' | 'high';
 }
 
 export interface VideoComment {

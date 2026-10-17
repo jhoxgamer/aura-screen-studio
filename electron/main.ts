@@ -97,9 +97,9 @@ function createPreRecordingWindow() {
 
   preRecordingWindow = new BrowserWindow({
     width: 460,
-    height: 700,
-    x: Math.round(width - 500),
-    y: Math.round(height - 740),
+    height: 730,
+    x: Math.round(width - 490),
+    y: Math.max(20, Math.round(height - 760)),
     frame: false,
     transparent: true,
     resizable: false,

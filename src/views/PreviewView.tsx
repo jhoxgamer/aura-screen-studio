@@ -25,7 +25,6 @@ import {
   Bookmark,
   Plus
 } from 'lucide-react';
-import confetti from 'canvas-confetti';
 import { RecordingMeta, ChapterItem } from '../types';
 
 export const PreviewView: React.FC = () => {
@@ -92,15 +91,6 @@ export const PreviewView: React.FC = () => {
   };
 
   useEffect(() => {
-    // Launch celebratory confetti effect on finishing video
-    try {
-      confetti({
-        particleCount: 80,
-        spread: 70,
-        origin: { y: 0.6 }
-      });
-    } catch (e) {}
-
     const cleanup = window.electronAPI.onOpenPreview(async (receivedMeta) => {
       setMeta(receivedMeta);
       setEditedTitle(receivedMeta.title || '');
@@ -398,15 +388,13 @@ export const PreviewView: React.FC = () => {
   const isPublicInternetLink = shareUrl.includes('trycloudflare.com');
 
   return (
-    <div className="w-full h-full min-h-screen bg-loom-dark text-white flex flex-col select-none overflow-hidden">
+    <div className="w-full h-full min-h-screen bg-[#0c0e14] text-white flex flex-col select-none overflow-hidden font-sans">
       {/* Top Header */}
-      <div className="h-16 bg-loom-panel border-b border-loom-border px-6 flex items-center justify-between shrink-0">
+      <div className="h-16 bg-[#121520] border-b border-[#202534] px-6 flex items-center justify-between shrink-0">
         <div className="flex items-center space-x-3 min-w-0">
-          <div className="w-8 h-8 rounded-xl bg-gradient-to-tr from-indigo-600 via-cyan-500 to-violet-500 p-0.5 shadow-md shadow-cyan-500/20 flex items-center justify-center shrink-0">
-            <div className="w-full h-full bg-[#0d111c] rounded-[10px] flex items-center justify-center">
-              <div className="w-4 h-4 rounded-full border border-cyan-400 flex items-center justify-center">
-                <div className="w-1.5 h-1.5 rounded-full bg-rose-500 animate-pulse" />
-              </div>
+          <div className="w-8 h-8 rounded-lg bg-[#1a1f2e] border border-[#2e374d] flex items-center justify-center shrink-0">
+            <div className="w-4 h-4 rounded-full border-2 border-indigo-400 flex items-center justify-center">
+              <div className="w-1.5 h-1.5 rounded-full bg-rose-500" />
             </div>
           </div>
 
@@ -422,35 +410,35 @@ export const PreviewView: React.FC = () => {
                     if (e.key === 'Escape') setIsEditingTitle(false);
                   }}
                   autoFocus
-                  className="bg-loom-card border border-loom-primary rounded px-2 py-0.5 text-xs text-white font-bold focus:outline-none"
+                  className="bg-[#0c0e14] border border-indigo-500 rounded px-2 py-0.5 text-xs text-white font-semibold focus:outline-none"
                 />
                 <button
                   onClick={handleSaveTitle}
-                  className="text-xs bg-loom-primary hover:bg-loom-primaryHover text-white px-2 py-0.5 rounded font-semibold"
+                  className="text-xs bg-indigo-600 hover:bg-indigo-500 text-white px-2 py-0.5 rounded font-medium"
                 >
                   Salvar
                 </button>
               </div>
             ) : (
               <div className="flex items-center space-x-2 group cursor-pointer" onClick={() => setIsEditingTitle(true)}>
-                <h1 className="text-sm font-bold text-white leading-tight truncate max-w-sm hover:text-loom-primary transition-colors">
+                <h1 className="text-sm font-semibold text-white leading-tight truncate max-w-sm hover:text-indigo-300 transition-colors">
                   {meta?.title || 'Gravação Concluída'}
                 </h1>
-                <Edit2 className="w-3 h-3 text-loom-muted group-hover:text-loom-primary transition-colors shrink-0" />
+                <Edit2 className="w-3 h-3 text-slate-400 group-hover:text-indigo-300 transition-colors shrink-0" />
               </div>
             )}
 
-            <div className="flex items-center space-x-2 mt-0.5 text-[11px] text-loom-muted">
+            <div className="flex items-center space-x-2 mt-0.5 text-[11px] text-slate-400">
               <span>{meta ? `${formatFileSize(meta.fileSize)} • ${meta.resolution} • ${(duration).toFixed(0)}s` : ''}</span>
               <span>•</span>
               {isPublicInternetLink ? (
-                <span className="inline-flex items-center space-x-1 text-emerald-400 font-semibold">
-                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
-                  <span>Link Público na Internet Ativo</span>
+                <span className="inline-flex items-center space-x-1 text-emerald-400 font-medium">
+                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 inline-block" />
+                  <span>Link Público Ativo</span>
                 </span>
               ) : (
-                <span className="inline-flex items-center space-x-1 text-loom-primary font-medium">
-                  <span className="w-1.5 h-1.5 rounded-full bg-loom-primary animate-pulse" />
+                <span className="inline-flex items-center space-x-1 text-indigo-400 font-medium">
+                  <span className="w-1.5 h-1.5 rounded-full bg-indigo-400 inline-block" />
                   <span>Conectando link global...</span>
                 </span>
               )}
@@ -463,7 +451,7 @@ export const PreviewView: React.FC = () => {
           {/* Share Link Button */}
           <button
             onClick={handleShareLink}
-            className="flex items-center space-x-1.5 bg-gradient-to-r from-loom-primary to-indigo-600 hover:brightness-110 active:scale-95 text-white px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all shadow-md shadow-indigo-600/30"
+            className="flex items-center space-x-1.5 bg-indigo-600 hover:bg-indigo-500 active:scale-95 text-white px-3.5 py-1.5 rounded-xl text-xs font-semibold transition-all shadow-sm"
           >
             {isLinkCopied ? <Check className="w-3.5 h-3.5" /> : <Share2 className="w-3.5 h-3.5" />}
             <span>{isLinkCopied ? 'Link Copiado!' : 'Copiar Link Público'}</span>
@@ -472,27 +460,27 @@ export const PreviewView: React.FC = () => {
           {/* Open in Browser */}
           <button
             onClick={handleOpenInBrowser}
-            className="flex items-center space-x-1.5 bg-loom-card hover:bg-loom-hover border border-loom-border px-3 py-1.5 rounded-xl text-xs font-semibold text-white transition-all shadow-sm"
+            className="flex items-center space-x-1.5 bg-[#171b26] hover:bg-[#202536] border border-[#262c3e] px-3 py-1.5 rounded-xl text-xs font-medium text-slate-200 transition-all shadow-sm"
             title="Abrir página pública no navegador"
           >
-            <ExternalLink className="w-3.5 h-3.5 text-loom-secondary" />
+            <ExternalLink className="w-3.5 h-3.5 text-indigo-400" />
             <span>Ver no Navegador</span>
           </button>
 
           {/* Download Video */}
           <button
             onClick={handleDownload}
-            className="flex items-center space-x-1.5 bg-loom-card hover:bg-loom-hover border border-loom-border px-3 py-1.5 rounded-xl text-xs font-semibold text-white transition-all shadow-sm"
+            className="flex items-center space-x-1.5 bg-[#171b26] hover:bg-[#202536] border border-[#262c3e] px-3 py-1.5 rounded-xl text-xs font-medium text-slate-200 transition-all shadow-sm"
             title="Salvar arquivo de vídeo no computador"
           >
-            <Download className="w-3.5 h-3.5 text-loom-accent" />
+            <Download className="w-3.5 h-3.5 text-emerald-400" />
             <span>Baixar Vídeo</span>
           </button>
 
           {/* Open Folder */}
           <button
             onClick={handleOpenFolder}
-            className="p-2 rounded-xl bg-loom-card hover:bg-loom-hover border border-loom-border text-loom-muted hover:text-white transition-all shadow-sm"
+            className="p-2 rounded-xl bg-[#171b26] hover:bg-[#202536] border border-[#262c3e] text-slate-400 hover:text-white transition-all shadow-sm"
             title="Abrir pasta no Windows Explorer"
           >
             <FolderOpen className="w-3.5 h-3.5" />
@@ -501,17 +489,17 @@ export const PreviewView: React.FC = () => {
           {/* New Recording */}
           <button
             onClick={handleNewRecording}
-            className="flex items-center space-x-1.5 bg-loom-card hover:bg-loom-hover border border-loom-border px-3 py-1.5 rounded-xl text-xs font-semibold text-white transition-all shadow-sm"
+            className="flex items-center space-x-1.5 bg-[#171b26] hover:bg-[#202536] border border-[#262c3e] px-3 py-1.5 rounded-xl text-xs font-medium text-slate-200 transition-all shadow-sm"
             title="Iniciar nova gravação"
           >
-            <PlusCircle className="w-3.5 h-3.5 text-loom-primary" />
+            <PlusCircle className="w-3.5 h-3.5 text-indigo-400" />
             <span>Nova Gravação</span>
           </button>
 
           {/* Delete */}
           <button
             onClick={handleDelete}
-            className="p-2 rounded-xl bg-loom-card hover:bg-red-500/20 border border-loom-border text-loom-muted hover:text-red-400 transition-all shadow-sm"
+            className="p-2 rounded-xl bg-[#171b26] hover:bg-rose-500/20 border border-[#262c3e] text-slate-400 hover:text-rose-400 transition-all shadow-sm"
             title="Excluir gravação"
           >
             <Trash2 className="w-3.5 h-3.5" />
@@ -520,17 +508,17 @@ export const PreviewView: React.FC = () => {
       </div>
 
       {/* Share Link Banner Alert */}
-      <div className="bg-loom-card/80 border-b border-loom-border/60 px-6 py-2 flex items-center justify-between text-xs">
+      <div className="bg-[#121520] border-b border-[#202534] px-6 py-2 flex items-center justify-between text-xs">
         <div className="flex items-center space-x-2 truncate">
-          <Globe className="w-3.5 h-3.5 text-loom-primary shrink-0" />
-          <span className="text-loom-muted">Link de compartilhamento para qualquer pessoa assistir:</span>
-          <span className="font-mono text-loom-secondary font-semibold select-all truncate max-w-lg">
+          <Globe className="w-3.5 h-3.5 text-indigo-400 shrink-0" />
+          <span className="text-slate-400">Link de compartilhamento para qualquer pessoa assistir:</span>
+          <span className="font-mono text-indigo-300 font-semibold select-all truncate max-w-lg">
             {shareUrl || 'Gerando link público...'}
           </span>
         </div>
         <button
           onClick={handleShareLink}
-          className="text-xs text-loom-primary hover:underline font-semibold shrink-0 ml-4"
+          className="text-xs text-indigo-400 hover:text-indigo-300 hover:underline font-semibold shrink-0 ml-4"
         >
           {isLinkCopied ? 'Copiado!' : 'Copiar'}
         </button>

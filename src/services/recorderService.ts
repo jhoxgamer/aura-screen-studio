@@ -16,6 +16,7 @@ export class RecorderService {
   private screenStream: MediaStream | null = null;
   private micStream: MediaStream | null = null;
   private audioContext: AudioContext | null = null;
+  private micGainNode: GainNode | null = null;
   private durationInterval: any = null;
   private onDurationUpdate?: (totalMs: number, sceneMs: number, sceneNumber: number) => void;
   private isCroppingActive: boolean = false;
@@ -193,11 +194,21 @@ export class RecorderService {
     }
 
     // 2. Capture microphone audio if available
+    const noiseLevel = options.noiseSuppressionLevel ?? 'medium';
     try {
       this.micStream = await navigator.mediaDevices.getUserMedia({
         audio: options.audioDeviceId
-          ? { deviceId: { exact: options.audioDeviceId }, echoCancellation: true, noiseSuppression: true }
-          : true,
+          ? {
+              deviceId: { exact: options.audioDeviceId },
+              echoCancellation: true,
+              noiseSuppression: noiseLevel !== 'off',
+              autoGainControl: false
+            }
+          : {
+              echoCancellation: true,
+              noiseSuppression: noiseLevel !== 'off',
+              autoGainControl: false
+            },
         video: false
       });
     } catch (err) {
@@ -205,7 +216,7 @@ export class RecorderService {
       this.micStream = null;
     }
 
-    // 3. Audio mixing with AudioContext
+    // 3. Audio mixing with Web Audio API DSP Chain
     const tracks: MediaStreamTrack[] = [];
     if (this.screenStream) {
       const videoTrack = this.screenStream.getVideoTracks()[0];
@@ -218,10 +229,74 @@ export class RecorderService {
     const destination = this.audioContext.createMediaStreamDestination();
     let hasAudio = false;
 
-    // Add microphone to mixer
+    // Add microphone to mixer with DSP processing (Filters -> Gain Boost -> Limiter)
     if (this.micStream && this.micStream.getAudioTracks().length > 0) {
       const micSource = this.audioContext.createMediaStreamSource(this.micStream);
-      micSource.connect(destination);
+      let currentNode: AudioNode = micSource;
+
+      // Real noise filtering stages
+      if (noiseLevel === 'low') {
+        // Highpass at 80Hz: removes 50/60Hz AC electrical hum, desk vibration, and low rumble
+        const highpass = this.audioContext.createBiquadFilter();
+        highpass.type = 'highpass';
+        highpass.frequency.setValueAtTime(80, this.audioContext.currentTime);
+        highpass.Q.setValueAtTime(0.707, this.audioContext.currentTime);
+        currentNode.connect(highpass);
+        currentNode = highpass;
+      } else if (noiseLevel === 'medium') {
+        // Highpass at 120Hz + Notch at 3500Hz for room fan & laptop noise suppression
+        const highpass = this.audioContext.createBiquadFilter();
+        highpass.type = 'highpass';
+        highpass.frequency.setValueAtTime(120, this.audioContext.currentTime);
+        highpass.Q.setValueAtTime(0.8, this.audioContext.currentTime);
+        currentNode.connect(highpass);
+        currentNode = highpass;
+
+        const notch = this.audioContext.createBiquadFilter();
+        notch.type = 'peaking';
+        notch.frequency.setValueAtTime(3500, this.audioContext.currentTime);
+        notch.gain.setValueAtTime(-5, this.audioContext.currentTime);
+        notch.Q.setValueAtTime(1.5, this.audioContext.currentTime);
+        currentNode.connect(notch);
+        currentNode = notch;
+      } else if (noiseLevel === 'high') {
+        // Highpass at 160Hz + Lowpass at 7500Hz for aggressive voice clarity in noisy environments
+        const highpass = this.audioContext.createBiquadFilter();
+        highpass.type = 'highpass';
+        highpass.frequency.setValueAtTime(160, this.audioContext.currentTime);
+        highpass.Q.setValueAtTime(0.9, this.audioContext.currentTime);
+        currentNode.connect(highpass);
+        currentNode = highpass;
+
+        const lowpass = this.audioContext.createBiquadFilter();
+        lowpass.type = 'lowpass';
+        lowpass.frequency.setValueAtTime(7500, this.audioContext.currentTime);
+        lowpass.Q.setValueAtTime(0.707, this.audioContext.currentTime);
+        currentNode.connect(lowpass);
+        currentNode = lowpass;
+      }
+
+      // Mic Volume Gain Node (0% to 200%, 100% = 1.0, 200% = 2.0x boost)
+      const micVolume = options.micVolume !== undefined ? options.micVolume : 100;
+      const gainMultiplier = Math.max(0, Math.min(200, micVolume)) / 100;
+      const gainNode = this.audioContext.createGain();
+      gainNode.gain.setValueAtTime(gainMultiplier, this.audioContext.currentTime);
+      currentNode.connect(gainNode);
+      currentNode = gainNode;
+      this.micGainNode = gainNode;
+
+      // Dynamics Compressor configured as transparent studio anti-clipping limiter
+      const limiter = this.audioContext.createDynamicsCompressor();
+      limiter.threshold.setValueAtTime(-2.5, this.audioContext.currentTime);
+      limiter.knee.setValueAtTime(4.0, this.audioContext.currentTime);
+      limiter.ratio.setValueAtTime(16.0, this.audioContext.currentTime);
+      limiter.attack.setValueAtTime(0.003, this.audioContext.currentTime);
+      limiter.release.setValueAtTime(0.12, this.audioContext.currentTime);
+      currentNode.connect(limiter);
+      currentNode = limiter;
+
+      // Connect DSP output to recorder destination
+      currentNode.connect(destination);
       hasAudio = true;
     }
 
@@ -356,6 +431,13 @@ export class RecorderService {
     return false;
   }
 
+  setMicGain(volume: number) {
+    if (this.micGainNode && this.audioContext) {
+      const mult = Math.max(0, Math.min(200, volume)) / 100;
+      this.micGainNode.gain.setValueAtTime(mult, this.audioContext.currentTime);
+    }
+  }
+
   async stop(): Promise<{ blob: Blob; buffer: ArrayBuffer; durationMs: number; chapters: ChapterItem[] }> {
     clearInterval(this.durationInterval);
 
@@ -446,6 +528,7 @@ export class RecorderService {
     this.screenStream?.getTracks().forEach((t) => t.stop());
     this.micStream?.getTracks().forEach((t) => t.stop());
     this.audioContext?.close().catch(() => {});
+    this.micGainNode = null;
     this.mediaRecorder = null;
     this.currentSceneChunks = [];
     this.scenes = [];
