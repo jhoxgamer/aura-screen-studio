@@ -13,17 +13,49 @@ export const CropSelectorView: React.FC = () => {
   const [mousePos, setMousePos] = useState<{ x: number; y: number }>({ x: 0, y: 0 });
   const [area, setArea] = useState<CropArea | null>(null);
 
+  const applyRatio = (ratio: AspectRatio) => {
+    setAspectRatio(ratio);
+    if (area && area.width > 10 && area.height > 10) {
+      const adjusted = calculateWithRatio(area.width, area.height, ratio);
+      setArea({
+        ...area,
+        width: Math.min(adjusted.width, window.innerWidth - area.x),
+        height: Math.min(adjusted.height, window.innerHeight - area.y)
+      });
+    }
+  };
+
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key === 'Escape') {
         handleCancel();
-      } else if (e.key === 'Enter' && area && area.width >= 50 && area.height >= 50) {
+      } else if (e.key === 'Enter' && area && area.width >= 40 && area.height >= 40) {
         handleConfirm();
+      } else if (e.key === '1') {
+        setAspectRatio('free');
+      } else if (e.key === '2') {
+        applyRatio('16:9');
+      } else if (e.key === '3') {
+        applyRatio('9:16');
+      } else if (e.key === '4') {
+        applyRatio('1:1');
+      } else if (e.key === '5') {
+        applyRatio('4:3');
+      } else if (area && ['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight'].includes(e.code)) {
+        e.preventDefault();
+        const delta = e.shiftKey ? 10 : 2;
+        let newX = area.x;
+        let newY = area.y;
+        if (e.code === 'ArrowUp') newY = Math.max(0, area.y - delta);
+        if (e.code === 'ArrowDown') newY = Math.min(window.innerHeight - area.height, area.y + delta);
+        if (e.code === 'ArrowLeft') newX = Math.max(0, area.x - delta);
+        if (e.code === 'ArrowRight') newX = Math.min(window.innerWidth - area.width, area.x + delta);
+        setArea({ ...area, x: newX, y: newY });
       }
     };
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [area]);
+  }, [area, aspectRatio]);
 
   const handleCancel = () => {
     if (window.electronAPI?.cancelCropSelection) {
@@ -158,23 +190,19 @@ export const CropSelectorView: React.FC = () => {
           {/* Aspect Ratio Presets */}
           <div className="flex items-center space-x-1 border-r border-[#262c3e] pr-3">
             <button
-              onClick={() => setAspectRatio('free')}
+              onClick={() => applyRatio('free')}
+              title="Proporção Livre (Tecla 1)"
               className={`px-2.5 py-1 rounded-lg text-[11px] font-medium transition-all ${
                 aspectRatio === 'free'
                   ? 'bg-indigo-600 text-white shadow-sm'
                   : 'text-slate-400 hover:text-white hover:bg-slate-800'
               }`}
             >
-              Livre
+              Livre (1)
             </button>
             <button
-              onClick={() => {
-                setAspectRatio('16:9');
-                if (area) {
-                  const h = area.width / (16 / 9);
-                  setArea({ ...area, height: h });
-                }
-              }}
+              onClick={() => applyRatio('16:9')}
+              title="Widescreen 16:9 (Tecla 2)"
               className={`flex items-center space-x-1 px-2.5 py-1 rounded-lg text-[11px] font-medium transition-all ${
                 aspectRatio === '16:9'
                   ? 'bg-indigo-600 text-white shadow-sm'
@@ -182,16 +210,11 @@ export const CropSelectorView: React.FC = () => {
               }`}
             >
               <Monitor className="w-3 h-3" />
-              <span>16:9</span>
+              <span>16:9 (2)</span>
             </button>
             <button
-              onClick={() => {
-                setAspectRatio('9:16');
-                if (area) {
-                  const h = area.width / (9 / 16);
-                  setArea({ ...area, height: h });
-                }
-              }}
+              onClick={() => applyRatio('9:16')}
+              title="Vertical 9:16 Shorts/Reels (Tecla 3)"
               className={`flex items-center space-x-1 px-2.5 py-1 rounded-lg text-[11px] font-medium transition-all ${
                 aspectRatio === '9:16'
                   ? 'bg-indigo-600 text-white shadow-sm'
@@ -199,16 +222,11 @@ export const CropSelectorView: React.FC = () => {
               }`}
             >
               <Smartphone className="w-3 h-3" />
-              <span>9:16 (Shorts)</span>
+              <span>9:16 (3)</span>
             </button>
             <button
-              onClick={() => {
-                setAspectRatio('1:1');
-                if (area) {
-                  const side = Math.max(area.width, area.height);
-                  setArea({ ...area, width: side, height: side });
-                }
-              }}
+              onClick={() => applyRatio('1:1')}
+              title="Quadrado 1:1 (Tecla 4)"
               className={`flex items-center space-x-1 px-2.5 py-1 rounded-lg text-[11px] font-medium transition-all ${
                 aspectRatio === '1:1'
                   ? 'bg-indigo-600 text-white shadow-sm'
@@ -216,12 +234,24 @@ export const CropSelectorView: React.FC = () => {
               }`}
             >
               <Square className="w-3 h-3" />
-              <span>1:1</span>
+              <span>1:1 (4)</span>
+            </button>
+            <button
+              onClick={() => applyRatio('4:3')}
+              title="Clássico 4:3 (Tecla 5)"
+              className={`flex items-center space-x-1 px-2.5 py-1 rounded-lg text-[11px] font-medium transition-all ${
+                aspectRatio === '4:3'
+                  ? 'bg-indigo-600 text-white shadow-sm'
+                  : 'text-slate-400 hover:text-white hover:bg-slate-800'
+              }`}
+            >
+              <Tv className="w-3 h-3" />
+              <span>4:3 (5)</span>
             </button>
           </div>
 
           <div className="text-[11px] text-slate-400">
-            Arraste na tela para desenhar <span className="text-slate-200 font-mono">(ESC cancela)</span>
+            Arraste ou use as <span className="text-indigo-300 font-medium">Setas</span> para ajuste fino <span className="text-slate-200 font-mono">(ESC cancela)</span>
           </div>
 
           <button

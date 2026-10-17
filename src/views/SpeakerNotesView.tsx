@@ -152,6 +152,16 @@ export const SpeakerNotesView: React.FC = () => {
         return;
       }
 
+      if (!isCollapsed && !e.ctrlKey && !e.metaKey && !e.altKey) {
+        if (e.key === '1') {
+          setMode('prompt');
+        } else if (e.key === '2') {
+          setMode('notes');
+        } else if (e.key === '3') {
+          setMode('edit');
+        }
+      }
+
       if (mode === 'prompt' && !isCollapsed) {
         if (e.code === 'Space') {
           e.preventDefault();
@@ -171,6 +181,19 @@ export const SpeakerNotesView: React.FC = () => {
         } else if (e.key === '-' || e.key === '_') {
           e.preventDefault();
           setFontSize(prev => Math.max(14, prev - 2));
+        }
+      } else if (mode === 'notes' && !isCollapsed) {
+        if (e.code === 'Space' || e.key === 'Enter') {
+          e.preventDefault();
+          setBulletNotes(prev => {
+            const firstPendingIdx = prev.findIndex(b => !b.done);
+            if (firstPendingIdx !== -1) {
+              const updated = [...prev];
+              updated[firstPendingIdx] = { ...updated[firstPendingIdx], done: true };
+              return updated;
+            }
+            return prev;
+          });
         }
       }
 
@@ -507,6 +530,7 @@ export const SpeakerNotesView: React.FC = () => {
         <div className="flex items-center space-x-1.5">
           <button
             onClick={() => setMode('prompt')}
+            title="Modo Teleprompter (Tecla 1)"
             className={`flex items-center space-x-1.5 px-3 py-1 rounded-lg text-xs font-medium transition-all ${
               mode === 'prompt'
                 ? 'bg-indigo-600 text-white shadow-sm'
@@ -514,11 +538,12 @@ export const SpeakerNotesView: React.FC = () => {
             }`}
           >
             <Tv className="w-3.5 h-3.5" />
-            <span>Teleprompter</span>
+            <span>Teleprompter (1)</span>
           </button>
 
           <button
             onClick={() => setMode('notes')}
+            title="Tópicos & Checklist (Tecla 2) • Espaço ou Enter marca próximo item"
             className={`flex items-center space-x-1.5 px-3 py-1 rounded-lg text-xs font-medium transition-all ${
               mode === 'notes'
                 ? 'bg-indigo-600 text-white shadow-sm'
@@ -526,11 +551,12 @@ export const SpeakerNotesView: React.FC = () => {
             }`}
           >
             <ListChecks className="w-3.5 h-3.5" />
-            <span>Tópicos & Checklist</span>
+            <span>Tópicos (2)</span>
           </button>
 
           <button
             onClick={() => setMode('edit')}
+            title="Editor & Roteiro (Tecla 3)"
             className={`flex items-center space-x-1.5 px-3 py-1 rounded-lg text-xs font-medium transition-all ${
               mode === 'edit'
                 ? 'bg-indigo-600 text-white shadow-sm'
@@ -538,7 +564,7 @@ export const SpeakerNotesView: React.FC = () => {
             }`}
           >
             <Edit3 className="w-3.5 h-3.5" />
-            <span>Editor & Roteiro</span>
+            <span>Editor (3)</span>
           </button>
         </div>
 

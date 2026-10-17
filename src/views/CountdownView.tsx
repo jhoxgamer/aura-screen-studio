@@ -50,9 +50,17 @@ export const CountdownView: React.FC = () => {
       playCountdownChime(newCount);
     });
 
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        window.electronAPI?.cancelRecording?.();
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+
     return () => {
       cleanupInit?.();
       cleanupTick();
+      window.removeEventListener('keydown', handleKeyDown);
     };
   }, []);
 
@@ -63,7 +71,7 @@ export const CountdownView: React.FC = () => {
   const strokeDashoffset = circumference - progressRatio * circumference;
 
   return (
-    <div className="w-screen h-screen flex items-center justify-center bg-black/60 backdrop-blur-md select-none overflow-hidden font-sans">
+    <div className="w-screen h-screen flex flex-col items-center justify-center bg-black/60 backdrop-blur-md select-none overflow-hidden font-sans">
       <div className="relative flex items-center justify-center">
         {/* Circular SVG Countdown Ring */}
         <svg className="w-56 h-56 -rotate-90 transform" viewBox="0 0 200 200">
@@ -110,6 +118,14 @@ export const CountdownView: React.FC = () => {
           </div>
         </div>
       </div>
+
+      {/* ESC Cancel Hint Pill */}
+      {count > 0 && (
+        <div className="mt-5 px-3 py-1 rounded-full bg-[#10131d]/90 border border-[#232838] text-[10px] font-mono text-slate-400 flex items-center space-x-1.5 shadow-lg backdrop-blur-md animate-in fade-in duration-300">
+          <span className="text-indigo-400 font-bold">[ESC]</span>
+          <span>Cancelar</span>
+        </div>
+      )}
     </div>
   );
 };

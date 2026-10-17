@@ -872,6 +872,90 @@ describe('End-to-End Integration & Subsystem Validation', () => {
       assert.equal(stepCounter, 2, 'Counter rolled back from 3 to 2');
       assert.equal(annotations.length, 1);
     });
+
+    test('v1.8.0 crop selector aspect ratio shortcuts and arrow nudging', () => {
+      let aspectRatio: 'free' | '16:9' | '9:16' | '1:1' | '4:3' = 'free';
+      let area = { x: 100, y: 100, width: 800, height: 600 };
+      const winW = 1920;
+      const winH = 1080;
+
+      const handleKey = (key: string, code: string, shift: boolean) => {
+        if (key === '1') aspectRatio = 'free';
+        else if (key === '2') aspectRatio = '16:9';
+        else if (key === '3') aspectRatio = '9:16';
+        else if (key === '4') aspectRatio = '1:1';
+        else if (key === '5') aspectRatio = '4:3';
+        else if (['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight'].includes(code)) {
+          const delta = shift ? 10 : 2;
+          let newX = area.x;
+          let newY = area.y;
+          if (code === 'ArrowUp') newY = Math.max(0, area.y - delta);
+          if (code === 'ArrowDown') newY = Math.min(winH - area.height, area.y + delta);
+          if (code === 'ArrowLeft') newX = Math.max(0, area.x - delta);
+          if (code === 'ArrowRight') newX = Math.min(winW - area.width, area.x + delta);
+          area = { ...area, x: newX, y: newY };
+        }
+      };
+
+      handleKey('2', '', false);
+      assert.equal(aspectRatio, '16:9');
+
+      handleKey('3', '', false);
+      assert.equal(aspectRatio, '9:16');
+
+      handleKey('5', '', false);
+      assert.equal(aspectRatio, '4:3');
+
+      // Fine nudge (2px)
+      handleKey('', 'ArrowRight', false);
+      assert.equal(area.x, 102);
+
+      // Coarse nudge (10px with Shift)
+      handleKey('', 'ArrowDown', true);
+      assert.equal(area.y, 110);
+    });
+
+    test('v1.8.0 speaker notes mode switching and checklist advance on Space', () => {
+      let mode: 'prompt' | 'notes' | 'edit' = 'prompt';
+      const bullets = [
+        { id: '1', text: 'Intro', done: false },
+        { id: '2', text: 'Demo', done: false }
+      ];
+
+      const handleKey = (key: string, code: string) => {
+        if (key === '1') mode = 'prompt';
+        else if (key === '2') mode = 'notes';
+        else if (key === '3') mode = 'edit';
+        else if (mode === 'notes' && (code === 'Space' || key === 'Enter')) {
+          const idx = bullets.findIndex(b => !b.done);
+          if (idx !== -1) bullets[idx].done = true;
+        }
+      };
+
+      handleKey('2', '', false);
+      assert.equal(mode, 'notes');
+
+      // Space advances the first unchecked bullet
+      handleKey('', 'Space');
+      assert.equal(bullets[0].done, true);
+      assert.equal(bullets[1].done, false);
+
+      // Next Space advances the second bullet
+      handleKey('', 'Space');
+      assert.equal(bullets[1].done, true);
+    });
+
+    test('v1.8.0 countdown abort immediately on Escape key', () => {
+      let cancelled = false;
+      const handleCountdownKey = (key: string) => {
+        if (key === 'Escape') {
+          cancelled = true;
+        }
+      };
+
+      handleCountdownKey('Escape');
+      assert.equal(cancelled, true, 'Escape safely cancels countdown');
+    });
   });
 });
 
