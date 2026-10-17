@@ -315,6 +315,7 @@ export class ShareServer {
     const commentsJson = JSON.stringify(video.comments || []);
     const reactionsJson = JSON.stringify(video.reactions || []);
     const transcriptJson = JSON.stringify(video.transcript || []);
+    const chaptersJson = JSON.stringify(video.chapters || []);
     const aiSummary = video.aiSummary || 'Gravação gerada pelo Aura Screen Studio com tela, câmera e áudio combinados.';
     const formattedDate = new Date(video.createdAt).toLocaleDateString('pt-BR', {
       day: '2-digit',
@@ -422,10 +423,11 @@ export class ShareServer {
 
         <!-- Custom Player Controls Bar -->
         <div class="absolute bottom-0 inset-x-0 bg-gradient-to-t from-black/95 via-black/60 to-transparent p-4 opacity-0 group-hover:opacity-100 transition-opacity">
-          <!-- Timeline scrubber with reaction dots -->
+          <!-- Timeline scrubber with reaction dots and chapter marks -->
           <div class="relative mb-3 flex items-center">
             <input type="range" id="seek-bar" min="0" max="100" value="0" step="0.1" class="w-full h-1.5 bg-gray-700/80 rounded-lg cursor-pointer appearance-none">
-            <div id="timeline-reactions" class="absolute inset-x-0 pointer-events-none h-1.5"></div>
+            <div id="timeline-chapters" class="absolute inset-x-0 pointer-events-none h-1.5 z-10"></div>
+            <div id="timeline-reactions" class="absolute inset-x-0 pointer-events-none h-1.5 z-20"></div>
           </div>
 
           <div class="flex items-center justify-between">
@@ -474,12 +476,15 @@ export class ShareServer {
       </div>
     </div>
 
-    <!-- Right Sidebar: Comments & Transcript (1 col) -->
+    <!-- Right Sidebar: Comments, Chapters & Transcript (1 col) -->
     <div class="flex flex-col space-y-4">
       <!-- Tabs header -->
       <div class="bg-[#0d111c] border border-slate-800/90 rounded-2xl p-1 flex space-x-1">
         <button onclick="switchTab('comments')" id="tab-comments-btn" class="flex-1 py-2 text-xs font-semibold rounded-xl bg-gradient-to-r from-indigo-600 to-cyan-600 text-white transition-all shadow-sm">
           Comentários (<span id="comments-count">0</span>)
+        </button>
+        <button onclick="switchTab('chapters')" id="tab-chapters-btn" class="flex-1 py-2 text-xs font-medium rounded-xl text-slate-400 hover:text-white transition-all">
+          Capítulos (<span id="chapters-count">${(video.chapters || []).length}</span>)
         </button>
         <button onclick="switchTab('transcript')" id="tab-transcript-btn" class="flex-1 py-2 text-xs font-medium rounded-xl text-slate-400 hover:text-white transition-all">
           Transcrição
@@ -508,7 +513,18 @@ export class ShareServer {
         </div>
       </div>
 
-      <!-- Tab 2: Transcript Section -->
+      <!-- Tab 2: Chapters Section -->
+      <div id="chapters-tab" class="hidden bg-[#0d111c] border border-slate-800/90 rounded-2xl p-4 flex-1 flex flex-col h-[520px]">
+        <div class="text-xs text-slate-400 font-medium mb-3 flex items-center justify-between">
+          <span>Capítulos do Vídeo</span>
+          <span class="text-[10px] text-cyan-400">Clique para pular</span>
+        </div>
+        <div id="chapters-list" class="flex-1 overflow-y-auto space-y-2 pr-1 text-xs">
+          <!-- Populated by JS -->
+        </div>
+      </div>
+
+      <!-- Tab 3: Transcript Section -->
       <div id="transcript-tab" class="hidden bg-[#0d111c] border border-slate-800/90 rounded-2xl p-4 flex-1 flex flex-col h-[520px]">
         <div id="transcript-list" class="flex-1 overflow-y-auto space-y-2.5 pr-1 text-xs">
           <!-- Populated by JS -->
@@ -522,6 +538,7 @@ export class ShareServer {
     let comments = ${commentsJson};
     let reactions = ${reactionsJson};
     const transcript = ${transcriptJson};
+    const chapters = ${chaptersJson};
 
     const video = document.getElementById('main-video');
     const playBtn = document.getElementById('big-play-btn');
@@ -702,17 +719,83 @@ export class ShareServer {
       \`).join('');
     }
 
+    function renderChapters() {
+      const container = document.getElementById('chapters-list');
+      if (!container) return;
+      if (!chapters || chapters.length === 0) {
+        container.innerHTML = '<p class="text-slate-500 italic p-3 text-center">Nenhum capítulo salvo para esta gravação.</p>';
+        return;
+      }
+      container.innerHTML = chapters.map(c => \`
+        <div onclick="jumpToChapter(\${c.time})" class="chapter-card p-3 rounded-xl border border-slate-800/80 hover:border-cyan-500/50 hover:bg-slate-800/60 cursor-pointer flex items-center space-x-3 transition-all group">
+          <span class="font-mono text-cyan-400 font-bold bg-cyan-500/10 px-2.5 py-1 rounded-lg text-xs shrink-0 group-hover:bg-cyan-500 group-hover:text-slate-950 transition-colors">
+            \${formatTime(c.time)}
+          </span>
+          <span class="text-slate-200 font-semibold text-xs flex-1 truncate">\${escapeText(c.title)}</span>
+          <svg class="w-3.5 h-3.5 text-slate-500 group-hover:text-cyan-400 group-hover:translate-x-0.5 transition-all" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+        </div>
+      \`).join('');
+    }
+
+    function renderTimelineChapters() {
+      const container = document.getElementById('timeline-chapters');
+      if (!container) return;
+      container.innerHTML = '';
+      const dur = video.duration || 1;
+      chapters.forEach(c => {
+        const pct = (c.time / dur) * 100;
+        const tick = document.createElement('div');
+        tick.style.position = 'absolute';
+        tick.style.left = pct + '%';
+        tick.style.top = '-3px';
+        tick.style.width = '3px';
+        tick.style.height = '12px';
+        tick.style.borderRadius = '2px';
+        tick.style.backgroundColor = '#fbbf24';
+        tick.title = c.title + ' (' + formatTime(c.time) + ')';
+        tick.style.pointerEvents = 'auto';
+        tick.style.cursor = 'pointer';
+        tick.onclick = (e) => {
+          e.stopPropagation();
+          jumpToChapter(c.time);
+        };
+        container.appendChild(tick);
+      });
+    }
+
+    function jumpToChapter(time) {
+      video.currentTime = time;
+      video.play();
+      playBtn.classList.add('hidden');
+      playPauseBtn.innerHTML = '<svg class="w-5 h-5 fill-current" viewBox="0 0 24 24"><rect x="6" y="4" width="4" height="16"/><rect x="14" y="4" width="4" height="16"/></svg>';
+    }
+
     function switchTab(tab) {
+      const cTab = document.getElementById('comments-tab');
+      const chTab = document.getElementById('chapters-tab');
+      const tTab = document.getElementById('transcript-tab');
+      const cBtn = document.getElementById('tab-comments-btn');
+      const chBtn = document.getElementById('tab-chapters-btn');
+      const tBtn = document.getElementById('tab-transcript-btn');
+
+      cTab.classList.add('hidden');
+      chTab.classList.add('hidden');
+      tTab.classList.add('hidden');
+      cBtn.className = 'flex-1 py-2 text-xs font-medium rounded-xl text-slate-400 hover:text-white transition-all';
+      chBtn.className = 'flex-1 py-2 text-xs font-medium rounded-xl text-slate-400 hover:text-white transition-all';
+      tBtn.className = 'flex-1 py-2 text-xs font-medium rounded-xl text-slate-400 hover:text-white transition-all';
+
+      const activeStyle = 'flex-1 py-2 text-xs font-semibold rounded-xl bg-gradient-to-r from-indigo-600 to-cyan-600 text-white transition-all shadow-sm';
+
       if (tab === 'comments') {
-        document.getElementById('comments-tab').classList.remove('hidden');
-        document.getElementById('transcript-tab').classList.add('hidden');
-        document.getElementById('tab-comments-btn').className = 'flex-1 py-2 text-xs font-semibold rounded-xl bg-[#625df5] text-white transition-all shadow-sm';
-        document.getElementById('tab-transcript-btn').className = 'flex-1 py-2 text-xs font-medium rounded-xl text-gray-400 hover:text-white transition-all';
-      } else {
-        document.getElementById('comments-tab').classList.add('hidden');
-        document.getElementById('transcript-tab').classList.remove('hidden');
-        document.getElementById('tab-transcript-btn').className = 'flex-1 py-2 text-xs font-semibold rounded-xl bg-[#625df5] text-white transition-all shadow-sm';
-        document.getElementById('tab-comments-btn').className = 'flex-1 py-2 text-xs font-medium rounded-xl text-gray-400 hover:text-white transition-all';
+        cTab.classList.remove('hidden');
+        cBtn.className = activeStyle;
+      } else if (tab === 'chapters') {
+        chTab.classList.remove('hidden');
+        chBtn.className = activeStyle;
+      } else if (tab === 'transcript') {
+        tTab.classList.remove('hidden');
+        tBtn.className = activeStyle;
       }
     }
 
@@ -737,8 +820,12 @@ export class ShareServer {
 
     // Init
     renderComments();
+    renderChapters();
     renderTranscript();
-    video.addEventListener('loadedmetadata', renderTimelineReactions);
+    video.addEventListener('loadedmetadata', () => {
+      renderTimelineReactions();
+      renderTimelineChapters();
+    });
   </script>
 </body>
 </html>`;

@@ -51,6 +51,12 @@ export interface TranscriptItem {
   text: string;
 }
 
+export interface ChapterItem {
+  id: string;
+  time: number;
+  title: string;
+}
+
 export interface RecordingMeta {
   id: string;
   title: string;
@@ -65,6 +71,7 @@ export interface RecordingMeta {
   aiTitle?: string;
   aiSummary?: string;
   transcript?: TranscriptItem[];
+  chapters?: ChapterItem[];
   comments?: VideoComment[];
   reactions?: VideoReaction[];
   cropArea?: CropArea;

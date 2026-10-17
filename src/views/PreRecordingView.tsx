@@ -263,7 +263,15 @@ export const PreRecordingView: React.FC = () => {
           </div>
         </div>
 
-        <div className="flex items-center space-x-1" style={{ WebkitAppRegion: 'no-drag' } as any}>
+        <div className="flex items-center space-x-1.5" style={{ WebkitAppRegion: 'no-drag' } as any}>
+          <button
+            onClick={() => window.electronAPI.takeScreenshot()}
+            title="Capturar Screenshot com Anotações (Alt+Shift+S)"
+            className="flex items-center space-x-1 px-2.5 py-1 rounded-lg bg-slate-800/80 hover:bg-slate-700 text-slate-300 hover:text-cyan-400 text-[11px] font-semibold transition-all border border-slate-700/60"
+          >
+            <Camera className="w-3.5 h-3.5 text-cyan-400" />
+            <span>Screenshot</span>
+          </button>
           <button
             onClick={() => window.electronAPI.checkForUpdates()}
             title="Verificar Atualizações do Sistema"

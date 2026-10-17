@@ -50,6 +50,12 @@ export interface TranscriptItem {
   text: string;
 }
 
+export interface ChapterItem {
+  id: string;
+  time: number;
+  title: string;
+}
+
 export interface RecordingMeta {
   id: string;
   title: string;
@@ -64,6 +70,7 @@ export interface RecordingMeta {
   aiTitle?: string;
   aiSummary?: string;
   transcript?: TranscriptItem[];
+  chapters?: ChapterItem[];
   comments?: VideoComment[];
   reactions?: VideoReaction[];
   cropArea?: CropArea;
@@ -92,6 +99,7 @@ declare global {
       getShareUrl: (id: string) => Promise<string>;
       getPublicUrl: () => Promise<string | null>;
       updateTitle: (id: string, newTitle: string) => Promise<boolean>;
+      updateChapters: (id: string, chapters: ChapterItem[]) => Promise<boolean>;
       downloadRecording: (id: string) => Promise<boolean>;
       trimRecording: (id: string, buffer: ArrayBuffer, newDurationMs: number) => Promise<any>;
       openPreRecording: () => void;
@@ -104,6 +112,10 @@ declare global {
       startCropSelection: () => void;
       sendCropArea: (area: CropArea) => void;
       cancelCropSelection: () => void;
+      takeScreenshot: () => void;
+      copyScreenshotToClipboard: (dataUrl: string) => Promise<boolean>;
+      saveScreenshotFile: (dataUrl: string) => Promise<string>;
+      onScreenshotData: (callback: (dataUrl: string) => void) => () => void;
       checkForUpdates: () => Promise<{ isLatest: boolean; version: string; error?: string }>;
       getAppVersion: () => Promise<string>;
       startUpdateDownload: () => void;

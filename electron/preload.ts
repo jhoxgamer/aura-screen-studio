@@ -73,6 +73,9 @@ export const electronAPI = {
   updateTitle: async (id: string, newTitle: string): Promise<boolean> => {
     return await ipcRenderer.invoke('recordings:update-title', id, newTitle);
   },
+  updateChapters: async (id: string, chapters: any[]): Promise<boolean> => {
+    return await ipcRenderer.invoke('recordings:update-chapters', id, chapters);
+  },
   downloadRecording: async (id: string): Promise<boolean> => {
     return await ipcRenderer.invoke('recordings:download', id);
   },
@@ -110,6 +113,20 @@ export const electronAPI = {
   },
   cancelCropSelection: () => {
     ipcRenderer.send('crop:cancel-selection');
+  },
+  takeScreenshot: () => {
+    ipcRenderer.send('screenshot:take');
+  },
+  copyScreenshotToClipboard: async (dataUrl: string): Promise<boolean> => {
+    return await ipcRenderer.invoke('screenshot:copy-clipboard', dataUrl);
+  },
+  saveScreenshotFile: async (dataUrl: string): Promise<string> => {
+    return await ipcRenderer.invoke('screenshot:save-file', dataUrl);
+  },
+  onScreenshotData: (callback: (dataUrl: string) => void) => {
+    const handler = (_: any, dataUrl: string) => callback(dataUrl);
+    ipcRenderer.on('screenshot:data', handler);
+    return () => ipcRenderer.removeListener('screenshot:data', handler);
   },
 
   // Auto-Updater

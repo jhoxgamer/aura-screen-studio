@@ -1,21 +1,35 @@
-import { RecordingOptions } from '../types';
+import { RecordingOptions, ChapterItem } from '../types';
+
+export interface RecordingScene {
+  id: string;
+  name: string;
+  durationMs: number;
+  chunks: Blob[];
+}
 
 export class RecorderService {
   private mediaRecorder: MediaRecorder | null = null;
-  private recordedChunks: Blob[] = [];
+  private currentSceneChunks: Blob[] = [];
+  private scenes: RecordingScene[] = [];
+  private currentSceneStartTime: number = 0;
+  private currentSceneAccumulatedMs: number = 0;
   private screenStream: MediaStream | null = null;
   private micStream: MediaStream | null = null;
   private audioContext: AudioContext | null = null;
-  private startTime: number = 0;
   private durationInterval: any = null;
-  private onDurationUpdate?: (ms: number) => void;
+  private onDurationUpdate?: (totalMs: number, sceneMs: number, sceneNumber: number) => void;
   private isCroppingActive: boolean = false;
   private cropVideoElement: HTMLVideoElement | null = null;
   private cropAnimFrame: number | null = null;
   private rawScreenStream: MediaStream | null = null;
 
-  async start(options: RecordingOptions, onDuration?: (ms: number) => void): Promise<void> {
-    this.recordedChunks = [];
+  async start(
+    options: RecordingOptions,
+    onDuration?: (totalMs: number, sceneMs: number, sceneNumber: number) => void
+  ): Promise<void> {
+    this.currentSceneChunks = [];
+    this.scenes = [];
+    this.currentSceneAccumulatedMs = 0;
     this.onDurationUpdate = onDuration;
 
     let width = 1920;
@@ -250,30 +264,86 @@ export class RecorderService {
 
     this.mediaRecorder.ondataavailable = (event) => {
       if (event.data && event.data.size > 0) {
-        this.recordedChunks.push(event.data);
+        this.currentSceneChunks.push(event.data);
       }
     };
 
     this.mediaRecorder.start(1000); // 1-second chunks
-    this.startTime = Date.now();
+    this.currentSceneStartTime = Date.now();
 
     this.durationInterval = setInterval(() => {
       if (this.onDurationUpdate && this.mediaRecorder?.state === 'recording') {
-        this.onDurationUpdate(Date.now() - this.startTime);
+        const activeTake = Date.now() - this.currentSceneStartTime;
+        const sceneMs = this.currentSceneAccumulatedMs + activeTake;
+        const prevScenesMs = this.scenes.reduce((acc, s) => acc + s.durationMs, 0);
+        const totalMs = prevScenesMs + sceneMs;
+        this.onDurationUpdate(totalMs, sceneMs, this.scenes.length + 1);
       }
-    }, 500);
+    }, 250);
   }
 
   pause() {
     if (this.mediaRecorder && this.mediaRecorder.state === 'recording') {
+      this.currentSceneAccumulatedMs += Date.now() - this.currentSceneStartTime;
       this.mediaRecorder.pause();
     }
   }
 
   resume() {
     if (this.mediaRecorder && this.mediaRecorder.state === 'paused') {
+      this.currentSceneStartTime = Date.now();
       this.mediaRecorder.resume();
     }
+  }
+
+  retakeCurrentScene() {
+    this.currentSceneChunks = [];
+    this.currentSceneAccumulatedMs = 0;
+    this.currentSceneStartTime = Date.now();
+    if (this.onDurationUpdate) {
+      const prevMs = this.scenes.reduce((acc, s) => acc + s.durationMs, 0);
+      this.onDurationUpdate(prevMs, 0, this.scenes.length + 1);
+    }
+  }
+
+  sealCurrentScene(name?: string) {
+    const activeTake = this.mediaRecorder?.state === 'recording' ? (Date.now() - this.currentSceneStartTime) : 0;
+    const sceneDuration = this.currentSceneAccumulatedMs + activeTake;
+    
+    if (this.currentSceneChunks.length > 0) {
+      this.scenes.push({
+        id: 'scene_' + Date.now() + '_' + Math.random().toString(36).substring(2, 6),
+        name: name || `Cena ${this.scenes.length + 1}`,
+        durationMs: Math.max(500, sceneDuration),
+        chunks: [...this.currentSceneChunks]
+      });
+    }
+    this.currentSceneChunks = [];
+    this.currentSceneAccumulatedMs = 0;
+    this.currentSceneStartTime = Date.now();
+  }
+
+  deleteScene(index: number) {
+    if (index >= 0 && index < this.scenes.length) {
+      this.scenes.splice(index, 1);
+      this.scenes.forEach((s, idx) => {
+        if (s.name.startsWith('Cena ')) {
+          s.name = `Cena ${idx + 1}`;
+        }
+      });
+      if (this.onDurationUpdate) {
+        const prevMs = this.scenes.reduce((acc, s) => acc + s.durationMs, 0);
+        this.onDurationUpdate(prevMs, 0, this.scenes.length + 1);
+      }
+    }
+  }
+
+  getScenes(): { id: string; name: string; durationMs: number }[] {
+    return this.scenes.map((s) => ({ id: s.id, name: s.name, durationMs: s.durationMs }));
+  }
+
+  getCurrentSceneNumber(): number {
+    return this.scenes.length + 1;
   }
 
   setMicMuted(muted: boolean): boolean {
@@ -286,9 +356,21 @@ export class RecorderService {
     return false;
   }
 
-  async stop(): Promise<{ blob: Blob; buffer: ArrayBuffer; durationMs: number }> {
+  async stop(): Promise<{ blob: Blob; buffer: ArrayBuffer; durationMs: number; chapters: ChapterItem[] }> {
     clearInterval(this.durationInterval);
-    const durationMs = Date.now() - this.startTime;
+
+    const activeTake = this.mediaRecorder?.state === 'recording' ? (Date.now() - this.currentSceneStartTime) : 0;
+    const finalSceneDuration = this.currentSceneAccumulatedMs + activeTake;
+
+    if (this.currentSceneChunks.length > 0) {
+      this.scenes.push({
+        id: 'scene_' + Date.now(),
+        name: `Cena ${this.scenes.length + 1}`,
+        durationMs: Math.max(500, finalSceneDuration),
+        chunks: [...this.currentSceneChunks]
+      });
+      this.currentSceneChunks = [];
+    }
 
     return new Promise((resolve, reject) => {
       if (!this.mediaRecorder) {
@@ -296,8 +378,24 @@ export class RecorderService {
       }
 
       this.mediaRecorder.onstop = async () => {
-        const blob = new Blob(this.recordedChunks, { type: 'video/webm' });
+        const allChunks = this.scenes.flatMap((s) => s.chunks);
+        const blob = new Blob(allChunks, { type: 'video/webm' });
         const buffer = await blob.arrayBuffer();
+
+        const totalDurationMs = this.scenes.reduce((acc, s) => acc + s.durationMs, 0);
+
+        let runningMs = 0;
+        const chapters: ChapterItem[] = this.scenes.length > 1
+          ? this.scenes.map((s, idx) => {
+              const chap: ChapterItem = {
+                id: s.id,
+                time: Math.round((runningMs / 1000) * 10) / 10,
+                title: s.name || `Cena ${idx + 1}`
+              };
+              runningMs += s.durationMs;
+              return chap;
+            })
+          : [];
 
         // Cleanup tracks
         this.isCroppingActive = false;
@@ -319,7 +417,7 @@ export class RecorderService {
         this.micStream?.getTracks().forEach((t) => t.stop());
         this.audioContext?.close().catch(() => {});
 
-        resolve({ blob, buffer, durationMs });
+        resolve({ blob, buffer, durationMs: totalDurationMs, chapters });
       };
 
       if (this.mediaRecorder.state !== 'inactive') {
@@ -349,7 +447,9 @@ export class RecorderService {
     this.micStream?.getTracks().forEach((t) => t.stop());
     this.audioContext?.close().catch(() => {});
     this.mediaRecorder = null;
-    this.recordedChunks = [];
+    this.currentSceneChunks = [];
+    this.scenes = [];
+    this.currentSceneAccumulatedMs = 0;
   }
 }
 

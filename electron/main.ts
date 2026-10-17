@@ -1,4 +1,4 @@
-import { app, BrowserWindow, ipcMain, desktopCapturer, screen, globalShortcut, shell, dialog, Tray, Menu, nativeImage } from 'electron';
+import { app, BrowserWindow, ipcMain, desktopCapturer, screen, globalShortcut, shell, dialog, Tray, Menu, nativeImage, clipboard } from 'electron';
 import * as path from 'path';
 import * as fs from 'fs';
 import { autoUpdater } from 'electron-updater';
@@ -13,6 +13,7 @@ let countdownWindow: BrowserWindow | null = null;
 let previewWindow: BrowserWindow | null = null;
 let speakerNotesWindow: BrowserWindow | null = null;
 let cropSelectorWindow: BrowserWindow | null = null;
+let screenshotStudioWindow: BrowserWindow | null = null;
 let shareServer: ShareServer | null = null;
 let tray: Tray | null = null;
 
@@ -206,10 +207,10 @@ function createControlBarWindow() {
   const { height } = primaryDisplay.workAreaSize;
 
   controlBarWindow = new BrowserWindow({
-    width: 370,
-    height: 64,
-    x: 320,
-    y: Math.round(height - 100),
+    width: 540,
+    height: 74,
+    x: 300,
+    y: Math.round(height - 110),
     frame: false,
     transparent: true,
     alwaysOnTop: true,
@@ -453,6 +454,66 @@ function createCropSelectorWindow() {
       preRecordingWindow.focus();
     }
   });
+}
+
+// 9. Create Instant Screenshot Studio Window
+function createScreenshotStudioWindow(dataUrl: string) {
+  if (screenshotStudioWindow && !screenshotStudioWindow.isDestroyed()) {
+    screenshotStudioWindow.show();
+    screenshotStudioWindow.focus();
+    screenshotStudioWindow.webContents.send('screenshot:data', dataUrl);
+    return;
+  }
+
+  const primaryDisplay = screen.getPrimaryDisplay();
+  const { width, height } = primaryDisplay.bounds;
+
+  screenshotStudioWindow = new BrowserWindow({
+    x: 0,
+    y: 0,
+    width,
+    height,
+    frame: false,
+    transparent: true,
+    alwaysOnTop: true,
+    resizable: false,
+    skipTaskbar: false,
+    focusable: true,
+    webPreferences: {
+      preload: getPreloadPath(),
+      nodeIntegration: false,
+      contextIsolation: true
+    }
+  });
+
+  screenshotStudioWindow.setAlwaysOnTop(true, 'screen-saver');
+  loadView(screenshotStudioWindow, 'screenshot-studio');
+
+  screenshotStudioWindow.webContents.once('did-finish-load', () => {
+    screenshotStudioWindow?.webContents.send('screenshot:data', dataUrl);
+  });
+
+  screenshotStudioWindow.on('closed', () => {
+    screenshotStudioWindow = null;
+  });
+}
+
+async function captureAndOpenScreenshotStudio() {
+  try {
+    const primaryDisplay = screen.getPrimaryDisplay();
+    const { width, height } = primaryDisplay.size;
+    const sources = await desktopCapturer.getSources({
+      types: ['screen'],
+      thumbnailSize: { width: Math.round(width * 1.5), height: Math.round(height * 1.5) }
+    });
+    if (sources.length > 0) {
+      const dataUrl = sources[0].thumbnail.toDataURL();
+      broadcastSound('camera');
+      createScreenshotStudioWindow(dataUrl);
+    }
+  } catch (err) {
+    console.error('Screenshot capture failed:', err);
+  }
 }
 
 // Helper: Broadcast sound to active windows
@@ -795,6 +856,17 @@ function setupIpcHandlers() {
     return false;
   });
 
+  ipcMain.handle('recordings:update-chapters', async (_, id: string, chapters: any[]) => {
+    const list = readMetadata();
+    const target = list.find((r) => r.id === id);
+    if (target) {
+      target.chapters = chapters;
+      writeMetadata(list);
+      return true;
+    }
+    return false;
+  });
+
   ipcMain.handle('recordings:download', async (_, id: string) => {
     const list = readMetadata();
     const item = list.find((r) => r.id === id);
@@ -823,6 +895,39 @@ function setupIpcHandlers() {
       return item;
     }
     return null;
+  });
+
+  // Instant Screenshot Handlers
+  ipcMain.on('screenshot:take', () => {
+    captureAndOpenScreenshotStudio();
+  });
+
+  ipcMain.handle('screenshot:copy-clipboard', async (_, dataUrl: string) => {
+    try {
+      const img = nativeImage.createFromDataURL(dataUrl);
+      clipboard.writeImage(img);
+      return true;
+    } catch (e) {
+      console.error('Failed to copy screenshot to clipboard:', e);
+      return false;
+    }
+  });
+
+  ipcMain.handle('screenshot:save-file', async (_, dataUrl: string) => {
+    try {
+      const screenshotsDir = path.join(app.getPath('pictures'), 'AuraScreenshots');
+      if (!fs.existsSync(screenshotsDir)) {
+        fs.mkdirSync(screenshotsDir, { recursive: true });
+      }
+      const fileName = `Aura_Screenshot_${new Date().toISOString().replace(/[:.]/g, '-')}.png`;
+      const filePath = path.join(screenshotsDir, fileName);
+      const base64Data = dataUrl.replace(/^data:image\/png;base64,/, '');
+      await fs.promises.writeFile(filePath, base64Data, 'base64');
+      return filePath;
+    } catch (e) {
+      console.error('Failed to save screenshot file:', e);
+      throw e;
+    }
   });
 
   ipcMain.handle('share:get-public-url', async () => {
@@ -929,6 +1034,12 @@ function createSystemTray() {
           }
         },
         { type: 'separator' },
+        {
+          label: '📸 Capturar Screenshot Instantâneo (Alt+Shift+S)',
+          click: () => {
+            captureAndOpenScreenshotStudio();
+          }
+        },
         {
           label: '📁 Biblioteca de Vídeos Aura',
           click: () => {
@@ -1109,6 +1220,10 @@ app.whenReady().then(() => {
 
   globalShortcut.register('CommandOrControl+Shift+T', () => {
     toggleSpeakerNotesWindow();
+  });
+
+  globalShortcut.register('CommandOrControl+Shift+S', () => {
+    captureAndOpenScreenshotStudio();
   });
 
   createPreRecordingWindow();

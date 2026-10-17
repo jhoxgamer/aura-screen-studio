@@ -9,7 +9,10 @@ import {
   GripVertical,
   FileText,
   Mic,
-  MicOff
+  MicOff,
+  Plus,
+  Layers,
+  Sparkles
 } from 'lucide-react';
 import { RecordingOptions } from '../types';
 import { recorderService } from '../services/recorderService';
@@ -17,11 +20,14 @@ import { transcriptionService } from '../services/transcriptionService';
 
 export const ControlBarView: React.FC = () => {
   const [seconds, setSeconds] = useState(0);
+  const [sceneSeconds, setSceneSeconds] = useState(0);
+  const [sceneNumber, setSceneNumber] = useState(1);
   const [isPaused, setIsPaused] = useState(false);
   const [isDrawing, setIsDrawing] = useState(false);
   const [isSpeakerNotesOpen, setIsSpeakerNotesOpen] = useState(false);
   const [isMicMuted, setIsMicMuted] = useState(false);
   const [isStopping, setIsStopping] = useState(false);
+  const [retakeNotice, setRetakeNotice] = useState<string | null>(null);
   const optionsRef = useRef<RecordingOptions | null>(null);
 
   useEffect(() => {
@@ -30,8 +36,10 @@ export const ControlBarView: React.FC = () => {
       optionsRef.current = options;
       try {
         transcriptionService.start();
-        await recorderService.start(options, (ms) => {
-          setSeconds(Math.floor(ms / 1000));
+        await recorderService.start(options, (totalMs, scMs, scNum) => {
+          setSeconds(Math.floor(totalMs / 1000));
+          setSceneSeconds(Math.floor(scMs / 1000));
+          setSceneNumber(scNum);
         });
       } catch (err) {
         console.error('Failed to start recorder service:', err);
@@ -65,7 +73,7 @@ export const ControlBarView: React.FC = () => {
     setIsStopping(true);
 
     try {
-      const { buffer, durationMs } = await recorderService.stop();
+      const { buffer, durationMs, chapters } = await recorderService.stop();
       const { transcript, aiSummary, aiTitle } = transcriptionService.stop();
 
       const title = aiTitle || `Gravação Aura ${new Date().toLocaleDateString('pt-BR')} ${new Date().toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })}`;
@@ -77,7 +85,8 @@ export const ControlBarView: React.FC = () => {
         resolution: optionsRef.current?.resolution || '1080p',
         aiTitle,
         aiSummary,
-        transcript
+        transcript,
+        chapters
       });
     } catch (err) {
       console.error('Error saving recording:', err);
@@ -97,14 +106,34 @@ export const ControlBarView: React.FC = () => {
     }
   };
 
+  const handleRetakeScene = () => {
+    recorderService.retakeCurrentScene();
+    setSceneSeconds(0);
+    setRetakeNotice(`Cena ${sceneNumber} reiniciada!`);
+    setTimeout(() => setRetakeNotice(null), 2200);
+  };
+
+  const handleNewScene = () => {
+    recorderService.sealCurrentScene();
+    const nextNum = recorderService.getCurrentSceneNumber();
+    setSceneNumber(nextNum);
+    setSceneSeconds(0);
+    setRetakeNotice(`Nova Cena ${nextNum} iniciada!`);
+    setTimeout(() => setRetakeNotice(null), 2000);
+  };
+
   const handleRestart = async () => {
     try {
       recorderService.cleanup();
       setSeconds(0);
+      setSceneSeconds(0);
+      setSceneNumber(1);
       setIsPaused(false);
       if (optionsRef.current) {
-        await recorderService.start(optionsRef.current, (ms) => {
-          setSeconds(Math.floor(ms / 1000));
+        await recorderService.start(optionsRef.current, (totalMs, scMs, scNum) => {
+          setSeconds(Math.floor(totalMs / 1000));
+          setSceneSeconds(Math.floor(scMs / 1000));
+          setSceneNumber(scNum);
         });
       }
     } catch (err) {
@@ -134,7 +163,15 @@ export const ControlBarView: React.FC = () => {
   };
 
   return (
-    <div className="w-full h-full flex items-center justify-center p-1 select-none">
+    <div className="w-full h-full flex flex-col items-center justify-center p-1 select-none relative">
+      {/* Toast Notice for Scene Retake / New Scene */}
+      {retakeNotice && (
+        <div className="absolute -top-7 px-3 py-0.5 rounded-full bg-cyan-500/90 text-slate-950 font-bold text-[11px] shadow-lg animate-bounce flex items-center space-x-1">
+          <Sparkles className="w-3 h-3" />
+          <span>{retakeNotice}</span>
+        </div>
+      )}
+
       <div
         className="flex items-center space-x-1.5 bg-[#0b0e17]/95 backdrop-blur-xl px-2.5 py-1.5 rounded-2xl border border-cyan-500/30 shadow-2xl shadow-cyan-500/10"
         style={{ WebkitAppRegion: 'drag' } as any}
@@ -160,6 +197,43 @@ export const ControlBarView: React.FC = () => {
               </span>
             )}
           </button>
+        </div>
+
+        {/* Scene Pill */}
+        <div style={{ WebkitAppRegion: 'no-drag' } as any} className="flex items-center space-x-1">
+          <div
+            className="flex items-center space-x-1 bg-slate-800/80 border border-slate-700/60 px-2 py-1 rounded-xl text-[11px] font-semibold text-slate-300"
+            title={`Cena atual ${sceneNumber}: ${formatTime(sceneSeconds)}`}
+          >
+            <span className="w-1.5 h-1.5 rounded-full bg-cyan-400 animate-pulse" />
+            <span>Cena {sceneNumber}</span>
+          </div>
+
+          {/* Retake Current Scene Button */}
+          <button
+            onClick={handleRetakeScene}
+            title="Regravar apenas esta cena (descarta o take atual e reinicia esta cena)"
+            className={`p-1.5 rounded-xl transition-all flex items-center space-x-1 ${
+              isPaused
+                ? 'bg-amber-500/20 text-amber-300 border border-amber-500/40 hover:bg-amber-500/30'
+                : 'text-slate-400 hover:text-amber-400 hover:bg-slate-800/60'
+            }`}
+          >
+            <RotateCcw className="w-3.5 h-3.5" />
+            {isPaused && <span className="text-[10px] font-bold">Regravar</span>}
+          </button>
+
+          {/* Add / Next Scene Button (when paused) */}
+          {isPaused && (
+            <button
+              onClick={handleNewScene}
+              title="Nova Cena (finaliza este take e inicia a próxima cena/capítulo)"
+              className="px-2 py-1 rounded-xl bg-cyan-500/20 text-cyan-300 border border-cyan-500/40 hover:bg-cyan-500/30 text-[10px] font-bold transition-all flex items-center space-x-1"
+            >
+              <Plus className="w-3 h-3" />
+              <span>Nova Cena</span>
+            </button>
+          )}
         </div>
 
         {/* Pause / Resume Button */}
@@ -192,11 +266,11 @@ export const ControlBarView: React.FC = () => {
           </button>
         </div>
 
-        {/* Restart Recording */}
+        {/* Restart Recording Entirely */}
         <div style={{ WebkitAppRegion: 'no-drag' } as any}>
           <button
             onClick={handleRestart}
-            title="Reiniciar Gravação do Zero"
+            title="Reiniciar Gravação Inteira do Zero"
             className="p-2 rounded-xl text-slate-400 hover:text-white hover:bg-slate-800/60 transition-all"
           >
             <RotateCcw className="w-3.5 h-3.5" />
