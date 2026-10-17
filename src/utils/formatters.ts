@@ -60,3 +60,20 @@ export function getAspectRatio(width: number, height: number): string {
   const ratioH = Math.round(height) / divisor;
   return `${ratioW}:${ratioH}`;
 }
+
+export function formatRelativeDate(timestampMs: number): string {
+  if (!timestampMs || isNaN(timestampMs)) return '';
+  const now = Date.now();
+  const diffSecs = Math.max(0, Math.floor((now - timestampMs) / 1000));
+  if (diffSecs < 60) return 'Agora mesmo';
+  const diffMins = Math.floor(diffSecs / 60);
+  if (diffMins < 60) return `Há ${diffMins} min`;
+  const diffHours = Math.floor(diffMins / 60);
+  if (diffHours < 24) return `Há ${diffHours}h`;
+  const diffDays = Math.floor(diffHours / 24);
+  if (diffDays === 1) return 'Ontem';
+  if (diffDays < 7) return `Há ${diffDays} dias`;
+
+  const d = new Date(timestampMs);
+  return d.toLocaleDateString('pt-BR', { day: '2-digit', month: 'short' });
+}

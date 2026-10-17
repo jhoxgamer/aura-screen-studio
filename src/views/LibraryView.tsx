@@ -11,9 +11,12 @@ import {
   ExternalLink,
   Download,
   Search,
-  Check
+  Check,
+  Edit3,
+  X
 } from 'lucide-react';
 import { RecordingMeta } from '../types';
+import { formatRelativeDate } from '../utils/formatters';
 
 export const LibraryView: React.FC = () => {
   const [recordings, setRecordings] = useState<RecordingMeta[]>([]);
@@ -21,6 +24,8 @@ export const LibraryView: React.FC = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [copiedId, setCopiedId] = useState<string | null>(null);
   const [confirmDeleteId, setConfirmDeleteId] = useState<string | null>(null);
+  const [editingId, setEditingId] = useState<string | null>(null);
+  const [editedTitle, setEditedTitle] = useState('');
 
   useEffect(() => {
     loadList();
@@ -51,6 +56,26 @@ export const LibraryView: React.FC = () => {
 
   const handleOpenFolder = (filePath: string) => {
     window.electronAPI.openFileFolder(filePath);
+  };
+
+  const handleSaveRename = async (id: string) => {
+    const trimmed = editedTitle.trim();
+    if (!trimmed) {
+      setEditingId(null);
+      return;
+    }
+    try {
+      if (window.electronAPI?.updateTitle) {
+        await window.electronAPI.updateTitle(id, trimmed);
+        setRecordings((prev) =>
+          prev.map((r) => (r.id === id ? { ...r, title: trimmed } : r))
+        );
+      }
+    } catch (err) {
+      console.error('Failed to update title:', err);
+    } finally {
+      setEditingId(null);
+    }
   };
 
   const formatDuration = (ms: number) => {
@@ -125,10 +150,53 @@ export const LibraryView: React.FC = () => {
                   <Play className="w-4 h-4 text-indigo-400 group-hover:text-white fill-current transition-colors ml-0.5" />
                 </div>
 
-                <div className="min-w-0">
-                  <h3 className="text-xs font-semibold text-white truncate max-w-[190px] group-hover:text-indigo-200 transition-colors" title={rec.title}>
-                    {rec.title}
-                  </h3>
+                <div className="min-w-0 flex-1">
+                  {editingId === rec.id ? (
+                    <div className="flex items-center space-x-1.5" onClick={(e) => e.stopPropagation()}>
+                      <input
+                        type="text"
+                        value={editedTitle}
+                        onChange={(e) => setEditedTitle(e.target.value)}
+                        onKeyDown={(e) => {
+                          if (e.key === 'Enter') handleSaveRename(rec.id);
+                          if (e.key === 'Escape') setEditingId(null);
+                        }}
+                        autoFocus
+                        className="bg-[#0b0d13] border border-indigo-500/60 rounded px-2 py-0.5 text-xs text-white focus:outline-none focus:ring-1 focus:ring-indigo-500 w-48"
+                      />
+                      <button
+                        onClick={() => handleSaveRename(rec.id)}
+                        className="p-1 rounded bg-indigo-600 hover:bg-indigo-500 text-white"
+                        title="Salvar nome"
+                      >
+                        <Check className="w-3 h-3" />
+                      </button>
+                      <button
+                        onClick={() => setEditingId(null)}
+                        className="p-1 rounded bg-slate-800 hover:bg-slate-700 text-slate-300"
+                        title="Cancelar"
+                      >
+                        <X className="w-3 h-3" />
+                      </button>
+                    </div>
+                  ) : (
+                    <div className="flex items-center space-x-1.5 group/title">
+                      <h3 className="text-xs font-semibold text-white truncate max-w-[190px] group-hover:text-indigo-200 transition-colors" title={rec.title}>
+                        {rec.title}
+                      </h3>
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setEditingId(rec.id);
+                          setEditedTitle(rec.title);
+                        }}
+                        className="opacity-0 group-hover/title:opacity-100 p-0.5 text-slate-400 hover:text-indigo-300 transition-opacity"
+                        title="Renomear gravação"
+                      >
+                        <Edit3 className="w-3 h-3" />
+                      </button>
+                    </div>
+                  )}
                   <div className="flex items-center space-x-2 text-[10px] text-slate-400 mt-0.5">
                     <span className="flex items-center space-x-1">
                       <Clock className="w-3 h-3 text-slate-400" />
@@ -138,6 +206,15 @@ export const LibraryView: React.FC = () => {
                     <span>{formatSize(rec.fileSize)}</span>
                     <span>•</span>
                     <span className="font-mono text-slate-500">{rec.resolution || '1080p'}</span>
+                    {rec.createdAt && (
+                      <>
+                        <span>•</span>
+                        <span className="flex items-center space-x-1 text-slate-400" title={new Date(rec.createdAt).toLocaleString()}>
+                          <Calendar className="w-2.5 h-2.5 text-slate-500" />
+                          <span>{formatRelativeDate(rec.createdAt)}</span>
+                        </span>
+                      </>
+                    )}
                   </div>
                 </div>
               </div>

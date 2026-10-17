@@ -5,7 +5,8 @@ import {
   formatDurationHuman,
   formatFileSize,
   getResolutionDimensions,
-  getAspectRatio
+  getAspectRatio,
+  formatRelativeDate
 } from '../src/utils/formatters.ts';
 
 describe('Formatters Utilities', () => {
@@ -104,6 +105,29 @@ describe('Formatters Utilities', () => {
 
     test('calculates 9:16 vertical video ratio', () => {
       assert.equal(getAspectRatio(1080, 1920), '9:16');
+    });
+  });
+
+  describe('formatRelativeDate', () => {
+    test('handles zero or invalid timestamps', () => {
+      assert.equal(formatRelativeDate(0), '');
+      assert.equal(formatRelativeDate(NaN), '');
+    });
+
+    test('formats recent timestamps as Agora mesmo', () => {
+      assert.equal(formatRelativeDate(Date.now() - 10000), 'Agora mesmo');
+    });
+
+    test('formats minute differences', () => {
+      assert.equal(formatRelativeDate(Date.now() - 5 * 60 * 1000), 'Há 5 min');
+    });
+
+    test('formats hour differences', () => {
+      assert.equal(formatRelativeDate(Date.now() - 3 * 3600 * 1000), 'Há 3h');
+    });
+
+    test('formats yesterday', () => {
+      assert.equal(formatRelativeDate(Date.now() - 25 * 3600 * 1000), 'Ontem');
     });
   });
 });

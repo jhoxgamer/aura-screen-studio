@@ -823,6 +823,17 @@ export const PreviewView: React.FC = () => {
                 className="w-16 bg-loom-card border border-loom-border rounded px-2 py-1 text-white font-mono text-xs focus:border-indigo-500 outline-none"
               />
               <span className="text-loom-muted">s</span>
+              <button
+                type="button"
+                onClick={() => {
+                  const point = Math.min(currentTime, trimEnd);
+                  setTrimStart(Number(point.toFixed(1)));
+                }}
+                title="Marcar início no segundo atual do player"
+                className="px-1.5 py-1 text-[10px] font-semibold bg-slate-800 hover:bg-indigo-600/30 text-indigo-300 hover:text-white rounded border border-slate-700 hover:border-indigo-500/40 transition-colors"
+              >
+                Atual
+              </button>
             </div>
 
             <div className="flex items-center space-x-1.5 text-xs">
@@ -840,6 +851,17 @@ export const PreviewView: React.FC = () => {
                 className="w-16 bg-loom-card border border-loom-border rounded px-2 py-1 text-white font-mono text-xs focus:border-indigo-500 outline-none"
               />
               <span className="text-loom-muted">s</span>
+              <button
+                type="button"
+                onClick={() => {
+                  const point = Math.max(currentTime, trimStart);
+                  setTrimEnd(Number(point.toFixed(1)));
+                }}
+                title="Marcar fim no segundo atual do player"
+                className="px-1.5 py-1 text-[10px] font-semibold bg-slate-800 hover:bg-indigo-600/30 text-indigo-300 hover:text-white rounded border border-slate-700 hover:border-indigo-500/40 transition-colors"
+              >
+                Atual
+              </button>
             </div>
 
             <button
