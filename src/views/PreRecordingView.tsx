@@ -908,19 +908,21 @@ export const PreRecordingView: React.FC<PreRecordingViewProps> = ({ initialTab =
             )}
 
             {/* Camera Selector & Live Framing Preview */}
-            {mode !== 'screen-only' && (
+            {(mode === 'screen-cam' || mode === 'cam-only') && (
               <div className="space-y-1">
                 <div className="flex items-center justify-between">
                   <h2 className="text-[10px] font-bold text-[#929CAF] uppercase tracking-wider block">
                     Câmera / Webcam
                   </h2>
-                  <button
-                    type="button"
-                    onClick={() => setShowLiveCamPreview(!showLiveCamPreview)}
-                    className="text-[10px] text-[#78A5FF] hover:text-[#9AB9FF] font-medium"
-                  >
-                    {showLiveCamPreview ? 'Ocultar Preview' : 'Exibir Preview'}
-                  </button>
+                  {videoDevices.length > 0 && (
+                    <button
+                      type="button"
+                      onClick={() => setShowLiveCamPreview(!showLiveCamPreview)}
+                      className="text-[10px] text-[#78A5FF] hover:text-[#9AB9FF] font-medium"
+                    >
+                      {showLiveCamPreview ? 'Ocultar Preview' : 'Exibir Preview'}
+                    </button>
+                  )}
                 </div>
 
                 <div className="bg-[#121722] border border-[#303A4B] rounded-xl p-2 flex items-center space-x-2">
@@ -943,7 +945,7 @@ export const PreRecordingView: React.FC<PreRecordingViewProps> = ({ initialTab =
                 </div>
 
                 {/* Live Webcam Framing Box */}
-                {showLiveCamPreview && (
+                {showLiveCamPreview && videoDevices.length > 0 && (
                   <div className="relative w-full h-24 bg-[#0B0E14] rounded-xl overflow-hidden border border-[#303A4B] flex items-center justify-center">
                     {camError ? (
                       <div className="flex flex-col items-center justify-center p-2 text-center space-y-0.5">
