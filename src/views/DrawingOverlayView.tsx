@@ -13,7 +13,8 @@ import {
   Hash,
   Focus,
   MousePointer,
-  Sun
+  Sun,
+  Undo2
 } from 'lucide-react';
 
 export type DrawingTool = 'pen' | 'highlighter' | 'arrow' | 'rectangle' | 'stamp' | 'eraser';
@@ -125,6 +126,12 @@ export const DrawingOverlayView: React.FC = () => {
       if (!active) return;
       if (e.key === 'Escape') {
         handleClose();
+      } else if ((e.ctrlKey || e.metaKey) && (e.key === 'z' || e.key === 'Z')) {
+        e.preventDefault();
+        handleUndo();
+      } else if (e.key === 'u' || e.key === 'U') {
+        e.preventDefault();
+        handleUndo();
       } else if (e.key === 'c' || e.key === 'C') {
         handleClear();
         showToolToast('Quadro Limpo (C)');
@@ -473,6 +480,17 @@ export const DrawingOverlayView: React.FC = () => {
     redraw();
   };
 
+  const handleUndo = () => {
+    if (strokesRef.current.length > 0) {
+      const removed = strokesRef.current.pop();
+      if (removed?.tool === 'stamp' && nextStampRef.current > 1) {
+        setNextStampNumber(Math.max(1, nextStampRef.current - 1));
+      }
+      redraw();
+      showToolToast('Último Traço Desfeito (Ctrl+Z)');
+    }
+  };
+
   const handleClear = () => {
     strokesRef.current = [];
     currentPointsRef.current = [];
@@ -642,6 +660,15 @@ export const DrawingOverlayView: React.FC = () => {
           <Clock className="w-3.5 h-3.5 text-indigo-400" />
           <span>3s Auto-apagar</span>
           {vanishingInk && <Check className="w-3 h-3 text-indigo-300 ml-0.5" />}
+        </button>
+
+        {/* Undo Stroke */}
+        <button
+          onClick={handleUndo}
+          title="Desfazer último traço (Ctrl+Z ou U)"
+          className="p-2 rounded-xl text-slate-400 hover:text-white hover:bg-[#1a1f2e] transition-colors active:scale-95"
+        >
+          <Undo2 className="w-4 h-4" />
         </button>
 
         {/* Clear Canvas */}

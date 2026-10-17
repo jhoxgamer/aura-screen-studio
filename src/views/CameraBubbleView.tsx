@@ -143,29 +143,90 @@ export const CameraBubbleView: React.FC = () => {
     }
   }
 
-  const handleSizeChange = (newSize: BubbleSize) => {
+  const toastTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const showBubbleToast = (msg: string) => {
+    if (toastTimeoutRef.current) clearTimeout(toastTimeoutRef.current);
+    setFilterToast(msg);
+    toastTimeoutRef.current = setTimeout(() => setFilterToast(null), 1800);
+  };
+
+  const handleSizeChange = (newSize: BubbleSize, showToast = false) => {
     setSize(newSize);
     window.electronAPI.setBubbleSize(newSize);
+    if (showToast) {
+      const labels: Record<BubbleSize, string> = {
+        small: 'Tamanho: Pequeno (1)',
+        medium: 'Tamanho: Médio (2)',
+        large: 'Tamanho: Grande (3)',
+        fullscreen: 'Tela Inteira'
+      };
+      showBubbleToast(labels[newSize]);
+    }
   };
 
   const toggleCamera = () => {
-    const nextState = !isCameraActive;
-    setIsCameraActive(nextState);
-    if (streamRef.current) {
-      streamRef.current.getVideoTracks().forEach((track) => {
-        track.enabled = nextState;
-      });
-    }
+    setIsCameraActive(prev => {
+      const nextState = !prev;
+      if (streamRef.current) {
+        streamRef.current.getVideoTracks().forEach((track) => {
+          track.enabled = nextState;
+        });
+      }
+      showBubbleToast(nextState ? 'Câmera Ativada (V)' : 'Câmera Oculta (V)');
+      return nextState;
+    });
   };
 
   const cycleFilter = () => {
     const filters: Array<'none' | 'blur' | 'studio' | 'vibrant'> = ['none', 'blur', 'studio', 'vibrant'];
-    const next = filters[(filters.indexOf(cameraFilter) + 1) % filters.length];
-    setCameraFilter(next);
-    const names = { none: 'Natural', blur: 'Bokeh Blur', studio: 'Studio Light', vibrant: 'Vibrante' };
-    setFilterToast(names[next]);
-    setTimeout(() => setFilterToast(null), 1800);
+    setCameraFilter(prev => {
+      const next = filters[(filters.indexOf(prev) + 1) % filters.length];
+      const names: Record<string, string> = {
+        none: 'Filtro: Natural',
+        blur: 'Filtro: Bokeh Blur',
+        studio: 'Filtro: Studio Light',
+        vibrant: 'Filtro: Vibrante'
+      };
+      showBubbleToast(names[next] || next);
+      return next;
+    });
   };
+
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (['INPUT', 'TEXTAREA'].includes((e.target as HTMLElement)?.tagName)) return;
+      const key = e.key.toLowerCase();
+      if (key === '1') {
+        handleSizeChange('small', true);
+      } else if (key === '2') {
+        handleSizeChange('medium', true);
+      } else if (key === '3') {
+        handleSizeChange('large', true);
+      } else if (key === 'm') {
+        setIsMirrored(prev => {
+          const next = !prev;
+          showBubbleToast(next ? 'Espelhado (M)' : 'Normal (M)');
+          return next;
+        });
+      } else if (key === 's') {
+        setBubbleShape(prev => {
+          const next = prev === 'circle' ? 'squircle' : 'circle';
+          showBubbleToast(next === 'circle' ? 'Formato: Círculo (S)' : 'Formato: Squircle (S)');
+          return next;
+        });
+      } else if (key === 'f') {
+        cycleFilter();
+      } else if (key === 'v') {
+        toggleCamera();
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => {
+      window.removeEventListener('keydown', handleKeyDown);
+      if (toastTimeoutRef.current) clearTimeout(toastTimeoutRef.current);
+    };
+  }, []);
 
   // Dynamic audio-reactive ring glow scale
   const ringScale = 1 + (audioLevel > 0.05 ? audioLevel * 0.08 : 0);
@@ -278,8 +339,8 @@ export const CameraBubbleView: React.FC = () => {
         >
           {/* Bubble Size buttons */}
           <button
-            onClick={() => handleSizeChange('small')}
-            title="Tamanho Pequeno (P)"
+            onClick={() => handleSizeChange('small', true)}
+            title="Tamanho Pequeno (Tecla 1)"
             className={`w-6 h-6 rounded-full text-xs font-semibold transition-all flex items-center justify-center ${
               size === 'small' ? 'bg-indigo-600 text-white shadow-sm' : 'text-slate-400 hover:text-white'
             }`}
@@ -288,8 +349,8 @@ export const CameraBubbleView: React.FC = () => {
           </button>
 
           <button
-            onClick={() => handleSizeChange('medium')}
-            title="Tamanho Médio (M)"
+            onClick={() => handleSizeChange('medium', true)}
+            title="Tamanho Médio (Tecla 2)"
             className={`w-6 h-6 rounded-full text-xs font-semibold transition-all flex items-center justify-center ${
               size === 'medium' ? 'bg-indigo-600 text-white shadow-sm' : 'text-slate-400 hover:text-white'
             }`}
@@ -298,8 +359,8 @@ export const CameraBubbleView: React.FC = () => {
           </button>
 
           <button
-            onClick={() => handleSizeChange('large')}
-            title="Tamanho Grande (G)"
+            onClick={() => handleSizeChange('large', true)}
+            title="Tamanho Grande (Tecla 3)"
             className={`w-6 h-6 rounded-full text-xs font-semibold transition-all flex items-center justify-center ${
               size === 'large' ? 'bg-indigo-600 text-white shadow-sm' : 'text-slate-400 hover:text-white'
             }`}
@@ -311,8 +372,11 @@ export const CameraBubbleView: React.FC = () => {
 
           {/* Flip Horizontal (Mirror) */}
           <button
-            onClick={() => setIsMirrored(!isMirrored)}
-            title="Espelhar Câmera"
+            onClick={() => {
+              setIsMirrored(!isMirrored);
+              showBubbleToast(!isMirrored ? 'Espelhado (M)' : 'Normal (M)');
+            }}
+            title="Espelhar Câmera (Tecla M)"
             className={`p-1.5 rounded-full transition-colors ${
               isMirrored ? 'text-indigo-400 bg-indigo-500/20' : 'text-slate-400 hover:text-white'
             }`}
@@ -323,7 +387,7 @@ export const CameraBubbleView: React.FC = () => {
           {/* Camera toggle */}
           <button
             onClick={toggleCamera}
-            title={isCameraActive ? 'Desativar Câmera' : 'Ativar Câmera'}
+            title={isCameraActive ? 'Desativar Câmera (Tecla V)' : 'Ativar Câmera (Tecla V)'}
             className="p-1.5 rounded-full text-slate-400 hover:text-white transition-colors"
           >
             {isCameraActive ? <Video className="w-3.5 h-3.5" /> : <VideoOff className="w-3.5 h-3.5 text-rose-400" />}
@@ -331,8 +395,12 @@ export const CameraBubbleView: React.FC = () => {
 
           {/* Shape Toggle (Circle vs Squircle) */}
           <button
-            onClick={() => setBubbleShape(bubbleShape === 'circle' ? 'squircle' : 'circle')}
-            title={bubbleShape === 'circle' ? 'Mudar para Squircle' : 'Mudar para Círculo'}
+            onClick={() => {
+              const next = bubbleShape === 'circle' ? 'squircle' : 'circle';
+              setBubbleShape(next);
+              showBubbleToast(next === 'circle' ? 'Formato: Círculo (S)' : 'Formato: Squircle (S)');
+            }}
+            title={bubbleShape === 'circle' ? 'Mudar para Squircle (Tecla S)' : 'Mudar para Círculo (Tecla S)'}
             className="p-1.5 rounded-full text-slate-400 hover:text-white transition-colors"
           >
             {bubbleShape === 'circle' ? <Square className="w-3.5 h-3.5" /> : <Circle className="w-3.5 h-3.5" />}
@@ -341,7 +409,7 @@ export const CameraBubbleView: React.FC = () => {
           {/* Camera Filter / Studio Lighting toggle */}
           <button
             onClick={cycleFilter}
-            title={`Filtro: ${cameraFilter.toUpperCase()}`}
+            title={`Filtro: ${cameraFilter.toUpperCase()} (Tecla F)`}
             className={`p-1.5 rounded-full transition-colors ${
               cameraFilter !== 'none' ? 'bg-indigo-600 text-white font-medium shadow-sm' : 'text-slate-400 hover:text-white'
             }`}

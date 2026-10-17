@@ -13,7 +13,8 @@ import {
   Search,
   Check,
   Edit3,
-  X
+  X,
+  Copy
 } from 'lucide-react';
 import { RecordingMeta } from '../types';
 import { formatRelativeDate, sortRecordings, LibrarySortCriteria } from '../utils/formatters';
@@ -24,6 +25,7 @@ export const LibraryView: React.FC = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [sortCriteria, setSortCriteria] = useState<LibrarySortCriteria>('newest');
   const [copiedId, setCopiedId] = useState<string | null>(null);
+  const [copiedPathId, setCopiedPathId] = useState<string | null>(null);
   const [confirmDeleteId, setConfirmDeleteId] = useState<string | null>(null);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [editedTitle, setEditedTitle] = useState('');
@@ -159,7 +161,15 @@ export const LibraryView: React.FC = () => {
           </div>
 
           <div className="flex items-center space-x-2 text-[10px] text-slate-400">
-            <span>{recordings.length} {recordings.length === 1 ? 'vídeo gravado' : 'vídeos gravados'}</span>
+            <span>
+              {searchQuery ? (
+                <>
+                  <span className="font-semibold text-white">{sortedAndFiltered.length}</span> de {recordings.length} vídeos
+                </>
+              ) : (
+                `${recordings.length} ${recordings.length === 1 ? 'vídeo gravado' : 'vídeos gravados'}`
+              )}
+            </span>
             <span>•</span>
             <span className="font-mono text-indigo-300 font-medium">{formatSize(totalBytes)} em disco</span>
           </div>
@@ -307,6 +317,24 @@ export const LibraryView: React.FC = () => {
                   className="p-1.5 rounded-lg text-indigo-400 hover:bg-indigo-500/10 transition-colors"
                 >
                   <ExternalLink className="w-3.5 h-3.5" />
+                </button>
+
+                {/* Copy local file path */}
+                <button
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    navigator.clipboard.writeText(rec.filePath);
+                    setCopiedPathId(rec.id);
+                    setTimeout(() => setCopiedPathId(null), 2000);
+                  }}
+                  title="Copiar Caminho do Arquivo (C:\...)"
+                  className="p-1.5 rounded-lg text-slate-400 hover:text-indigo-300 hover:bg-slate-800 transition-colors"
+                >
+                  {copiedPathId === rec.id ? (
+                    <Check className="w-3.5 h-3.5 text-emerald-400" />
+                  ) : (
+                    <Copy className="w-3.5 h-3.5" />
+                  )}
                 </button>
 
                 {/* Open folder */}

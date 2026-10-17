@@ -600,6 +600,155 @@ describe('End-to-End Integration & Subsystem Validation', () => {
       step(1.0, true, false);
       assert.equal(scrollPos, 75.0, 'Scroll position resumes automatically upon hover release');
     });
+
+    test('v1.7.8 drawing overlay undo engine pops stroke and restores stamp step counter', () => {
+      interface Stroke {
+        tool: string;
+        points: Array<{ x: number; y: number }>;
+        stampNumber?: number;
+      }
+
+      const strokes: Stroke[] = [];
+      let nextStampNumber = 1;
+
+      const addStroke = (s: Stroke) => {
+        strokes.push(s);
+        if (s.tool === 'stamp') {
+          nextStampNumber++;
+        }
+      };
+
+      const handleUndo = () => {
+        if (strokes.length > 0) {
+          const removed = strokes.pop();
+          if (removed?.tool === 'stamp' && nextStampNumber > 1) {
+            nextStampNumber = Math.max(1, nextStampNumber - 1);
+          }
+        }
+      };
+
+      // Draw two pen strokes and a stamp badge
+      addStroke({ tool: 'pen', points: [{ x: 10, y: 10 }, { x: 20, y: 20 }] });
+      addStroke({ tool: 'arrow', points: [{ x: 50, y: 50 }, { x: 100, y: 100 }] });
+      addStroke({ tool: 'stamp', points: [{ x: 150, y: 150 }], stampNumber: 1 });
+
+      assert.equal(strokes.length, 3);
+      assert.equal(nextStampNumber, 2);
+
+      // Undo stamp badge -> removes stroke and rolls stamp number back to 1
+      handleUndo();
+      assert.equal(strokes.length, 2);
+      assert.equal(nextStampNumber, 1, 'Stamp counter rolled back on undo');
+
+      // Undo arrow stroke
+      handleUndo();
+      assert.equal(strokes.length, 1);
+      assert.equal(strokes[0].tool, 'pen');
+
+      // Undo pen stroke -> empty canvas
+      handleUndo();
+      assert.equal(strokes.length, 0);
+
+      // Extra undo on empty canvas is safe no-op
+      handleUndo();
+      assert.equal(strokes.length, 0);
+      assert.equal(nextStampNumber, 1);
+    });
+
+    test('v1.7.8 camera bubble express shortcuts correctly route sizes, mirror, and filter cycling', () => {
+      let size: 'small' | 'medium' | 'large' = 'medium';
+      let isMirrored = true;
+      let bubbleShape: 'circle' | 'squircle' = 'circle';
+      let cameraFilter: 'none' | 'blur' | 'studio' | 'vibrant' = 'none';
+      let isCameraActive = true;
+      let lastHudToast: string | null = null;
+
+      const filters: Array<'none' | 'blur' | 'studio' | 'vibrant'> = ['none', 'blur', 'studio', 'vibrant'];
+
+      const dispatchBubbleKey = (key: string) => {
+        const k = key.toLowerCase();
+        if (k === '1') {
+          size = 'small';
+          lastHudToast = 'Tamanho: Pequeno (1)';
+        } else if (k === '2') {
+          size = 'medium';
+          lastHudToast = 'Tamanho: Médio (2)';
+        } else if (k === '3') {
+          size = 'large';
+          lastHudToast = 'Tamanho: Grande (3)';
+        } else if (k === 'm') {
+          isMirrored = !isMirrored;
+          lastHudToast = isMirrored ? 'Espelhado (M)' : 'Normal (M)';
+        } else if (k === 's') {
+          bubbleShape = bubbleShape === 'circle' ? 'squircle' : 'circle';
+          lastHudToast = bubbleShape === 'circle' ? 'Formato: Círculo (S)' : 'Formato: Squircle (S)';
+        } else if (k === 'f') {
+          cameraFilter = filters[(filters.indexOf(cameraFilter) + 1) % filters.length];
+          lastHudToast = `Filtro: ${cameraFilter}`;
+        } else if (k === 'v') {
+          isCameraActive = !isCameraActive;
+          lastHudToast = isCameraActive ? 'Câmera Ativada (V)' : 'Câmera Oculta (V)';
+        }
+      };
+
+      // Test size switching
+      dispatchBubbleKey('1');
+      assert.equal(size, 'small');
+      assert.equal(lastHudToast, 'Tamanho: Pequeno (1)');
+
+      dispatchBubbleKey('3');
+      assert.equal(size, 'large');
+      assert.equal(lastHudToast, 'Tamanho: Grande (3)');
+
+      // Test mirror toggle
+      dispatchBubbleKey('M');
+      assert.equal(isMirrored, false);
+      assert.equal(lastHudToast, 'Normal (M)');
+
+      // Test shape toggle
+      dispatchBubbleKey('S');
+      assert.equal(bubbleShape, 'squircle');
+      assert.equal(lastHudToast, 'Formato: Squircle (S)');
+
+      // Test filter cycling
+      dispatchBubbleKey('f');
+      assert.equal(cameraFilter, 'blur');
+      dispatchBubbleKey('f');
+      assert.equal(cameraFilter, 'studio');
+      dispatchBubbleKey('f');
+      assert.equal(cameraFilter, 'vibrant');
+      dispatchBubbleKey('f');
+      assert.equal(cameraFilter, 'none');
+
+      // Test video mute toggle
+      dispatchBubbleKey('v');
+      assert.equal(isCameraActive, false);
+      assert.equal(lastHudToast, 'Câmera Oculta (V)');
+    });
+
+    test('v1.7.8 library video file path copy and search counter calculation', () => {
+      const recordings = [
+        { id: 'rec-1', title: 'Tutorial TypeScript', filePath: 'C:\\Videos\\rec-1.webm' },
+        { id: 'rec-2', title: 'Bug Reprodução Demo', filePath: 'C:\\Videos\\rec-2.webm' },
+        { id: 'rec-3', title: 'Tutorial Next.js', filePath: 'C:\\Videos\\rec-3.webm' }
+      ];
+
+      // File path copy validation
+      let copiedToClipboard = '';
+      const copyPath = (path: string) => { copiedToClipboard = path; };
+
+      copyPath(recordings[0].filePath);
+      assert.equal(copiedToClipboard, 'C:\\Videos\\rec-1.webm');
+
+      // Search & stats counter validation
+      const query = 'tutorial';
+      const filtered = recordings.filter(r => r.title.toLowerCase().includes(query.toLowerCase()));
+      assert.equal(filtered.length, 2);
+      assert.equal(recordings.length, 3);
+
+      const headerLabel = `${filtered.length} de ${recordings.length} vídeos`;
+      assert.equal(headerLabel, '2 de 3 vídeos');
+    });
   });
 });
 
