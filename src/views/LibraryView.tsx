@@ -112,15 +112,17 @@ export const LibraryView: React.FC = () => {
           filtered.map((rec) => (
             <div
               key={rec.id}
-              className="bg-[#131620] border border-[#222838] hover:border-[#323b52] rounded-xl p-3 flex items-center justify-between transition-all group shadow-sm"
+              onClick={() => window.electronAPI.openPreview(rec)}
+              className="bg-[#131620] border border-[#222838] hover:border-indigo-500/40 rounded-xl p-3 flex items-center justify-between transition-all group shadow-sm cursor-pointer hover:bg-[#161a26]"
+              title="Clique para assistir e editar este vídeo no Studio"
             >
               <div className="flex items-center space-x-3 min-w-0">
-                <div className="w-10 h-10 rounded-xl bg-[#191e2b] border border-[#283044] flex items-center justify-center shrink-0 group-hover:border-indigo-500/50 transition-colors">
-                  <Film className="w-5 h-5 text-indigo-400" />
+                <div className="w-10 h-10 rounded-xl bg-[#191e2b] border border-[#283044] flex items-center justify-center shrink-0 group-hover:border-indigo-500/50 group-hover:bg-indigo-600 transition-colors">
+                  <Play className="w-4 h-4 text-indigo-400 group-hover:text-white fill-current transition-colors ml-0.5" />
                 </div>
 
                 <div className="min-w-0">
-                  <h3 className="text-xs font-semibold text-white truncate max-w-[190px]" title={rec.title}>
+                  <h3 className="text-xs font-semibold text-white truncate max-w-[190px] group-hover:text-indigo-200 transition-colors" title={rec.title}>
                     {rec.title}
                   </h3>
                   <div className="flex items-center space-x-2 text-[10px] text-slate-400 mt-0.5">
@@ -136,10 +138,11 @@ export const LibraryView: React.FC = () => {
                 </div>
               </div>
 
-              <div className="flex items-center space-x-1 shrink-0">
+              <div className="flex items-center space-x-1 shrink-0" onClick={(e) => e.stopPropagation()}>
                 {/* Copy share link */}
                 <button
-                  onClick={async () => {
+                  onClick={async (e) => {
+                    e.stopPropagation();
                     const url = rec.shareUrl || await window.electronAPI.getShareUrl(rec.id);
                     navigator.clipboard.writeText(url);
                     setCopiedId(rec.id);
@@ -153,7 +156,10 @@ export const LibraryView: React.FC = () => {
 
                 {/* Download video */}
                 <button
-                  onClick={() => window.electronAPI.downloadRecording(rec.id)}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    window.electronAPI.downloadRecording(rec.id);
+                  }}
                   title="Baixar Vídeo no Computador"
                   className="p-1.5 rounded-lg text-emerald-400 hover:bg-emerald-500/10 transition-colors"
                 >
@@ -162,7 +168,8 @@ export const LibraryView: React.FC = () => {
 
                 {/* Open in web browser */}
                 <button
-                  onClick={async () => {
+                  onClick={async (e) => {
+                    e.stopPropagation();
                     const url = await window.electronAPI.getShareUrl(rec.id);
                     window.electronAPI.openExternalUrl(url);
                   }}
@@ -174,7 +181,10 @@ export const LibraryView: React.FC = () => {
 
                 {/* Open folder */}
                 <button
-                  onClick={() => handleOpenFolder(rec.filePath)}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    handleOpenFolder(rec.filePath);
+                  }}
                   title="Abrir Pasta no Windows Explorer"
                   className="p-1.5 rounded-lg text-slate-400 hover:text-white hover:bg-slate-800 transition-colors"
                 >
@@ -183,7 +193,10 @@ export const LibraryView: React.FC = () => {
 
                 {/* Delete */}
                 <button
-                  onClick={() => handleDelete(rec.id)}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    handleDelete(rec.id);
+                  }}
                   title="Excluir Gravação"
                   className="p-1.5 rounded-lg text-slate-400 hover:text-rose-400 hover:bg-rose-500/10 transition-colors"
                 >

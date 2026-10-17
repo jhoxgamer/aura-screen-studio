@@ -32,17 +32,17 @@ interface Annotation {
 }
 
 const COLORS = [
-  { id: 'cyan', hex: '#06b6d4', name: 'Cyan' },
-  { id: 'purple', hex: '#a855f7', name: 'Roxo' },
-  { id: 'rose', hex: '#f43f5e', name: 'Rosa' },
-  { id: 'emerald', hex: '#10b981', name: 'Verde' },
-  { id: 'amber', hex: '#f59e0b', name: 'Amarelo' }
+  { id: 'rose', hex: '#f43f5e', name: 'Rosa Coral' },
+  { id: 'indigo', hex: '#6366f1', name: 'Índigo Studio' },
+  { id: 'amber', hex: '#f59e0b', name: 'Âmbar Dourado' },
+  { id: 'emerald', hex: '#10b981', name: 'Esmeralda' },
+  { id: 'sky', hex: '#0ea5e9', name: 'Azul Céu' }
 ];
 
 export const ScreenshotStudioView: React.FC = () => {
   const [dataUrl, setDataUrl] = useState<string | null>(null);
   const [activeTool, setActiveTool] = useState<Tool>('arrow');
-  const [activeColor, setActiveColor] = useState<string>('#06b6d4');
+  const [activeColor, setActiveColor] = useState<string>('#f43f5e');
   const [annotations, setAnnotations] = useState<Annotation[]>([]);
   const [stepCounter, setStepCounter] = useState(1);
   const [isCopied, setIsCopied] = useState(false);

@@ -42,13 +42,39 @@ interface ClickRipple {
 
 export const DrawingOverlayView: React.FC = () => {
   const [active, setActive] = useState(false);
-  const [tool, setTool] = useState<DrawingTool>('pen');
-  const [color, setColor] = useState('#f43f5e'); // Studio Coral/Rose
-  const [strokeWidth, setStrokeWidth] = useState(4);
-  const [vanishingInk, setVanishingInk] = useState(true);
+  const [tool, setTool] = useState<DrawingTool>(() => {
+    return (localStorage.getItem('aura_draw_tool') as DrawingTool) || 'pen';
+  });
+  const [color, setColor] = useState(() => {
+    return localStorage.getItem('aura_draw_color') || '#f43f5e';
+  });
+  const [strokeWidth, setStrokeWidth] = useState(() => {
+    const saved = localStorage.getItem('aura_draw_width');
+    return saved ? Number(saved) : 4;
+  });
+  const [vanishingInk, setVanishingInk] = useState(() => {
+    const saved = localStorage.getItem('aura_draw_vanishing');
+    return saved !== null ? saved === 'true' : true;
+  });
   const [mouseSpotlight, setMouseSpotlight] = useState(false);
   const [backgroundDimmer, setBackgroundDimmer] = useState(false);
   const [nextStampNumber, setNextStampNumber] = useState(1);
+
+  useEffect(() => {
+    localStorage.setItem('aura_draw_tool', tool);
+  }, [tool]);
+
+  useEffect(() => {
+    localStorage.setItem('aura_draw_color', color);
+  }, [color]);
+
+  useEffect(() => {
+    localStorage.setItem('aura_draw_width', String(strokeWidth));
+  }, [strokeWidth]);
+
+  useEffect(() => {
+    localStorage.setItem('aura_draw_vanishing', String(vanishingInk));
+  }, [vanishingInk]);
 
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const strokesRef = useRef<PathStroke[]>([]);

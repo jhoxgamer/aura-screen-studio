@@ -16,13 +16,32 @@ import { BubbleSize, RecordingOptions } from '../types';
 
 export const CameraBubbleView: React.FC = () => {
   const [size, setSize] = useState<BubbleSize>('medium');
-  const [isMirrored, setIsMirrored] = useState(true);
+  const [isMirrored, setIsMirrored] = useState<boolean>(() => {
+    const saved = localStorage.getItem('aura_bubble_mirrored');
+    return saved !== null ? saved === 'true' : true;
+  });
   const [isCameraActive, setIsCameraActive] = useState(true);
   const [showControls, setShowControls] = useState(false);
-  const [cameraFilter, setCameraFilter] = useState<'none' | 'blur' | 'studio' | 'vibrant'>('none');
-  const [bubbleShape, setBubbleShape] = useState<'circle' | 'squircle'>('circle');
+  const [cameraFilter, setCameraFilter] = useState<'none' | 'blur' | 'studio' | 'vibrant'>(() => {
+    return (localStorage.getItem('aura_bubble_filter') as any) || 'none';
+  });
+  const [bubbleShape, setBubbleShape] = useState<'circle' | 'squircle'>(() => {
+    return (localStorage.getItem('aura_bubble_shape') as any) || 'circle';
+  });
   const [filterToast, setFilterToast] = useState<string | null>(null);
   const [audioLevel, setAudioLevel] = useState<number>(0);
+
+  useEffect(() => {
+    localStorage.setItem('aura_bubble_mirrored', String(isMirrored));
+  }, [isMirrored]);
+
+  useEffect(() => {
+    localStorage.setItem('aura_bubble_filter', cameraFilter);
+  }, [cameraFilter]);
+
+  useEffect(() => {
+    localStorage.setItem('aura_bubble_shape', bubbleShape);
+  }, [bubbleShape]);
 
   const videoRef = useRef<HTMLVideoElement>(null);
   const streamRef = useRef<MediaStream | null>(null);

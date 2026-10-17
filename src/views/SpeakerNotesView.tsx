@@ -59,7 +59,7 @@ export const SpeakerNotesView: React.FC = () => {
   const [text, setText] = useState<string>(() => {
     return localStorage.getItem('aura_speaker_notes_v2') ||
       localStorage.getItem('aura_speaker_notes') ||
-      `📝 Bem-vindo ao Teleprompter Aura!\n\nCole ou digite aqui seu roteiro de apresentação.\n\n• Pressione [ESPAÇO] para iniciar ou pausar a rolagem suave sem travar.\n• Use [SETA CIMA] e [SETA BAIXO] para acelerar ou desacelerar.\n• Mantenha o olhar na linha guia cyan para contato visual perfeito com a câmera!\n• Mude para a aba "Tópicos" se preferir falar por tópicos e marcar os itens abordados.`;
+      `📝 Bem-vindo ao Teleprompter Aura!\n\nCole ou digite aqui seu roteiro de apresentação.\n\n• Pressione [ESPAÇO] para iniciar ou pausar a rolagem suave sem travar.\n• Use [SETA CIMA] e [SETA BAIXO] para acelerar ou desacelerar.\n• Mantenha o olhar na linha guia visual (índigo) para contato visual perfeito com a câmera!\n• Mude para a aba "Tópicos" se preferir falar por tópicos e marcar os itens abordados.`;
   });
 
   // Bullet Notes list (Loom Style checklist)
@@ -83,9 +83,17 @@ export const SpeakerNotesView: React.FC = () => {
   const [speed, setSpeed] = useState<number>(() => {
     return Number(localStorage.getItem('aura_prompter_speed')) || 1.25;
   });
-  const [fontSize, setFontSize] = useState<number>(20);
-  const [opacity, setOpacity] = useState<number>(95);
-  const [isMirrored, setIsMirrored] = useState(false);
+  const [fontSize, setFontSize] = useState<number>(() => {
+    const saved = localStorage.getItem('aura_prompter_font_size');
+    return saved ? Number(saved) : 20;
+  });
+  const [opacity, setOpacity] = useState<number>(() => {
+    const saved = localStorage.getItem('aura_prompter_opacity');
+    return saved ? Number(saved) : 95;
+  });
+  const [isMirrored, setIsMirrored] = useState<boolean>(() => {
+    return localStorage.getItem('aura_prompter_mirrored') === 'true';
+  });
   const [isCollapsed, setIsCollapsed] = useState(false);
   const [currentLinePreview, setCurrentLinePreview] = useState('');
 
@@ -102,6 +110,18 @@ export const SpeakerNotesView: React.FC = () => {
   useEffect(() => {
     localStorage.setItem('aura_prompter_speed', speed.toString());
   }, [speed]);
+
+  useEffect(() => {
+    localStorage.setItem('aura_prompter_font_size', fontSize.toString());
+  }, [fontSize]);
+
+  useEffect(() => {
+    localStorage.setItem('aura_prompter_opacity', opacity.toString());
+  }, [opacity]);
+
+  useEffect(() => {
+    localStorage.setItem('aura_prompter_mirrored', String(isMirrored));
+  }, [isMirrored]);
 
   useEffect(() => {
     localStorage.setItem('aura_speaker_notes_bullets', JSON.stringify(bulletNotes));

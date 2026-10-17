@@ -102,9 +102,9 @@ export const PreviewView: React.FC = () => {
         setPublicUrl(pub);
       } catch (e) {}
 
-      const videoSrc = receivedMeta.shareUrl
-        ? receivedMeta.shareUrl.replace('/share/', '/video/')
-        : `http://localhost:4545/video/${receivedMeta.id}`;
+      const videoSrc = receivedMeta.id
+        ? `http://localhost:4545/video/${receivedMeta.id}`
+        : `file://${receivedMeta.filePath}`;
       extractWaveform(videoSrc);
     });
 
@@ -532,9 +532,7 @@ export const PreviewView: React.FC = () => {
             <video
               ref={videoRef}
               src={
-                meta.shareUrl
-                  ? meta.shareUrl.replace('/share/', '/video/')
-                  : meta.id
+                meta.id
                   ? `http://localhost:4545/video/${meta.id}`
                   : `file://${meta.filePath}`
               }

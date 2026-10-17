@@ -82,6 +82,9 @@ export const electronAPI = {
   trimRecording: async (id: string, buffer: ArrayBuffer, newDurationMs: number): Promise<any> => {
     return await ipcRenderer.invoke('recordings:trim', id, buffer, newDurationMs);
   },
+  openPreview: (idOrMeta: string | RecordingMeta) => {
+    ipcRenderer.send('recordings:open-preview', idOrMeta);
+  },
   openPreRecording: () => {
     ipcRenderer.send('window:open-pre-recording');
   },

@@ -897,6 +897,19 @@ function setupIpcHandlers() {
     return null;
   });
 
+  ipcMain.on('recordings:open-preview', (_, idOrMeta: string | RecordingMeta) => {
+    let targetMeta: RecordingMeta | undefined;
+    if (typeof idOrMeta === 'string') {
+      const list = readMetadata();
+      targetMeta = list.find((r) => r.id === idOrMeta);
+    } else {
+      targetMeta = idOrMeta;
+    }
+    if (targetMeta) {
+      createPreviewWindow(targetMeta);
+    }
+  });
+
   // Instant Screenshot Handlers
   ipcMain.on('screenshot:take', () => {
     captureAndOpenScreenshotStudio();

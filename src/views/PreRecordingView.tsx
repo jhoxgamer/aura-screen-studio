@@ -26,16 +26,22 @@ import { LibraryView } from './LibraryView';
 
 export const PreRecordingView: React.FC = () => {
   const [activeTab, setActiveTab] = useState<'record' | 'library'>('record');
-  const [mode, setMode] = useState<RecordingMode>('screen-cam');
+  const [mode, setMode] = useState<RecordingMode>(() => {
+    return (localStorage.getItem('aura_recording_mode') as RecordingMode) || 'screen-cam';
+  });
   const [publicUrl, setPublicUrl] = useState<string | null>(null);
   const [sources, setSources] = useState<CaptureSource[]>([]);
   const [selectedSourceId, setSelectedSourceId] = useState<string>('');
   
   const [videoDevices, setVideoDevices] = useState<MediaDeviceInfo[]>([]);
-  const [selectedVideoId, setSelectedVideoId] = useState<string>('');
+  const [selectedVideoId, setSelectedVideoId] = useState<string>(() => {
+    return localStorage.getItem('aura_video_device_id') || '';
+  });
   
   const [audioDevices, setAudioDevices] = useState<MediaDeviceInfo[]>([]);
-  const [selectedAudioId, setSelectedAudioId] = useState<string>('');
+  const [selectedAudioId, setSelectedAudioId] = useState<string>(() => {
+    return localStorage.getItem('aura_audio_device_id') || '';
+  });
   
   // Real Audio DSP controls
   const [micVolume, setMicVolume] = useState<number>(() => {
@@ -49,14 +55,27 @@ export const PreRecordingView: React.FC = () => {
   const [audioLevel, setAudioLevel] = useState<number>(0);
   const [isClipping, setIsClipping] = useState<boolean>(false);
   
-  const [includeSystemAudio, setIncludeSystemAudio] = useState(true);
-  const [resolution, setResolution] = useState<'720p' | '1080p' | '4k'>('1080p');
-  const [fps, setFps] = useState<number>(60);
+  const [includeSystemAudio, setIncludeSystemAudio] = useState<boolean>(() => {
+    const saved = localStorage.getItem('aura_include_system_audio');
+    return saved !== null ? saved === 'true' : true;
+  });
+  const [resolution, setResolution] = useState<'720p' | '1080p' | '4k'>(() => {
+    return (localStorage.getItem('aura_resolution') as any) || '1080p';
+  });
+  const [fps, setFps] = useState<number>(() => {
+    const saved = localStorage.getItem('aura_fps');
+    return saved ? Number(saved) : 60;
+  });
 
   // Advanced feature toggles
-  const [speakerNotesEnabled, setSpeakerNotesEnabled] = useState(false);
+  const [speakerNotesEnabled, setSpeakerNotesEnabled] = useState<boolean>(() => {
+    return localStorage.getItem('aura_speaker_notes_enabled') === 'true';
+  });
   const [isSpeakerNotesOpen, setIsSpeakerNotesOpen] = useState(false);
-  const [highlightCursor, setHighlightCursor] = useState(true);
+  const [highlightCursor, setHighlightCursor] = useState<boolean>(() => {
+    const saved = localStorage.getItem('aura_highlight_cursor');
+    return saved !== null ? saved === 'true' : true;
+  });
   const [cropArea, setCropArea] = useState<CropArea | null>(null);
   const [showLiveCamPreview, setShowLiveCamPreview] = useState(true);
 
@@ -110,7 +129,31 @@ export const PreRecordingView: React.FC = () => {
     };
   }, []);
 
-  // Save mic preferences
+  // Save preferences
+  useEffect(() => {
+    localStorage.setItem('aura_recording_mode', mode);
+  }, [mode]);
+
+  useEffect(() => {
+    localStorage.setItem('aura_resolution', resolution);
+  }, [resolution]);
+
+  useEffect(() => {
+    localStorage.setItem('aura_fps', String(fps));
+  }, [fps]);
+
+  useEffect(() => {
+    localStorage.setItem('aura_include_system_audio', String(includeSystemAudio));
+  }, [includeSystemAudio]);
+
+  useEffect(() => {
+    localStorage.setItem('aura_speaker_notes_enabled', String(speakerNotesEnabled));
+  }, [speakerNotesEnabled]);
+
+  useEffect(() => {
+    localStorage.setItem('aura_highlight_cursor', String(highlightCursor));
+  }, [highlightCursor]);
+
   useEffect(() => {
     localStorage.setItem('aura_mic_volume', String(micVolume));
   }, [micVolume]);
@@ -118,6 +161,14 @@ export const PreRecordingView: React.FC = () => {
   useEffect(() => {
     localStorage.setItem('aura_noise_suppression', noiseSuppressionLevel);
   }, [noiseSuppressionLevel]);
+
+  useEffect(() => {
+    if (selectedAudioId) localStorage.setItem('aura_audio_device_id', selectedAudioId);
+  }, [selectedAudioId]);
+
+  useEffect(() => {
+    if (selectedVideoId) localStorage.setItem('aura_video_device_id', selectedVideoId);
+  }, [selectedVideoId]);
 
   // Load capture sources & media devices
   useEffect(() => {
@@ -136,10 +187,22 @@ export const PreRecordingView: React.FC = () => {
         const aInputs = devices.filter((d) => d.kind === 'audioinput');
 
         setVideoDevices(vInputs);
-        if (vInputs.length > 0) setSelectedVideoId(vInputs[0].deviceId);
+        const savedVideo = localStorage.getItem('aura_video_device_id');
+        const matchedVideo = vInputs.find((d) => d.deviceId === savedVideo);
+        if (matchedVideo) {
+          setSelectedVideoId(matchedVideo.deviceId);
+        } else if (vInputs.length > 0) {
+          setSelectedVideoId(vInputs[0].deviceId);
+        }
 
         setAudioDevices(aInputs);
-        if (aInputs.length > 0) setSelectedAudioId(aInputs[0].deviceId);
+        const savedAudio = localStorage.getItem('aura_audio_device_id');
+        const matchedAudio = aInputs.find((d) => d.deviceId === savedAudio);
+        if (matchedAudio) {
+          setSelectedAudioId(matchedAudio.deviceId);
+        } else if (aInputs.length > 0) {
+          setSelectedAudioId(aInputs[0].deviceId);
+        }
       } catch (err) {
         console.error('Error fetching devices:', err);
       }
@@ -466,7 +529,7 @@ export const PreRecordingView: React.FC = () => {
           <div className="flex items-center space-x-2">
             <span className="font-semibold text-sm tracking-tight text-white">Aura Screen Studio</span>
             <span className="text-[10px] text-slate-400 bg-[#181c28] border border-[#262c3e] px-1.5 py-0.5 rounded font-mono">
-              v{appVersion || '1.7.1'}
+              v{appVersion || '1.7.2'}
             </span>
           </div>
         </div>
@@ -1070,7 +1133,7 @@ export const PreRecordingView: React.FC = () => {
             {/* App Version & Manual Update Check */}
             <div className="flex items-center justify-between pt-2 border-t border-[#202534] text-[11px] text-slate-500">
               <span className="font-mono flex items-center gap-1.5">
-                <span>v{appVersion || '1.7.1'}</span>
+                <span>v{appVersion || '1.7.2'}</span>
                 {updateFeedback && (
                   <span className="text-emerald-400 font-sans font-medium text-[10px] bg-emerald-950/60 border border-emerald-500/40 px-1.5 py-0.5 rounded">
                     {updateFeedback}
