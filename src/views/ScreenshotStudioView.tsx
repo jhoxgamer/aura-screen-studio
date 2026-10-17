@@ -32,17 +32,17 @@ interface Annotation {
 }
 
 const COLORS = [
-  { id: 'rose', hex: '#f43f5e', name: 'Rosa Coral' },
-  { id: 'indigo', hex: '#6366f1', name: 'Índigo Studio' },
-  { id: 'amber', hex: '#f59e0b', name: 'Âmbar Dourado' },
-  { id: 'emerald', hex: '#10b981', name: 'Esmeralda' },
-  { id: 'sky', hex: '#0ea5e9', name: 'Azul Céu' }
+  { id: 'mint', hex: '#3AD6C6', name: 'Signal Mint' },
+  { id: 'coral', hex: '#FF5F6D', name: 'Coral Gravador' },
+  { id: 'amber', hex: '#FFBD66', name: 'Âmbar Alerta' },
+  { id: 'green', hex: '#4CD6A0', name: 'Verde Sucesso' },
+  { id: 'ice', hex: '#65E6D8', name: 'Signal Mint Claro' }
 ];
 
 export const ScreenshotStudioView: React.FC = () => {
   const [dataUrl, setDataUrl] = useState<string | null>(null);
   const [activeTool, setActiveTool] = useState<Tool>('arrow');
-  const [activeColor, setActiveColor] = useState<string>('#f43f5e');
+  const [activeColor, setActiveColor] = useState<string>('#3AD6C6');
   const activeColorRef = useRef(activeColor);
 
   useEffect(() => {
@@ -440,23 +440,23 @@ export const ScreenshotStudioView: React.FC = () => {
 
       {/* Toast Notification */}
       {toastMessage && (
-        <div className="absolute top-6 left-1/2 -translate-x-1/2 z-50 bg-[#0e111a]/95 border border-[#232838] text-white px-5 py-2.5 rounded-2xl shadow-2xl flex items-center space-x-2 text-xs font-medium backdrop-blur-md">
-          <Sparkles className="w-4 h-4 text-indigo-400" />
+        <div className="absolute top-6 left-1/2 -translate-x-1/2 z-50 bg-[#111A22]/95 border border-[#3AD6C6]/40 text-[#F4F7FA] px-5 py-2.5 rounded-2xl shadow-2xl flex items-center space-x-2 text-xs font-medium backdrop-blur-md">
+          <Sparkles className="w-4 h-4 text-[#3AD6C6]" />
           <span>{toastMessage}</span>
         </div>
       )}
 
       {/* Floating Modern Annotation Toolbar */}
-      <div className="absolute bottom-6 left-1/2 -translate-x-1/2 z-40 bg-[#0e111a]/95 border border-[#232838] backdrop-blur-xl px-4 py-2 rounded-2xl shadow-2xl flex items-center space-x-3">
+      <div className="absolute bottom-6 left-1/2 -translate-x-1/2 z-40 bg-[#111A22]/95 border border-[#31414D] backdrop-blur-xl px-4 py-2 rounded-2xl shadow-2xl flex items-center space-x-3">
         {/* Tools */}
-        <div className="flex items-center space-x-1 border-r border-[#222838] pr-3">
+        <div className="flex items-center space-x-1 border-r border-[#31414D] pr-3">
           <button
             onClick={() => setActiveTool('crop')}
             title="Recortar Área (Tecla C)"
             className={`p-2 rounded-xl transition-all ${
               activeTool === 'crop'
-                ? 'bg-indigo-600 text-white font-medium shadow-sm'
-                : 'text-slate-400 hover:text-white hover:bg-slate-800/60'
+                ? 'bg-[#3AD6C6] text-[#062B2A] font-bold shadow-sm'
+                : 'text-[#92A2AE] hover:text-[#F4F7FA] hover:bg-[#18242E]'
             }`}
           >
             <Crop className="w-4 h-4" />
@@ -467,8 +467,8 @@ export const ScreenshotStudioView: React.FC = () => {
             title="Seta Direcional (Tecla A)"
             className={`p-2 rounded-xl transition-all ${
               activeTool === 'arrow'
-                ? 'bg-indigo-600 text-white font-medium shadow-sm'
-                : 'text-slate-400 hover:text-white hover:bg-slate-800/60'
+                ? 'bg-[#3AD6C6] text-[#062B2A] font-bold shadow-sm'
+                : 'text-[#92A2AE] hover:text-[#F4F7FA] hover:bg-[#18242E]'
             }`}
           >
             <ArrowRight className="w-4 h-4" />
@@ -479,8 +479,8 @@ export const ScreenshotStudioView: React.FC = () => {
             title="Destaque Retângulo (Tecla R)"
             className={`p-2 rounded-xl transition-all ${
               activeTool === 'rect'
-                ? 'bg-indigo-600 text-white font-medium shadow-sm'
-                : 'text-slate-400 hover:text-white hover:bg-slate-800/60'
+                ? 'bg-[#3AD6C6] text-[#062B2A] font-bold shadow-sm'
+                : 'text-[#92A2AE] hover:text-[#F4F7FA] hover:bg-[#18242E]'
             }`}
           >
             <Square className="w-4 h-4" />
@@ -491,8 +491,8 @@ export const ScreenshotStudioView: React.FC = () => {
             title="Etapas Numeradas (Tecla S)"
             className={`p-2 rounded-xl transition-all ${
               activeTool === 'step'
-                ? 'bg-indigo-600 text-white font-medium shadow-sm'
-                : 'text-slate-400 hover:text-white hover:bg-slate-800/60'
+                ? 'bg-[#3AD6C6] text-[#062B2A] font-bold shadow-sm'
+                : 'text-[#92A2AE] hover:text-[#F4F7FA] hover:bg-[#18242E]'
             }`}
           >
             <Hash className="w-4 h-4" />
@@ -503,8 +503,8 @@ export const ScreenshotStudioView: React.FC = () => {
             title="Desenho Livre (Tecla P)"
             className={`p-2 rounded-xl transition-all ${
               activeTool === 'pen'
-                ? 'bg-indigo-600 text-white font-medium shadow-sm'
-                : 'text-slate-400 hover:text-white hover:bg-slate-800/60'
+                ? 'bg-[#3AD6C6] text-[#062B2A] font-bold shadow-sm'
+                : 'text-[#92A2AE] hover:text-[#F4F7FA] hover:bg-[#18242E]'
             }`}
           >
             <PenTool className="w-4 h-4" />
@@ -515,8 +515,8 @@ export const ScreenshotStudioView: React.FC = () => {
             title="Tarja de Confidencialidade (Tecla B)"
             className={`p-2 rounded-xl transition-all ${
               activeTool === 'blur'
-                ? 'bg-indigo-600 text-white font-medium shadow-sm'
-                : 'text-slate-400 hover:text-white hover:bg-slate-800/60'
+                ? 'bg-[#3AD6C6] text-[#062B2A] font-bold shadow-sm'
+                : 'text-[#92A2AE] hover:text-[#F4F7FA] hover:bg-[#18242E]'
             }`}
           >
             <EyeOff className="w-4 h-4" />
@@ -527,8 +527,8 @@ export const ScreenshotStudioView: React.FC = () => {
             title="Anotação de Texto (Tecla T)"
             className={`p-2 rounded-xl transition-all ${
               activeTool === 'text'
-                ? 'bg-indigo-600 text-white font-medium shadow-sm'
-                : 'text-slate-400 hover:text-white hover:bg-slate-800/60'
+                ? 'bg-[#3AD6C6] text-[#062B2A] font-bold shadow-sm'
+                : 'text-[#92A2AE] hover:text-[#F4F7FA] hover:bg-[#18242E]'
             }`}
           >
             <Type className="w-4 h-4" />
@@ -536,7 +536,7 @@ export const ScreenshotStudioView: React.FC = () => {
         </div>
 
         {/* Colors */}
-        <div className="flex items-center space-x-1.5 border-r border-[#222838] pr-3">
+        <div className="flex items-center space-x-1.5 border-r border-[#31414D] pr-3">
           {COLORS.map((c, idx) => (
             <button
               key={c.id}
@@ -554,10 +554,10 @@ export const ScreenshotStudioView: React.FC = () => {
           {/* Custom Color Spectrum Picker */}
           <label
             title="Escolher Cor Personalizada (Espectro Completo)"
-            className="relative w-5 h-5 rounded-full cursor-pointer overflow-hidden border border-slate-600 hover:border-white transition-all hover:scale-110 flex items-center justify-center shrink-0"
+            className="relative w-5 h-5 rounded-full cursor-pointer overflow-hidden border border-[#31414D] hover:border-white transition-all hover:scale-110 flex items-center justify-center shrink-0"
             style={{
               background:
-                'conic-gradient(from 0deg, #f43f5e, #f59e0b, #10b981, #0ea5e9, #6366f1, #ec4899, #f43f5e)'
+                'conic-gradient(from 0deg, #3AD6C6, #FF5F6D, #FFBD66, #4CD6A0, #65E6D8, #3AD6C6)'
             }}
           >
             <input
@@ -573,7 +573,7 @@ export const ScreenshotStudioView: React.FC = () => {
         <button
           onClick={handleUndo}
           title="Desfazer (Ctrl+Z ou U)"
-          className="p-2 rounded-xl text-slate-400 hover:text-white hover:bg-slate-800/60 transition-all"
+          className="p-2 rounded-xl text-[#92A2AE] hover:text-[#F4F7FA] hover:bg-[#18242E] transition-all"
         >
           <Undo2 className="w-4 h-4" />
         </button>
@@ -581,17 +581,17 @@ export const ScreenshotStudioView: React.FC = () => {
         {/* Copy Image Button */}
         <button
           onClick={handleCopy}
-          className="flex items-center space-x-1.5 bg-indigo-600 hover:bg-indigo-500 active:scale-95 text-white px-3.5 py-1.5 rounded-xl text-xs font-semibold transition-all shadow-sm"
+          className="flex items-center space-x-1.5 bg-[#3AD6C6] hover:bg-[#65E6D8] active:scale-95 text-[#062B2A] px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all shadow-sm"
           title="Copiar imagem para área de transferência (Ctrl+C)"
         >
-          {isCopied ? <Check className="w-3.5 h-3.5" /> : <Copy className="w-3.5 h-3.5" />}
+          {isCopied ? <Check className="w-3.5 h-3.5 stroke-[3]" /> : <Copy className="w-3.5 h-3.5" />}
           <span>{isCopied ? 'Copiado!' : 'Copiar Imagem'}</span>
         </button>
 
         {/* Save PNG Button */}
         <button
           onClick={handleSave}
-          className="p-2 rounded-xl text-slate-300 hover:text-indigo-400 hover:bg-slate-800/60 transition-all"
+          className="p-2 rounded-xl text-[#C0CDD6] hover:text-[#3AD6C6] hover:bg-[#18242E] transition-all"
           title="Salvar arquivo PNG em Fotos"
         >
           <Download className="w-4 h-4" />
@@ -601,7 +601,7 @@ export const ScreenshotStudioView: React.FC = () => {
         <button
           onClick={() => window.electronAPI.closeCurrentWindow()}
           title="Fechar (Esc)"
-          className="p-2 rounded-xl text-slate-400 hover:text-rose-400 hover:bg-rose-500/10 transition-all"
+          className="p-2 rounded-xl text-[#92A2AE] hover:text-[#FF5F6D] hover:bg-[#FF5F6D]/10 transition-all"
         >
           <X className="w-4 h-4" />
         </button>

@@ -5,9 +5,16 @@ class LiveShareService {
   private intervalId: any = null;
   private isCapturing: boolean = false;
   private isPaused: boolean = false;
+  private isDispatching: boolean = false;
+  private targetFps: number = 60; // 60 FPS Ultra-Smooth by default!
+  private quality: number = 0.88; // Crisp 1080p high fidelity
+  private framesSent: number = 0;
+  private lastFpsCheck: number = Date.now();
+  private currentFps: number = 60;
 
-  public async startCapture(sourceId?: string): Promise<boolean> {
+  public async startCapture(sourceId?: string, fps: number = 60): Promise<boolean> {
     if (this.isCapturing) return true;
+    this.targetFps = fps;
 
     try {
       let targetSourceId = sourceId;
@@ -19,6 +26,7 @@ class LiveShareService {
 
       if (!targetSourceId) return false;
 
+      // Request desktop stream at up to 60 FPS with 1080p high resolution
       const stream = await (navigator.mediaDevices as any).getUserMedia({
         audio: false,
         video: {
@@ -29,7 +37,7 @@ class LiveShareService {
             maxWidth: 1920,
             minHeight: 720,
             maxHeight: 1080,
-            maxFrameRate: 30
+            maxFrameRate: 60
           }
         }
       });
@@ -42,11 +50,11 @@ class LiveShareService {
 
       this.canvasEl = document.createElement('canvas');
       this.isCapturing = true;
+      this.framesSent = 0;
+      this.lastFpsCheck = Date.now();
 
-      // Continuous 25 FPS screen capture
-      this.intervalId = setInterval(() => {
-        this.captureAndDispatchFrame();
-      }, 40);
+      // Launch dynamic high-frequency loop for smooth 60 FPS delivery
+      this.scheduleNextFrame();
 
       return true;
     } catch (err) {
@@ -55,15 +63,43 @@ class LiveShareService {
     }
   }
 
+  public setTargetFps(fps: number) {
+    this.targetFps = Math.max(15, Math.min(60, fps));
+    if (this.intervalId) {
+      clearInterval(this.intervalId);
+      this.scheduleNextFrame();
+    }
+  }
+
+  public getTargetFps(): number {
+    return this.targetFps;
+  }
+
+  public getCurrentFps(): number {
+    return this.currentFps;
+  }
+
+  public setQuality(quality: number) {
+    this.quality = Math.max(0.5, Math.min(0.95, quality));
+  }
+
+  private scheduleNextFrame() {
+    const frameIntervalMs = Math.round(1000 / this.targetFps);
+    this.intervalId = setInterval(() => {
+      this.captureAndDispatchFrame();
+    }, frameIntervalMs);
+  }
+
   private captureAndDispatchFrame() {
     if (!this.isCapturing || this.isPaused || !this.videoEl || !this.canvasEl) return;
     if (this.videoEl.videoWidth === 0 || this.videoEl.videoHeight === 0) return;
+    if (this.isDispatching) return; // Prevent frame piling / backpressure
 
     const ctx = this.canvasEl.getContext('2d', { alpha: false });
     if (!ctx) return;
 
-    // Scale resolution for high-definition 1080p presentation with low bandwidth footprint
-    const targetWidth = Math.min(1600, this.videoEl.videoWidth);
+    // Full 1080p high definition presentation
+    const targetWidth = Math.min(1920, this.videoEl.videoWidth);
     const targetHeight = Math.round((targetWidth / this.videoEl.videoWidth) * this.videoEl.videoHeight);
 
     if (this.canvasEl.width !== targetWidth || this.canvasEl.height !== targetHeight) {
@@ -72,17 +108,31 @@ class LiveShareService {
     }
 
     ctx.drawImage(this.videoEl, 0, 0, targetWidth, targetHeight);
+    this.isDispatching = true;
 
     this.canvasEl.toBlob(
       (blob) => {
         if (blob && window.electronAPI?.sendLiveFrame) {
           blob.arrayBuffer().then((buf) => {
             window.electronAPI.sendLiveFrame(buf);
+            this.isDispatching = false;
+            this.framesSent++;
+
+            const now = Date.now();
+            if (now - this.lastFpsCheck >= 1000) {
+              this.currentFps = Math.round((this.framesSent * 1000) / (now - this.lastFpsCheck));
+              this.framesSent = 0;
+              this.lastFpsCheck = now;
+            }
+          }).catch(() => {
+            this.isDispatching = false;
           });
+        } else {
+          this.isDispatching = false;
         }
       },
       'image/jpeg',
-      0.82
+      this.quality
     );
   }
 
@@ -92,6 +142,7 @@ class LiveShareService {
 
   public stopCapture() {
     this.isCapturing = false;
+    this.isDispatching = false;
     if (this.intervalId) {
       clearInterval(this.intervalId);
       this.intervalId = null;

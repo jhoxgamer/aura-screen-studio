@@ -631,23 +631,23 @@ export const PreRecordingView: React.FC = () => {
   };
 
   return (
-    <div className="w-[460px] h-[730px] bg-[#0c0e14] text-slate-100 rounded-2xl border border-[#232838] shadow-2xl flex flex-col overflow-hidden select-none font-sans">
+    <div className="w-[470px] min-h-[730px] bg-[#0B1117] text-[#F4F7FA] rounded-2xl border border-[#31414D] shadow-2xl flex flex-col overflow-hidden select-none font-sans">
       {/* Title Bar / Drag Handle */}
       <div
-        className="h-12 bg-[#121520] px-4 flex items-center justify-between border-b border-[#202534]"
+        className="h-12 bg-[#111A22] px-4 flex items-center justify-between border-b border-[#31414D]"
         style={{ WebkitAppRegion: 'drag' } as any}
       >
         <div className="flex items-center space-x-2.5">
           {/* Authentic Studio Emblem */}
-          <div className="w-7 h-7 rounded-lg bg-[#1a1f2e] border border-[#2e374d] flex items-center justify-center">
-            <div className="w-3.5 h-3.5 rounded-full border-2 border-indigo-400 flex items-center justify-center">
-              <div className="w-1.5 h-1.5 rounded-full bg-rose-500" />
+          <div className="w-7 h-7 rounded-lg bg-[#18242E] border border-[#31414D] flex items-center justify-center">
+            <div className="w-3.5 h-3.5 rounded-full border-2 border-[#3AD6C6] flex items-center justify-center">
+              <div className="w-1.5 h-1.5 rounded-full bg-[#FF5F6D]" />
             </div>
           </div>
           <div className="flex items-center space-x-2">
-            <span className="font-semibold text-sm tracking-tight text-white">Aura Screen Studio</span>
-            <span className="text-[10px] text-slate-400 bg-[#181c28] border border-[#262c3e] px-1.5 py-0.5 rounded font-mono">
-              v{appVersion || '1.8.0'}
+            <span className="font-semibold text-sm tracking-tight text-[#F4F7FA]">Aura Screen Studio</span>
+            <span className="text-[10px] text-[#C0CDD6] bg-[#18242E] border border-[#31414D] px-1.5 py-0.5 rounded font-mono">
+              v{appVersion || '2.2.0'}
             </span>
           </div>
         </div>
@@ -655,36 +655,36 @@ export const PreRecordingView: React.FC = () => {
         <div className="flex items-center space-x-1" style={{ WebkitAppRegion: 'no-drag' } as any}>
           <button
             onClick={() => window.electronAPI.startLiveShare()}
-            title="Compartilhar Tela ao Vivo no Estilo Zoom (Alt+Shift+Z)"
-            className="flex items-center space-x-1.5 px-2.5 py-1 rounded-md bg-emerald-950/50 hover:bg-emerald-900/60 text-emerald-300 hover:text-emerald-100 text-[11px] font-medium transition-colors border border-emerald-500/40"
+            title="Transmitir Tela ao Vivo em 60 FPS (Alt+Shift+Z)"
+            className="flex items-center space-x-1.5 px-2.5 py-1 rounded-md bg-[#12312F] hover:bg-[#18242E] text-[#3AD6C6] hover:text-[#65E6D8] text-[11px] font-semibold transition-colors border border-[#3AD6C6]/50"
           >
-            <Radio className="w-3.5 h-3.5 text-emerald-400 animate-pulse" />
-            <span>Ao Vivo</span>
+            <Radio className="w-3.5 h-3.5 text-[#3AD6C6] animate-pulse" />
+            <span>Ao Vivo (60 FPS)</span>
           </button>
           <button
             onClick={() => window.electronAPI.takeScreenshot()}
             title={`Capturar Screenshot com Anotações (${getShortcutLabel('s')})`}
-            className="flex items-center space-x-1 px-2.5 py-1 rounded-md bg-[#1a1f2e] hover:bg-[#232a3d] text-slate-300 hover:text-indigo-300 text-[11px] font-medium transition-colors border border-[#2b334a]"
+            className="flex items-center space-x-1 px-2.5 py-1 rounded-md bg-[#18242E] hover:bg-[#202E39] text-[#C0CDD6] hover:text-[#3AD6C6] text-[11px] font-medium transition-colors border border-[#31414D]"
           >
-            <Camera className="w-3.5 h-3.5 text-indigo-400" />
+            <Camera className="w-3.5 h-3.5 text-[#3AD6C6]" />
             <span>Screenshot</span>
           </button>
           <button
             onClick={() => window.electronAPI.checkForUpdates()}
             title="Verificar Atualizações"
-            className="p-1.5 hover:bg-[#1f2434] rounded-md text-slate-400 hover:text-white transition-colors"
+            className="p-1.5 hover:bg-[#202E39] rounded-md text-[#92A2AE] hover:text-[#F4F7FA] transition-colors"
           >
             <RefreshCw className="w-3.5 h-3.5" />
           </button>
           <button
             onClick={() => window.electronAPI.minimizeCurrentWindow()}
-            className="p-1.5 hover:bg-[#1f2434] rounded-md text-slate-400 hover:text-white transition-colors"
+            className="p-1.5 hover:bg-[#202E39] rounded-md text-[#92A2AE] hover:text-[#F4F7FA] transition-colors"
           >
             <Minus className="w-3.5 h-3.5" />
           </button>
           <button
             onClick={() => window.electronAPI.closeCurrentWindow()}
-            className="p-1.5 hover:bg-rose-500/20 hover:text-rose-400 rounded-md text-slate-400 transition-colors"
+            className="p-1.5 hover:bg-[#B83A48]/20 hover:text-[#FF5F6D] rounded-md text-[#92A2AE] transition-colors"
           >
             <X className="w-3.5 h-3.5" />
           </button>
@@ -692,27 +692,27 @@ export const PreRecordingView: React.FC = () => {
       </div>
 
       {/* Tabs */}
-      <div className="flex border-b border-[#202534] px-4 bg-[#0f121a] pt-2">
+      <div className="flex border-b border-[#31414D] px-4 bg-[#111A22] pt-2">
         <button
           onClick={() => setActiveTab('record')}
-          className={`flex items-center space-x-2 px-4 py-2 font-medium text-xs rounded-t-lg transition-all ${
+          className={`flex items-center space-x-2 px-4 py-2 font-semibold text-xs rounded-t-lg transition-all ${
             activeTab === 'record'
-              ? 'text-white border-b-2 border-indigo-500 bg-[#151924]'
-              : 'text-slate-400 hover:text-slate-200'
+              ? 'text-[#F4F7FA] border-b-2 border-[#3AD6C6] bg-[#18242E]'
+              : 'text-[#92A2AE] hover:text-[#F4F7FA]'
           }`}
         >
-          <PlayCircle className="w-3.5 h-3.5 text-indigo-400" />
+          <PlayCircle className="w-3.5 h-3.5 text-[#3AD6C6]" />
           <span>Nova Gravação</span>
         </button>
         <button
           onClick={() => setActiveTab('library')}
-          className={`flex items-center space-x-2 px-4 py-2 font-medium text-xs rounded-t-lg transition-all ${
+          className={`flex items-center space-x-2 px-4 py-2 font-semibold text-xs rounded-t-lg transition-all ${
             activeTab === 'library'
-              ? 'text-white border-b-2 border-indigo-500 bg-[#151924]'
-              : 'text-slate-400 hover:text-slate-200'
+              ? 'text-[#F4F7FA] border-b-2 border-[#3AD6C6] bg-[#18242E]'
+              : 'text-[#92A2AE] hover:text-[#F4F7FA]'
           }`}
         >
-          <FolderOpen className="w-3.5 h-3.5 text-slate-400" />
+          <FolderOpen className="w-3.5 h-3.5 text-[#C0CDD6]" />
           <span>Biblioteca de Vídeos</span>
         </button>
       </div>
@@ -723,17 +723,17 @@ export const PreRecordingView: React.FC = () => {
         <div className="flex-1 p-4 overflow-y-auto space-y-4">
           {/* In-App Auto-Update Notification Banner */}
           {updaterStatus.state === 'downloading' && (
-            <div className="p-3 bg-[#131b2e] border border-indigo-500/40 rounded-xl space-y-1.5">
-              <div className="flex items-center justify-between text-xs font-semibold text-indigo-300">
+            <div className="p-3 bg-[#18242E] border border-[#3AD6C6]/40 rounded-xl space-y-1.5">
+              <div className="flex items-center justify-between text-xs font-semibold text-[#3AD6C6]">
                 <span className="flex items-center space-x-1.5">
-                  <RefreshCw className="w-3.5 h-3.5 animate-spin text-indigo-400" />
+                  <RefreshCw className="w-3.5 h-3.5 animate-spin text-[#3AD6C6]" />
                   <span>Baixando atualização v{updaterStatus.version || ''}...</span>
                 </span>
-                <span className="font-mono text-indigo-200">{updaterStatus.percent || 0}%</span>
+                <span className="font-mono text-[#F4F7FA]">{updaterStatus.percent || 0}%</span>
               </div>
-              <div className="w-full bg-[#0a0f1d] rounded-full h-1.5 overflow-hidden">
+              <div className="w-full bg-[#111A22] rounded-full h-1.5 overflow-hidden">
                 <div
-                  className="bg-indigo-500 h-full rounded-full transition-all duration-300"
+                  className="bg-[#3AD6C6] h-full rounded-full transition-all duration-300"
                   style={{ width: `${updaterStatus.percent || 0}%` }}
                 />
               </div>
@@ -741,19 +741,19 @@ export const PreRecordingView: React.FC = () => {
           )}
 
           {updaterStatus.state === 'downloaded' && (
-            <div className="p-3 bg-[#10201c] border border-emerald-500/50 rounded-xl flex items-center justify-between">
+            <div className="p-3 bg-[#12312F] border border-[#4CD6A0]/50 rounded-xl flex items-center justify-between">
               <div className="text-xs">
-                <span className="font-bold text-emerald-400 flex items-center gap-1.5">
-                  <ShieldCheck className="w-4 h-4 text-emerald-400" />
+                <span className="font-bold text-[#4CD6A0] flex items-center gap-1.5">
+                  <ShieldCheck className="w-4 h-4 text-[#4CD6A0]" />
                   Atualização v{updaterStatus.version || ''} Pronta
                 </span>
-                <span className="text-[11px] text-slate-300 block">
+                <span className="text-[11px] text-[#C0CDD6] block">
                   Reinicie para aplicar as melhorias no app.
                 </span>
               </div>
               <button
                 onClick={() => window.electronAPI?.installUpdateNow?.()}
-                className="px-3 py-1.5 bg-emerald-500 hover:bg-emerald-400 text-slate-950 text-xs font-bold rounded-lg transition-colors whitespace-nowrap"
+                className="px-3 py-1.5 bg-[#4CD6A0] hover:bg-[#65E6D8] text-[#062B2A] text-xs font-bold rounded-lg transition-colors whitespace-nowrap"
               >
                 Reiniciar Agora
               </button>
@@ -762,7 +762,7 @@ export const PreRecordingView: React.FC = () => {
 
           {/* Mode Selector */}
           <div>
-            <label className="text-[11px] font-semibold text-slate-400 uppercase tracking-wider block mb-2">
+            <label className="text-[11px] font-bold text-[#92A2AE] uppercase tracking-wider block mb-2">
               Modo de Gravação
             </label>
             <div className="grid grid-cols-4 gap-1.5">
@@ -770,39 +770,39 @@ export const PreRecordingView: React.FC = () => {
                 onClick={() => setMode('screen-cam')}
                 className={`flex flex-col items-center justify-center p-2.5 rounded-xl border text-center transition-all ${
                   mode === 'screen-cam'
-                    ? 'bg-indigo-500/15 border-indigo-500 text-white font-medium shadow-sm'
-                    : 'bg-[#131620] border-[#222838] text-slate-400 hover:border-[#323b52] hover:text-white'
+                    ? 'bg-[#12312F] border-2 border-[#3AD6C6] text-[#3AD6C6] font-bold shadow-sm'
+                    : 'bg-[#111A22] border border-[#31414D] text-[#C0CDD6] hover:border-[#3AD6C6]/40 hover:text-[#F4F7FA]'
                 }`}
               >
                 <div className="relative mb-1">
-                  <Monitor className="w-4 h-4 text-indigo-400" />
-                  <span className="absolute -bottom-0.5 -right-0.5 w-2 h-2 rounded-full bg-rose-500 border border-[#131620]" />
+                  <Monitor className="w-4 h-4 text-[#3AD6C6]" />
+                  <span className="absolute -bottom-0.5 -right-0.5 w-2 h-2 rounded-full bg-[#FF5F6D] border border-[#111A22]" />
                 </div>
-                <span className="text-[11px] leading-tight">Tela + Cam</span>
+                <span className="text-[11px] leading-tight font-medium">Tela + Cam</span>
               </button>
 
               <button
                 onClick={() => setMode('screen-only')}
                 className={`flex flex-col items-center justify-center p-2.5 rounded-xl border text-center transition-all ${
                   mode === 'screen-only'
-                    ? 'bg-indigo-500/15 border-indigo-500 text-white font-medium shadow-sm'
-                    : 'bg-[#131620] border-[#222838] text-slate-400 hover:border-[#323b52] hover:text-white'
+                    ? 'bg-[#12312F] border-2 border-[#3AD6C6] text-[#3AD6C6] font-bold shadow-sm'
+                    : 'bg-[#111A22] border border-[#31414D] text-[#C0CDD6] hover:border-[#3AD6C6]/40 hover:text-[#F4F7FA]'
                 }`}
               >
-                <Monitor className="w-4 h-4 mb-1 text-slate-300" />
-                <span className="text-[11px] leading-tight">Só Tela</span>
+                <Monitor className="w-4 h-4 mb-1 text-[#C0CDD6]" />
+                <span className="text-[11px] leading-tight font-medium">Só Tela</span>
               </button>
 
               <button
                 onClick={() => setMode('cam-only')}
                 className={`flex flex-col items-center justify-center p-2.5 rounded-xl border text-center transition-all ${
                   mode === 'cam-only'
-                    ? 'bg-indigo-500/15 border-indigo-500 text-white font-medium shadow-sm'
-                    : 'bg-[#131620] border-[#222838] text-slate-400 hover:border-[#323b52] hover:text-white'
+                    ? 'bg-[#12312F] border-2 border-[#3AD6C6] text-[#3AD6C6] font-bold shadow-sm'
+                    : 'bg-[#111A22] border border-[#31414D] text-[#C0CDD6] hover:border-[#3AD6C6]/40 hover:text-[#F4F7FA]'
                 }`}
               >
-                <Camera className="w-4 h-4 mb-1 text-rose-400" />
-                <span className="text-[11px] leading-tight">Só Câmera</span>
+                <Camera className="w-4 h-4 mb-1 text-[#FF5F6D]" />
+                <span className="text-[11px] leading-tight font-medium">Só Câmera</span>
               </button>
 
               <button
@@ -812,21 +812,21 @@ export const PreRecordingView: React.FC = () => {
                 }}
                 className={`flex flex-col items-center justify-center p-2.5 rounded-xl border text-center transition-all ${
                   mode === 'custom-area'
-                    ? 'bg-indigo-500/15 border-indigo-500 text-white font-medium shadow-sm'
-                    : 'bg-[#131620] border-[#222838] text-slate-400 hover:border-[#323b52] hover:text-white'
+                    ? 'bg-[#12312F] border-2 border-[#3AD6C6] text-[#3AD6C6] font-bold shadow-sm'
+                    : 'bg-[#111A22] border border-[#31414D] text-[#C0CDD6] hover:border-[#3AD6C6]/40 hover:text-[#F4F7FA]'
                 }`}
               >
-                <Crop className="w-4 h-4 mb-1 text-emerald-400" />
-                <span className="text-[11px] leading-tight">Área Recorte</span>
+                <Crop className="w-4 h-4 mb-1 text-[#4CD6A0]" />
+                <span className="text-[11px] leading-tight font-medium">Área Recorte</span>
               </button>
             </div>
 
             {/* Custom Area Details & Pick Button */}
             {mode === 'custom-area' && (
-              <div className="mt-2 p-2.5 bg-[#131620] border border-[#222838] rounded-xl flex items-center justify-between">
+              <div className="mt-2 p-2.5 bg-[#111A22] border border-[#31414D] rounded-xl flex items-center justify-between">
                 <div className="text-xs">
-                  <span className="text-slate-400">Região: </span>
-                  <span className="font-mono text-indigo-300 font-semibold">
+                  <span className="text-[#92A2AE]">Região: </span>
+                  <span className="font-mono text-[#3AD6C6] font-bold">
                     {cropArea ? `${Math.round(cropArea.width)} × ${Math.round(cropArea.height)} px` : 'Nenhuma definida'}
                   </span>
                 </div>
@@ -834,7 +834,7 @@ export const PreRecordingView: React.FC = () => {
                   {cropArea && (
                     <button
                       onClick={() => setCropArea(null)}
-                      className="px-2 py-1 rounded-lg bg-[#1a1f2e] hover:bg-[#252c42] text-slate-400 hover:text-rose-400 text-xs transition-colors"
+                      className="px-2 py-1 rounded-lg bg-[#18242E] hover:bg-[#202E39] text-[#92A2AE] hover:text-[#FF5F6D] text-xs transition-colors"
                       title="Redefinir para tela inteira"
                     >
                       Redefinir
@@ -842,7 +842,7 @@ export const PreRecordingView: React.FC = () => {
                   )}
                   <button
                     onClick={() => window.electronAPI.startCropSelection()}
-                    className="px-2.5 py-1 rounded-lg bg-indigo-500/20 hover:bg-indigo-500/30 text-indigo-300 text-xs font-semibold transition-colors"
+                    className="px-2.5 py-1 rounded-lg bg-[#12312F] hover:bg-[#18242E] text-[#3AD6C6] border border-[#3AD6C6]/40 text-xs font-bold transition-colors"
                   >
                     {cropArea ? 'Alterar Área' : 'Selecionar na Tela'}
                   </button>
@@ -1280,23 +1280,23 @@ export const PreRecordingView: React.FC = () => {
           </div>
 
           {/* Global Share Link Status Pill */}
-          <div className="bg-[#131620] border border-[#222838] rounded-xl px-3 py-2 flex items-center justify-between text-xs">
+          <div className="bg-[#111A22] border border-[#31414D] rounded-xl px-3 py-2 flex items-center justify-between text-xs">
             <div className="flex items-center space-x-2 truncate">
-              <Globe className="w-3.5 h-3.5 text-indigo-400 shrink-0" />
-              <span className="text-[11px] text-slate-400">Link Público:</span>
+              <Globe className="w-3.5 h-3.5 text-[#3AD6C6] shrink-0" />
+              <span className="text-[11px] text-[#92A2AE]">Link Público:</span>
               {publicUrl ? (
-                <span className="text-[11px] text-emerald-400 font-medium truncate flex items-center space-x-1">
-                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 inline-block" />
+                <span className="text-[11px] text-[#4CD6A0] font-medium truncate flex items-center space-x-1">
+                  <span className="w-1.5 h-1.5 rounded-full bg-[#4CD6A0] inline-block" />
                   <span>Ativo para compartilhamento</span>
                 </span>
               ) : (
-                <span className="text-[11px] text-slate-500">Iniciando túnel seguro...</span>
+                <span className="text-[11px] text-[#92A2AE]">Iniciando túnel seguro...</span>
               )}
             </div>
             {publicUrl && (
               isHubCopied ? (
-                <span className="text-[11px] text-emerald-400 font-semibold shrink-0 ml-2 flex items-center space-x-1">
-                  <Check className="w-3 h-3 text-emerald-400" />
+                <span className="text-[11px] text-[#4CD6A0] font-semibold shrink-0 ml-2 flex items-center space-x-1">
+                  <Check className="w-3 h-3 text-[#4CD6A0]" />
                   <span>Copiado!</span>
                 </span>
               ) : (
@@ -1306,7 +1306,7 @@ export const PreRecordingView: React.FC = () => {
                     setIsHubCopied(true);
                     setTimeout(() => setIsHubCopied(false), 2500);
                   }}
-                  className="text-[11px] text-indigo-400 hover:text-indigo-300 font-semibold shrink-0 ml-2"
+                  className="text-[11px] text-[#3AD6C6] hover:text-[#65E6D8] font-semibold shrink-0 ml-2"
                 >
                   Copiar Hub
                 </button>
@@ -1318,36 +1318,36 @@ export const PreRecordingView: React.FC = () => {
           <div className="pt-1 flex flex-col gap-2">
             <button
               onClick={handleStart}
-              className="w-full bg-rose-600 hover:bg-rose-500 active:scale-[0.99] text-white font-bold py-3.5 px-4 rounded-xl shadow-lg flex items-center justify-center space-x-2.5 transition-all"
+              className="w-full bg-[#FF5F6D] hover:bg-[#FF5F6D]/90 active:scale-[0.99] text-[#2B0E13] font-black py-3.5 px-4 rounded-xl shadow-lg shadow-[#FF5F6D]/20 flex items-center justify-center space-x-2.5 transition-all"
             >
-              <div className="w-2.5 h-2.5 rounded-full bg-white" />
+              <div className="w-2.5 h-2.5 rounded-full bg-[#2B0E13]" />
               <span className="tracking-wide">INICIAR GRAVAÇÃO</span>
             </button>
 
             <button
               onClick={() => window.electronAPI.startLiveShare()}
-              title="Iniciar transmissão ao vivo no estilo Zoom para qualquer dispositivo via link ou QR Code"
-              className="w-full bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 active:scale-[0.99] text-white font-bold py-2.5 px-4 rounded-xl shadow-md flex items-center justify-center space-x-2 transition-all border border-emerald-400/30"
+              title="Transmitir tela ao vivo com qualidade ultra fluida de até 60 FPS para qualquer dispositivo via link ou QR Code"
+              className="w-full bg-[#12312F] hover:bg-[#18242E] active:scale-[0.99] text-[#3AD6C6] hover:text-[#65E6D8] font-bold py-2.5 px-4 rounded-xl shadow-md flex items-center justify-center space-x-2 transition-all border border-[#3AD6C6]/50"
             >
-              <Radio className="w-4 h-4 text-emerald-200 animate-pulse" />
-              <span className="text-xs tracking-wide">COMPARTILHAR TELA AO VIVO (MODO ZOOM)</span>
+              <Radio className="w-4 h-4 text-[#3AD6C6] animate-pulse" />
+              <span className="text-xs tracking-wide">COMPARTILHAR TELA AO VIVO (60 FPS)</span>
             </button>
-            <div className="text-center mt-2.5 mb-1.5 flex items-center justify-center space-x-2 text-[10px] text-slate-400 font-mono">
+            <div className="text-center mt-2.5 mb-1.5 flex items-center justify-center space-x-2 text-[10px] text-[#92A2AE] font-mono">
               <span title="Pressione 1 a 4 para alternar modos">[1-4] Modos</span>
               <span>•</span>
               <span title="Pressione M para testar retorno de áudio">[M] Teste Áudio</span>
               <span>•</span>
               <span title="Pressione Enter para iniciar gravação">[Enter] Gravar</span>
               <span>•</span>
-              <span title="Atalho global do sistema" className="text-slate-400 font-semibold">{getShortcutLabel('a')}</span>
+              <span title="Atalho global do sistema" className="text-[#C0CDD6] font-semibold">{getShortcutLabel('a')}</span>
             </div>
 
             {/* App Version & Manual Update Check */}
-            <div className="flex items-center justify-between pt-2 border-t border-[#202534] text-[11px] text-slate-500">
+            <div className="flex items-center justify-between pt-2 border-t border-[#31414D] text-[11px] text-[#92A2AE]">
               <span className="font-mono flex items-center gap-1.5">
-                <span>v{appVersion || '1.8.0'}</span>
+                <span>v{appVersion || '2.2.0'}</span>
                 {updateFeedback && (
-                  <span className="text-emerald-400 font-sans font-medium text-[10px] bg-emerald-950/60 border border-emerald-500/40 px-1.5 py-0.5 rounded">
+                  <span className="text-[#4CD6A0] font-sans font-medium text-[10px] bg-[#12312F] border border-[#4CD6A0]/40 px-1.5 py-0.5 rounded">
                     {updateFeedback}
                   </span>
                 )}
@@ -1368,10 +1368,10 @@ export const PreRecordingView: React.FC = () => {
                   }
                 }}
                 disabled={isCheckingUpdate}
-                className="flex items-center space-x-1.5 hover:text-indigo-400 text-slate-400 transition-colors"
+                className="flex items-center space-x-1.5 hover:text-[#3AD6C6] text-[#C0CDD6] transition-colors"
                 title="Checar se há novas versões"
               >
-                <RefreshCw className={`w-3 h-3 ${isCheckingUpdate ? 'animate-spin text-indigo-400' : ''}`} />
+                <RefreshCw className={`w-3 h-3 ${isCheckingUpdate ? 'animate-spin text-[#3AD6C6]' : ''}`} />
                 <span>{isCheckingUpdate ? 'Verificando...' : 'Buscar Atualizações'}</span>
               </button>
             </div>

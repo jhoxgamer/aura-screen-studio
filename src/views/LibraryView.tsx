@@ -101,8 +101,8 @@ export const LibraryView: React.FC = () => {
 
   if (loading) {
     return (
-      <div className="flex-1 flex items-center justify-center text-slate-400 text-xs">
-        <div className="w-5 h-5 rounded-full border-2 border-indigo-400 border-t-transparent animate-spin mr-2" />
+      <div className="flex-1 flex items-center justify-center text-[#92A2AE] text-xs">
+        <div className="w-5 h-5 rounded-full border-2 border-[#3AD6C6] border-t-transparent animate-spin mr-2" />
         <span>Carregando biblioteca Aura...</span>
       </div>
     );
@@ -113,7 +113,7 @@ export const LibraryView: React.FC = () => {
       {/* Search & Stats Bar */}
       <div className="space-y-2 shrink-0">
         <div className="relative">
-          <Search className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" />
+          <Search className="w-4 h-4 text-[#92A2AE] absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" />
           <input
             type="text"
             value={searchQuery}
@@ -122,22 +122,22 @@ export const LibraryView: React.FC = () => {
               if (e.key === 'Escape') setSearchQuery('');
             }}
             placeholder="Buscar gravações por título..."
-            className="w-full bg-[#131620] border border-[#222838] rounded-xl pl-9 pr-8 py-2 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-indigo-500 transition-colors"
+            className="w-full bg-[#111A22] border border-[#31414D] rounded-xl pl-9 pr-8 py-2 text-xs text-[#F4F7FA] placeholder-[#92A2AE] focus:outline-none focus:border-[#3AD6C6] transition-colors"
           />
           {searchQuery && (
             <button
               onClick={() => setSearchQuery('')}
               title="Limpar busca (Esc)"
-              className="absolute right-2.5 top-1/2 -translate-y-1/2 p-0.5 rounded text-slate-500 hover:text-white transition-colors"
+              className="absolute right-2.5 top-1/2 -translate-y-1/2 p-0.5 rounded text-[#92A2AE] hover:text-[#F4F7FA] transition-colors"
             >
               <X className="w-3.5 h-3.5" />
             </button>
           )}
         </div>
 
-        <div className="flex items-center justify-between text-[11px] text-slate-400 px-1 gap-2 flex-wrap">
+        <div className="flex items-center justify-between text-[11px] text-[#C0CDD6] px-1 gap-2 flex-wrap">
           <div className="flex items-center space-x-1">
-            <span className="text-slate-500 text-[10px] uppercase font-bold tracking-wider mr-0.5">Ordenar:</span>
+            <span className="text-[#92A2AE] text-[10px] uppercase font-bold tracking-wider mr-0.5">Ordenar:</span>
             {(
               [
                 { id: 'newest', label: 'Recentes' },
@@ -151,8 +151,8 @@ export const LibraryView: React.FC = () => {
                 onClick={() => setSortCriteria(item.id)}
                 className={`px-2 py-0.5 rounded-lg text-[10px] font-medium transition-all ${
                   sortCriteria === item.id
-                    ? 'bg-indigo-600/30 text-indigo-300 border border-indigo-500/40'
-                    : 'text-slate-500 hover:text-slate-300 hover:bg-[#181d2a]'
+                    ? 'bg-[#12312F] text-[#3AD6C6] border border-[#3AD6C6]/40'
+                    : 'text-[#92A2AE] hover:text-[#F4F7FA] hover:bg-[#18242E]'
                 }`}
               >
                 {item.label}
@@ -160,18 +160,18 @@ export const LibraryView: React.FC = () => {
             ))}
           </div>
 
-          <div className="flex items-center space-x-2 text-[10px] text-slate-400">
+          <div className="flex items-center space-x-2 text-[10px] text-[#C0CDD6]">
             <span>
               {searchQuery ? (
                 <>
-                  <span className="font-semibold text-white">{sortedAndFiltered.length}</span> de {recordings.length} vídeos
+                  <span className="font-semibold text-[#F4F7FA]">{sortedAndFiltered.length}</span> de {recordings.length} vídeos
                 </>
               ) : (
                 `${recordings.length} ${recordings.length === 1 ? 'vídeo gravado' : 'vídeos gravados'}`
               )}
             </span>
             <span>•</span>
-            <span className="font-mono text-indigo-300 font-medium">{formatSize(totalBytes)} em disco</span>
+            <span className="font-mono text-[#3AD6C6] font-medium">{formatSize(totalBytes)} em disco</span>
           </div>
         </div>
       </div>
@@ -179,18 +179,18 @@ export const LibraryView: React.FC = () => {
       {/* Videos List */}
       <div className="flex-1 overflow-y-auto space-y-2 pr-1">
         {sortedAndFiltered.length === 0 ? (
-          <div className="h-64 flex flex-col items-center justify-center text-slate-500 space-y-2 text-center p-4">
-            <Film className="w-10 h-10 text-slate-700 stroke-[1.5]" />
-            <p className="text-xs font-semibold text-slate-300">
+          <div className="h-64 flex flex-col items-center justify-center text-[#92A2AE] space-y-2 text-center p-4">
+            <Film className="w-10 h-10 text-[#31414D] stroke-[1.5]" />
+            <p className="text-xs font-semibold text-[#F4F7FA]">
               {searchQuery ? 'Nenhum vídeo com esse nome' : 'Nenhuma gravação encontrada'}
             </p>
-            <p className="text-[11px] max-w-[240px] text-slate-500">
+            <p className="text-[11px] max-w-[240px] text-[#92A2AE]">
               {searchQuery ? 'Tente buscar com outras palavras-chave.' : 'Inicie sua primeira gravação na aba "Nova Gravação".'}
             </p>
             {searchQuery && (
               <button
                 onClick={() => setSearchQuery('')}
-                className="mt-2 px-3 py-1 bg-indigo-600/20 hover:bg-indigo-600/30 border border-indigo-500/30 text-indigo-300 text-xs rounded-lg transition-colors font-medium"
+                className="mt-2 px-3 py-1 bg-[#12312F] hover:bg-[#12312F]/80 border border-[#3AD6C6]/30 text-[#3AD6C6] text-xs rounded-lg transition-colors font-medium"
               >
                 Limpar Busca
               </button>
@@ -201,12 +201,12 @@ export const LibraryView: React.FC = () => {
             <div
               key={rec.id}
               onClick={() => window.electronAPI.openPreview(rec)}
-              className="bg-[#131620] border border-[#222838] hover:border-indigo-500/40 rounded-xl p-3 flex items-center justify-between transition-all group shadow-sm cursor-pointer hover:bg-[#161a26]"
+              className="bg-[#111A22] border border-[#31414D] hover:border-[#3AD6C6]/50 rounded-xl p-3 flex items-center justify-between transition-all group shadow-sm cursor-pointer hover:bg-[#18242E]"
               title="Clique para assistir e editar este vídeo no Studio"
             >
               <div className="flex items-center space-x-3 min-w-0">
-                <div className="w-10 h-10 rounded-xl bg-[#191e2b] border border-[#283044] flex items-center justify-center shrink-0 group-hover:border-indigo-500/50 group-hover:bg-indigo-600 transition-colors">
-                  <Play className="w-4 h-4 text-indigo-400 group-hover:text-white fill-current transition-colors ml-0.5" />
+                <div className="w-10 h-10 rounded-xl bg-[#18242E] border border-[#31414D] flex items-center justify-center shrink-0 group-hover:border-[#3AD6C6]/60 group-hover:bg-[#3AD6C6] transition-colors">
+                  <Play className="w-4 h-4 text-[#3AD6C6] group-hover:text-[#062B2A] fill-current transition-colors ml-0.5" />
                 </div>
 
                 <div className="min-w-0 flex-1">
@@ -221,18 +221,18 @@ export const LibraryView: React.FC = () => {
                           if (e.key === 'Escape') setEditingId(null);
                         }}
                         autoFocus
-                        className="bg-[#0b0d13] border border-indigo-500/60 rounded px-2 py-0.5 text-xs text-white focus:outline-none focus:ring-1 focus:ring-indigo-500 w-48"
+                        className="bg-[#0B1117] border border-[#3AD6C6]/60 rounded px-2 py-0.5 text-xs text-[#F4F7FA] focus:outline-none focus:ring-1 focus:ring-[#3AD6C6] w-48"
                       />
                       <button
                         onClick={() => handleSaveRename(rec.id)}
-                        className="p-1 rounded bg-indigo-600 hover:bg-indigo-500 text-white"
+                        className="p-1 rounded bg-[#3AD6C6] hover:bg-[#65E6D8] text-[#062B2A]"
                         title="Salvar nome"
                       >
-                        <Check className="w-3 h-3" />
+                        <Check className="w-3 h-3 stroke-[3]" />
                       </button>
                       <button
                         onClick={() => setEditingId(null)}
-                        className="p-1 rounded bg-slate-800 hover:bg-slate-700 text-slate-300"
+                        className="p-1 rounded bg-[#18242E] hover:bg-[#202E39] text-[#C0CDD6]"
                         title="Cancelar"
                       >
                         <X className="w-3 h-3" />
@@ -240,7 +240,7 @@ export const LibraryView: React.FC = () => {
                     </div>
                   ) : (
                     <div className="flex items-center space-x-1.5 group/title">
-                      <h3 className="text-xs font-semibold text-white truncate max-w-[190px] group-hover:text-indigo-200 transition-colors" title={rec.title}>
+                      <h3 className="text-xs font-semibold text-[#F4F7FA] truncate max-w-[190px] group-hover:text-[#3AD6C6] transition-colors" title={rec.title}>
                         {rec.title}
                       </h3>
                       <button
@@ -249,27 +249,27 @@ export const LibraryView: React.FC = () => {
                           setEditingId(rec.id);
                           setEditedTitle(rec.title);
                         }}
-                        className="opacity-0 group-hover/title:opacity-100 p-0.5 text-slate-400 hover:text-indigo-300 transition-opacity"
+                        className="opacity-0 group-hover/title:opacity-100 p-0.5 text-[#92A2AE] hover:text-[#3AD6C6] transition-opacity"
                         title="Renomear gravação"
                       >
                         <Edit3 className="w-3 h-3" />
                       </button>
                     </div>
                   )}
-                  <div className="flex items-center space-x-2 text-[10px] text-slate-400 mt-0.5">
+                  <div className="flex items-center space-x-2 text-[10px] text-[#92A2AE] mt-0.5">
                     <span className="flex items-center space-x-1">
-                      <Clock className="w-3 h-3 text-slate-400" />
+                      <Clock className="w-3 h-3 text-[#92A2AE]" />
                       <span>{formatDuration(rec.durationMs)}</span>
                     </span>
                     <span>•</span>
                     <span>{formatSize(rec.fileSize)}</span>
                     <span>•</span>
-                    <span className="font-mono text-slate-500">{rec.resolution || '1080p'}</span>
+                    <span className="font-mono text-[#C0CDD6]">{rec.resolution || '1080p'}</span>
                     {rec.createdAt && (
                       <>
                         <span>•</span>
-                        <span className="flex items-center space-x-1 text-slate-400" title={new Date(rec.createdAt).toLocaleString()}>
-                          <Calendar className="w-2.5 h-2.5 text-slate-500" />
+                        <span className="flex items-center space-x-1 text-[#92A2AE]" title={new Date(rec.createdAt).toLocaleString()}>
+                          <Calendar className="w-2.5 h-2.5 text-[#92A2AE]" />
                           <span>{formatRelativeDate(rec.createdAt)}</span>
                         </span>
                       </>
@@ -289,9 +289,9 @@ export const LibraryView: React.FC = () => {
                     setTimeout(() => setCopiedId(null), 2000);
                   }}
                   title="Copiar Link Compartilhável"
-                  className="p-1.5 rounded-lg text-indigo-400 hover:bg-indigo-500/15 transition-colors"
+                  className="p-1.5 rounded-lg text-[#3AD6C6] hover:bg-[#12312F] transition-colors"
                 >
-                  {copiedId === rec.id ? <Check className="w-3.5 h-3.5 text-emerald-400" /> : <Share2 className="w-3.5 h-3.5" />}
+                  {copiedId === rec.id ? <Check className="w-3.5 h-3.5 text-[#4CD6A0]" /> : <Share2 className="w-3.5 h-3.5" />}
                 </button>
 
                 {/* Download video */}
@@ -301,7 +301,7 @@ export const LibraryView: React.FC = () => {
                     window.electronAPI.downloadRecording(rec.id);
                   }}
                   title="Baixar Vídeo no Computador"
-                  className="p-1.5 rounded-lg text-emerald-400 hover:bg-emerald-500/10 transition-colors"
+                  className="p-1.5 rounded-lg text-[#4CD6A0] hover:bg-[#4CD6A0]/10 transition-colors"
                 >
                   <Download className="w-3.5 h-3.5" />
                 </button>
@@ -314,7 +314,7 @@ export const LibraryView: React.FC = () => {
                     window.electronAPI.openExternalUrl(url);
                   }}
                   title="Assistir no Navegador"
-                  className="p-1.5 rounded-lg text-indigo-400 hover:bg-indigo-500/10 transition-colors"
+                  className="p-1.5 rounded-lg text-[#3AD6C6] hover:bg-[#12312F] transition-colors"
                 >
                   <ExternalLink className="w-3.5 h-3.5" />
                 </button>
@@ -328,10 +328,10 @@ export const LibraryView: React.FC = () => {
                     setTimeout(() => setCopiedPathId(null), 2000);
                   }}
                   title="Copiar Caminho do Arquivo (C:\...)"
-                  className="p-1.5 rounded-lg text-slate-400 hover:text-indigo-300 hover:bg-slate-800 transition-colors"
+                  className="p-1.5 rounded-lg text-[#92A2AE] hover:text-[#3AD6C6] hover:bg-[#18242E] transition-colors"
                 >
                   {copiedPathId === rec.id ? (
-                    <Check className="w-3.5 h-3.5 text-emerald-400" />
+                    <Check className="w-3.5 h-3.5 text-[#4CD6A0]" />
                   ) : (
                     <Copy className="w-3.5 h-3.5" />
                   )}
@@ -344,25 +344,25 @@ export const LibraryView: React.FC = () => {
                     handleOpenFolder(rec.filePath);
                   }}
                   title="Abrir Pasta no Windows Explorer"
-                  className="p-1.5 rounded-lg text-slate-400 hover:text-white hover:bg-slate-800 transition-colors"
+                  className="p-1.5 rounded-lg text-[#92A2AE] hover:text-[#F4F7FA] hover:bg-[#18242E] transition-colors"
                 >
                   <FolderOpen className="w-3.5 h-3.5" />
                 </button>
 
                 {/* Delete with inline confirmation */}
                 {confirmDeleteId === rec.id ? (
-                  <div className="flex items-center space-x-1 bg-rose-950/70 border border-rose-500/40 rounded-lg px-1.5 py-0.5" onClick={(e) => e.stopPropagation()}>
+                  <div className="flex items-center space-x-1 bg-[#FF5F6D]/20 border border-[#FF5F6D]/40 rounded-lg px-1.5 py-0.5" onClick={(e) => e.stopPropagation()}>
                     <button
                       onClick={() => handleDelete(rec.id)}
                       title="Confirmar exclusão definitiva"
-                      className="text-[10px] text-rose-200 hover:text-white font-bold px-1.5 py-0.5 bg-rose-600 hover:bg-rose-500 rounded transition-colors"
+                      className="text-[10px] text-white font-bold px-1.5 py-0.5 bg-[#B83A48] hover:bg-[#A83240] rounded transition-colors"
                     >
                       Excluir
                     </button>
                     <button
                       onClick={() => setConfirmDeleteId(null)}
                       title="Cancelar"
-                      className="text-[10px] text-slate-400 hover:text-slate-200 px-1 py-0.5 transition-colors"
+                      className="text-[10px] text-[#C0CDD6] hover:text-[#F4F7FA] px-1 py-0.5 transition-colors"
                     >
                       Cancelar
                     </button>
@@ -374,7 +374,7 @@ export const LibraryView: React.FC = () => {
                       setConfirmDeleteId(rec.id);
                     }}
                     title="Excluir Gravação"
-                    className="p-1.5 rounded-lg text-slate-400 hover:text-rose-400 hover:bg-rose-500/10 transition-colors"
+                    className="p-1.5 rounded-lg text-[#92A2AE] hover:text-[#FF5F6D] hover:bg-[#FF5F6D]/10 transition-colors"
                   >
                     <Trash2 className="w-3.5 h-3.5" />
                   </button>

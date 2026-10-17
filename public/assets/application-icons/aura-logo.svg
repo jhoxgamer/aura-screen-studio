@@ -1,42 +1,42 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" fill="none">
   <defs>
-    <linearGradient id="auraGradient" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" stop-color="#06b6d4" />
-      <stop offset="35%" stop-color="#6366f1" />
-      <stop offset="70%" stop-color="#8b5cf6" />
-      <stop offset="100%" stop-color="#ec4899" />
+    <!-- Midnight Signal Gradients -->
+    <linearGradient id="mintGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#65E6D8" />
+      <stop offset="50%" stop-color="#3AD6C6" />
+      <stop offset="100%" stop-color="#12312F" />
     </linearGradient>
-    <radialGradient id="lensGlow" cx="50%" cy="50%" r="50%">
-      <stop offset="0%" stop-color="#06b6d4" stop-opacity="0.8" />
-      <stop offset="60%" stop-color="#6366f1" stop-opacity="0.2" />
-      <stop offset="100%" stop-color="#121826" stop-opacity="0" />
+
+    <radialGradient id="signalHalo" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#3AD6C6" stop-opacity="0.75" />
+      <stop offset="50%" stop-color="#12312F" stop-opacity="0.3" />
+      <stop offset="100%" stop-color="#0B1117" stop-opacity="0" />
     </radialGradient>
-    <filter id="auraBlur" x="-20%" y="-20%" width="140%" height="140%">
-      <feGaussianBlur stdDeviation="3" />
+
+    <filter id="studioGlow" x="-20%" y="-20%" width="140%" height="140%">
+      <feGaussianBlur stdDeviation="3.5" />
     </filter>
   </defs>
 
-  <!-- Background squircle -->
-  <rect x="6" y="6" width="88" height="88" rx="22" fill="#0d111c" stroke="rgba(255,255,255,0.12)" stroke-width="1.5" />
+  <!-- Midnight Dark Base Squircle -->
+  <rect x="6" y="6" width="88" height="88" rx="22" fill="#0B1117" stroke="#31414D" stroke-width="1.8" />
 
-  <!-- Soft glow halo -->
-  <circle cx="50" cy="50" r="32" fill="url(#lensGlow)" filter="url(#auraBlur)" />
+  <!-- Studio Ambient Halo -->
+  <circle cx="50" cy="50" r="34" fill="url(#signalHalo)" filter="url(#studioGlow)" />
 
-  <!-- Radiant Aura Ring -->
-  <circle cx="50" cy="50" r="30" stroke="url(#auraGradient)" stroke-width="5" stroke-linecap="round" />
+  <!-- Studio Framing Viewfinder Brackets in Signal Mint -->
+  <path d="M 22 34 L 22 22 L 34 22" stroke="#3AD6C6" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" />
+  <path d="M 78 34 L 78 22 L 66 22" stroke="#3AD6C6" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" />
+  <path d="M 22 66 L 22 78 L 34 78" stroke="#3AD6C6" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" />
+  <path d="M 78 66 L 78 78 L 66 78" stroke="#3AD6C6" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" />
 
-  <!-- Precision Aperture Petals -->
-  <g opacity="0.85">
-    <path d="M 50 24 L 56 36 L 44 42 Z" fill="#1c2438" stroke="#6366f1" stroke-width="0.8" />
-    <path d="M 72 37 L 65 50 L 53 46 Z" fill="#1c2438" stroke="#8b5cf6" stroke-width="0.8" />
-    <path d="M 72 63 L 59 66 L 57 54 Z" fill="#1c2438" stroke="#ec4899" stroke-width="0.8" />
-    <path d="M 50 76 L 44 64 L 56 58 Z" fill="#1c2438" stroke="#8b5cf6" stroke-width="0.8" />
-    <path d="M 28 63 L 35 50 L 47 54 Z" fill="#1c2438" stroke="#6366f1" stroke-width="0.8" />
-    <path d="M 28 37 L 41 34 L 43 46 Z" fill="#1c2438" stroke="#06b6d4" stroke-width="0.8" />
-  </g>
+  <!-- Signal Mint Capture Ring -->
+  <circle cx="50" cy="50" r="24" stroke="url(#mintGradient)" stroke-width="3.5" stroke-linecap="round" stroke-dasharray="140 10" />
 
-  <!-- Core Recording Dot -->
-  <circle cx="50" cy="50" r="10" fill="#06b6d4" />
-  <circle cx="50" cy="50" r="6" fill="#f43f5e" />
-  <circle cx="48" cy="48" r="2.2" fill="#ffffff" />
+  <!-- Central Recording Core in Coral -->
+  <circle cx="50" cy="50" r="11" fill="#FF5F6D" />
+  <circle cx="50" cy="50" r="11" stroke="#2B0E13" stroke-width="1.5" />
+
+  <!-- Specular Lens Glint -->
+  <circle cx="46.5" cy="46.5" r="2.8" fill="#FFFFFF" opacity="0.9" />
 </svg>

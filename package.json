@@ -1,6 +1,6 @@
 {
   "name": "aura-screen-studio",
-  "version": "2.1.0",
+  "version": "2.2.0",
   "type": "module",
   "description": "Aura Screen Studio - Professional Screen, Webcam & Audio Recorder with Instant Global Video Sharing",
   "main": "dist-electron/main.js",

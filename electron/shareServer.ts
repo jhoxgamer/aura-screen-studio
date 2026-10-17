@@ -509,52 +509,44 @@ export class ShareServer {
       width: 14px;
       height: 14px;
       border-radius: 50%;
-      background: #06b6d4;
+      background: #3AD6C6;
       cursor: pointer;
-      box-shadow: 0 0 12px rgba(6, 182, 212, 0.9);
+      box-shadow: 0 0 12px rgba(58, 214, 198, 0.9);
     }
   </style>
 </head>
-<body class="min-h-screen flex flex-col">
+<body class="min-h-screen flex flex-col bg-[#0B1117] text-[#F4F7FA] selection:bg-[#12312F] selection:text-[#3AD6C6]">
   <!-- Top Navbar -->
-  <header class="border-b border-slate-800/80 bg-[#0d111c]/95 backdrop-blur sticky top-0 z-40 px-6 py-3.5 flex items-center justify-between">
+  <header class="border-b border-[#31414D] bg-[#111A22]/95 backdrop-blur sticky top-0 z-40 px-6 py-3.5 flex items-center justify-between">
     <div class="flex items-center space-x-3">
-      <div class="w-9 h-9 rounded-xl bg-gradient-to-tr from-indigo-600 via-cyan-500 to-violet-500 p-0.5 shadow-lg shadow-cyan-500/20 flex items-center justify-center">
-        <div class="w-full h-full bg-[#0d111c] rounded-[10px] flex items-center justify-center">
-          <svg class="w-5 h-5 text-cyan-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <circle cx="12" cy="12" r="9" stroke="url(#hAuraGrad)" />
-            <circle cx="12" cy="12" r="3.5" fill="#f43f5e" />
-            <defs>
-              <linearGradient id="hAuraGrad" x1="0" y1="0" x2="1" y2="1">
-                <stop offset="0%" stop-color="#06b6d4"/>
-                <stop offset="100%" stop-color="#8b5cf6"/>
-              </linearGradient>
-            </defs>
-          </svg>
-        </div>
+      <div class="w-9 h-9 rounded-xl bg-[#18242E] border border-[#31414D] flex items-center justify-center shadow-lg">
+        <svg class="w-5 h-5 text-[#3AD6C6]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <circle cx="12" cy="12" r="9" stroke="#3AD6C6" />
+          <circle cx="12" cy="12" r="3.5" fill="#FF5F6D" />
+        </svg>
       </div>
       <div>
         <div class="flex items-center space-x-2">
-          <h1 class="text-sm font-bold text-white tracking-tight">${this.escapeHtml(title)}</h1>
-          <span class="text-[10px] uppercase font-bold tracking-wider px-2 py-0.5 rounded-full bg-cyan-500/10 text-cyan-400 border border-cyan-500/20">Aura</span>
+          <h1 class="text-sm font-bold text-[#F4F7FA] tracking-tight">${this.escapeHtml(title)}</h1>
+          <span class="text-[10px] uppercase font-bold tracking-wider px-2 py-0.5 rounded-full bg-[#12312F] text-[#3AD6C6] border border-[#3AD6C6]/30">Aura</span>
         </div>
-        <p class="text-xs text-slate-400">Gravado em ${formattedDate} • <span id="views-count">${video.viewsCount || 1}</span> visualizações</p>
+        <p class="text-xs text-[#92A2AE]">Gravado em ${formattedDate} • <span id="views-count">${video.viewsCount || 1}</span> visualizações</p>
       </div>
     </div>
 
     <div class="flex items-center space-x-2.5">
-      <button onclick="copyShareLink()" class="flex items-center space-x-1.5 bg-gradient-to-r from-indigo-600 to-cyan-600 hover:brightness-110 active:scale-95 text-white px-4 py-1.5 rounded-xl text-xs font-semibold transition-all shadow-md shadow-indigo-600/30">
+      <button onclick="copyShareLink()" class="flex items-center space-x-1.5 bg-[#3AD6C6] hover:bg-[#65E6D8] active:scale-95 text-[#062B2A] px-4 py-1.5 rounded-xl text-xs font-bold transition-all shadow-md">
         <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>
         <span id="copy-btn-text">Copiar Link</span>
       </button>
 
-      <button onclick="copyEmbedCode()" class="flex items-center space-x-1.5 bg-slate-800/80 hover:bg-slate-700 text-slate-200 border border-slate-700/60 px-3 py-1.5 rounded-xl text-xs font-medium transition-colors">
-        <svg class="w-3.5 h-3.5 text-cyan-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>
+      <button onclick="copyEmbedCode()" class="flex items-center space-x-1.5 bg-[#18242E] hover:bg-[#202E39] text-[#F4F7FA] border border-[#31414D] px-3 py-1.5 rounded-xl text-xs font-medium transition-colors">
+        <svg class="w-3.5 h-3.5 text-[#3AD6C6]" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>
         <span>Embed</span>
       </button>
 
-      <a href="/video/${video.id}" download="${video.id}.webm" class="flex items-center space-x-1.5 bg-slate-800/80 hover:bg-slate-700 text-slate-200 border border-slate-700/60 px-3 py-1.5 rounded-xl text-xs font-medium transition-colors">
-        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+      <a href="/video/${video.id}" download="${video.id}.webm" class="flex items-center space-x-1.5 bg-[#18242E] hover:bg-[#202E39] text-[#F4F7FA] border border-[#31414D] px-3 py-1.5 rounded-xl text-xs font-medium transition-colors">
+        <svg class="w-3.5 h-3.5 text-[#4CD6A0]" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
         <span>Baixar</span>
       </a>
     </div>
@@ -564,14 +556,14 @@ export class ShareServer {
   <main class="flex-1 max-w-6xl w-full mx-auto p-4 md:p-6 grid grid-cols-1 lg:grid-cols-3 gap-6">
     <!-- Video Player Section (Left 2 cols) -->
     <div class="lg:col-span-2 flex flex-col space-y-4">
-      <div id="player-container" class="relative aspect-video bg-black rounded-2xl overflow-hidden border border-gray-800/80 shadow-2xl group flex items-center justify-center">
+      <div id="player-container" class="relative aspect-video bg-black rounded-2xl overflow-hidden border border-[#31414D] shadow-2xl group flex items-center justify-center">
         <video id="main-video" class="w-full h-full object-contain cursor-pointer" playsinline preload="auto">
           <source src="/video/${video.id}" type="video/webm">
           Seu navegador não suporta a tag de vídeo.
         </video>
 
         <!-- Big Play Button Overlay -->
-        <button id="big-play-btn" onclick="togglePlay()" class="absolute w-20 h-20 rounded-full bg-gradient-to-tr from-indigo-600 via-cyan-500 to-violet-500 text-white flex items-center justify-center shadow-2xl shadow-cyan-500/30 hover:scale-110 active:scale-95 transition-all">
+        <button id="big-play-btn" onclick="togglePlay()" class="absolute w-20 h-20 rounded-full bg-[#3AD6C6] text-[#062B2A] flex items-center justify-center shadow-2xl hover:scale-110 active:scale-95 transition-all hover:bg-[#65E6D8]">
           <svg class="w-9 h-9 fill-current ml-1" viewBox="0 0 24 24"><polygon points="5 3 19 12 5 21 5 3"/></svg>
         </button>
 
@@ -582,26 +574,26 @@ export class ShareServer {
         <div class="absolute bottom-0 inset-x-0 bg-gradient-to-t from-black/95 via-black/60 to-transparent p-4 opacity-0 group-hover:opacity-100 transition-opacity">
           <!-- Timeline scrubber with reaction dots and chapter marks -->
           <div class="relative mb-3 flex items-center">
-            <input type="range" id="seek-bar" min="0" max="100" value="0" step="0.1" class="w-full h-1.5 bg-gray-700/80 rounded-lg cursor-pointer appearance-none">
+            <input type="range" id="seek-bar" min="0" max="100" value="0" step="0.1" class="w-full h-1.5 bg-[#31414D] rounded-lg cursor-pointer appearance-none">
             <div id="timeline-chapters" class="absolute inset-x-0 pointer-events-none h-1.5 z-10"></div>
             <div id="timeline-reactions" class="absolute inset-x-0 pointer-events-none h-1.5 z-20"></div>
           </div>
 
           <div class="flex items-center justify-between">
             <div class="flex items-center space-x-3">
-              <button onclick="togglePlay()" id="play-pause-btn" class="text-white hover:text-cyan-400 p-1">
+              <button onclick="togglePlay()" id="play-pause-btn" class="text-white hover:text-[#3AD6C6] p-1">
                 <svg class="w-5 h-5 fill-current" viewBox="0 0 24 24"><polygon points="5 3 19 12 5 21 5 3"/></svg>
               </button>
 
-              <span id="time-display" class="text-xs font-mono text-gray-300">00:00 / 00:00</span>
+              <span id="time-display" class="text-xs font-mono text-[#F4F7FA]">00:00 / 00:00</span>
             </div>
 
             <div class="flex items-center space-x-3">
               <!-- Playback Speed -->
-              <button onclick="cycleSpeed()" id="speed-btn" class="text-xs font-bold bg-white/10 hover:bg-white/20 px-2 py-1 rounded-lg text-white">1x</button>
+              <button onclick="cycleSpeed()" id="speed-btn" class="text-xs font-bold bg-[#18242E] hover:bg-[#202E39] border border-[#31414D] px-2 py-1 rounded-lg text-[#3AD6C6]">1x</button>
 
               <!-- Fullscreen -->
-              <button onclick="toggleFullscreen()" class="text-white hover:text-cyan-400 p-1">
+              <button onclick="toggleFullscreen()" class="text-white hover:text-[#3AD6C6] p-1">
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"/></svg>
               </button>
             </div>
@@ -610,60 +602,60 @@ export class ShareServer {
       </div>
 
       <!-- Emoji Reactions Bar (Aura Interactive Timeline) -->
-      <div class="bg-[#0d111c] border border-slate-800/90 rounded-2xl p-3 flex items-center justify-between shadow-md">
+      <div class="bg-[#111A22] border border-[#31414D] rounded-2xl p-3 flex items-center justify-between shadow-md">
         <div class="flex items-center space-x-1.5">
-          <span class="text-xs font-medium text-slate-400 mr-2">Reagir no segundo atual:</span>
-          <button onclick="sendReaction('👍')" class="p-2 hover:bg-white/10 rounded-xl text-xl hover:scale-125 transition-all">👍</button>
-          <button onclick="sendReaction('❤️')" class="p-2 hover:bg-white/10 rounded-xl text-xl hover:scale-125 transition-all">❤️</button>
-          <button onclick="sendReaction('👏')" class="p-2 hover:bg-white/10 rounded-xl text-xl hover:scale-125 transition-all">👏</button>
-          <button onclick="sendReaction('🎉')" class="p-2 hover:bg-white/10 rounded-xl text-xl hover:scale-125 transition-all">🎉</button>
-          <button onclick="sendReaction('🔥')" class="p-2 hover:bg-white/10 rounded-xl text-xl hover:scale-125 transition-all">🔥</button>
-          <button onclick="sendReaction('💡')" class="p-2 hover:bg-white/10 rounded-xl text-xl hover:scale-125 transition-all">💡</button>
-          <button onclick="sendReaction('😂')" class="p-2 hover:bg-white/10 rounded-xl text-xl hover:scale-125 transition-all">😂</button>
+          <span class="text-xs font-medium text-[#92A2AE] mr-2">Reagir no segundo atual:</span>
+          <button onclick="sendReaction('👍')" class="p-2 hover:bg-[#18242E] rounded-xl text-xl hover:scale-125 transition-all">👍</button>
+          <button onclick="sendReaction('❤️')" class="p-2 hover:bg-[#18242E] rounded-xl text-xl hover:scale-125 transition-all">❤️</button>
+          <button onclick="sendReaction('👏')" class="p-2 hover:bg-[#18242E] rounded-xl text-xl hover:scale-125 transition-all">👏</button>
+          <button onclick="sendReaction('🎉')" class="p-2 hover:bg-[#18242E] rounded-xl text-xl hover:scale-125 transition-all">🎉</button>
+          <button onclick="sendReaction('🔥')" class="p-2 hover:bg-[#18242E] rounded-xl text-xl hover:scale-125 transition-all">🔥</button>
+          <button onclick="sendReaction('💡')" class="p-2 hover:bg-[#18242E] rounded-xl text-xl hover:scale-125 transition-all">💡</button>
+          <button onclick="sendReaction('😂')" class="p-2 hover:bg-[#18242E] rounded-xl text-xl hover:scale-125 transition-all">😂</button>
         </div>
       </div>
 
       <!-- Video Details & AI Summary Card -->
-      <div class="bg-[#0d111c] border border-slate-800/90 rounded-2xl p-5 space-y-3">
-        <div class="flex items-center space-x-2 text-cyan-400 text-xs font-semibold uppercase tracking-wider">
+      <div class="bg-[#111A22] border border-[#31414D] rounded-2xl p-5 space-y-3">
+        <div class="flex items-center space-x-2 text-[#3AD6C6] text-xs font-bold uppercase tracking-wider">
           <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
           <span>Resumo Inteligente por IA</span>
         </div>
-        <p class="text-sm text-slate-300 leading-relaxed">${this.escapeHtml(aiSummary)}</p>
+        <p class="text-sm text-[#C0CDD6] leading-relaxed">${this.escapeHtml(aiSummary)}</p>
       </div>
     </div>
 
     <!-- Right Sidebar: Comments, Chapters & Transcript (1 col) -->
     <div class="flex flex-col space-y-4">
       <!-- Tabs header -->
-      <div class="bg-[#0d111c] border border-slate-800/90 rounded-2xl p-1 flex space-x-1">
-        <button onclick="switchTab('comments')" id="tab-comments-btn" class="flex-1 py-2 text-xs font-semibold rounded-xl bg-gradient-to-r from-indigo-600 to-cyan-600 text-white transition-all shadow-sm">
+      <div class="bg-[#111A22] border border-[#31414D] rounded-2xl p-1 flex space-x-1">
+        <button onclick="switchTab('comments')" id="tab-comments-btn" class="flex-1 py-2 text-xs font-bold rounded-xl bg-[#3AD6C6] text-[#062B2A] transition-all shadow-sm">
           Comentários (<span id="comments-count">0</span>)
         </button>
-        <button onclick="switchTab('chapters')" id="tab-chapters-btn" class="flex-1 py-2 text-xs font-medium rounded-xl text-slate-400 hover:text-white transition-all">
+        <button onclick="switchTab('chapters')" id="tab-chapters-btn" class="flex-1 py-2 text-xs font-medium rounded-xl text-[#92A2AE] hover:text-[#F4F7FA] transition-all">
           Capítulos (<span id="chapters-count">${(video.chapters || []).length}</span>)
         </button>
-        <button onclick="switchTab('transcript')" id="tab-transcript-btn" class="flex-1 py-2 text-xs font-medium rounded-xl text-slate-400 hover:text-white transition-all">
+        <button onclick="switchTab('transcript')" id="tab-transcript-btn" class="flex-1 py-2 text-xs font-medium rounded-xl text-[#92A2AE] hover:text-[#F4F7FA] transition-all">
           Transcrição
         </button>
       </div>
 
       <!-- Tab 1: Comments Section -->
-      <div id="comments-tab" class="bg-[#0d111c] border border-slate-800/90 rounded-2xl p-4 flex-1 flex flex-col h-[520px]">
+      <div id="comments-tab" class="bg-[#111A22] border border-[#31414D] rounded-2xl p-4 flex-1 flex flex-col h-[520px]">
         <!-- Comments list -->
         <div id="comments-list" class="flex-1 overflow-y-auto space-y-3 pr-1 text-sm">
           <!-- Populated by JS -->
         </div>
 
         <!-- Add Comment Form -->
-        <div class="pt-3 border-t border-slate-800 mt-2 space-y-2">
+        <div class="pt-3 border-t border-[#31414D] mt-2 space-y-2">
           <div class="flex items-center space-x-2">
-            <input type="text" id="comment-author" placeholder="Seu nome..." value="Espectador" class="bg-slate-900 border border-slate-700/60 rounded-xl px-2.5 py-1 text-xs text-white focus:outline-none focus:border-cyan-500 w-32">
-            <span class="text-xs text-cyan-400 font-mono" id="current-timestamp-badge">em 00:00</span>
+            <input type="text" id="comment-author" placeholder="Seu nome..." value="Espectador" class="bg-[#18242E] border border-[#31414D] rounded-xl px-2.5 py-1 text-xs text-[#F4F7FA] placeholder-[#92A2AE] focus:outline-none focus:border-[#3AD6C6] w-32">
+            <span class="text-xs text-[#3AD6C6] font-mono font-medium" id="current-timestamp-badge">em 00:00</span>
           </div>
           <div class="flex space-x-2">
-            <input type="text" id="comment-text" placeholder="Adicione seu comentário..." class="flex-1 bg-slate-900 border border-slate-700/60 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-cyan-500" onkeydown="if(event.key==='Enter') submitComment()">
-            <button onclick="submitComment()" class="bg-gradient-to-r from-indigo-600 to-cyan-600 hover:brightness-110 text-white px-3.5 py-2 rounded-xl text-xs font-semibold transition-all shadow-md">
+            <input type="text" id="comment-text" placeholder="Adicione seu comentário..." class="flex-1 bg-[#18242E] border border-[#31414D] rounded-xl px-3 py-2 text-xs text-[#F4F7FA] placeholder-[#92A2AE] focus:outline-none focus:border-[#3AD6C6]" onkeydown="if(event.key==='Enter') submitComment()">
+            <button onclick="submitComment()" class="bg-[#3AD6C6] hover:bg-[#65E6D8] text-[#062B2A] px-3.5 py-2 rounded-xl text-xs font-bold transition-all shadow-md">
               Enviar
             </button>
           </div>
@@ -671,10 +663,10 @@ export class ShareServer {
       </div>
 
       <!-- Tab 2: Chapters Section -->
-      <div id="chapters-tab" class="hidden bg-[#0d111c] border border-slate-800/90 rounded-2xl p-4 flex-1 flex flex-col h-[520px]">
-        <div class="text-xs text-slate-400 font-medium mb-3 flex items-center justify-between">
+      <div id="chapters-tab" class="hidden bg-[#111A22] border border-[#31414D] rounded-2xl p-4 flex-1 flex flex-col h-[520px]">
+        <div class="text-xs text-[#92A2AE] font-medium mb-3 flex items-center justify-between">
           <span>Capítulos do Vídeo</span>
-          <span class="text-[10px] text-cyan-400">Clique para pular</span>
+          <span class="text-[10px] text-[#3AD6C6]">Clique para pular</span>
         </div>
         <div id="chapters-list" class="flex-1 overflow-y-auto space-y-2 pr-1 text-xs">
           <!-- Populated by JS -->
@@ -682,7 +674,7 @@ export class ShareServer {
       </div>
 
       <!-- Tab 3: Transcript Section -->
-      <div id="transcript-tab" class="hidden bg-[#0d111c] border border-slate-800/90 rounded-2xl p-4 flex-1 flex flex-col h-[520px]">
+      <div id="transcript-tab" class="hidden bg-[#111A22] border border-[#31414D] rounded-2xl p-4 flex-1 flex flex-col h-[520px]">
         <div id="transcript-list" class="flex-1 overflow-y-auto space-y-2.5 pr-1 text-xs">
           <!-- Populated by JS -->
         </div>
@@ -995,22 +987,22 @@ export class ShareServer {
     const list = this.getMetadata();
 
     const itemsHtml = list.map(v => `
-      <div class="bg-[#16171d] border border-gray-800/90 rounded-2xl p-4 flex flex-col justify-between hover:border-indigo-500/50 transition-all shadow-lg group">
+      <div class="bg-[#111A22] border border-[#31414D] rounded-2xl p-4 flex flex-col justify-between hover:border-[#3AD6C6]/50 transition-all shadow-lg group">
         <div>
           <div class="aspect-video bg-black rounded-xl overflow-hidden mb-3 relative flex items-center justify-center">
             <video src="/video/${v.id}#t=0.5" class="w-full h-full object-cover"></video>
             <div class="absolute inset-0 bg-black/40 group-hover:bg-transparent transition-all flex items-center justify-center">
-              <a href="/share/${v.id}" class="w-12 h-12 rounded-full bg-[#625df5]/90 text-white flex items-center justify-center shadow-lg group-hover:scale-110 transition-all">
+              <a href="/share/${v.id}" class="w-12 h-12 rounded-full bg-[#3AD6C6] text-[#062B2A] flex items-center justify-center shadow-lg group-hover:scale-110 transition-all hover:bg-[#65E6D8]">
                 <svg class="w-6 h-6 fill-current ml-0.5" viewBox="0 0 24 24"><polygon points="5 3 19 12 5 21 5 3"/></svg>
               </a>
             </div>
           </div>
-          <h3 class="text-sm font-semibold text-white truncate">${this.escapeHtml(v.title)}</h3>
-          <p class="text-xs text-gray-400 mt-1">${new Date(v.createdAt).toLocaleDateString('pt-BR')} • ${(v.durationMs / 1000).toFixed(0)}s • ${v.viewsCount || 0} visualizações</p>
+          <h3 class="text-sm font-semibold text-[#F4F7FA] truncate">${this.escapeHtml(v.title)}</h3>
+          <p class="text-xs text-[#92A2AE] mt-1">${new Date(v.createdAt).toLocaleDateString('pt-BR')} • ${(v.durationMs / 1000).toFixed(0)}s • ${v.viewsCount || 0} visualizações</p>
         </div>
-        <div class="mt-4 pt-3 border-t border-gray-800/80 flex items-center justify-between">
-          <a href="/share/${v.id}" class="text-xs font-semibold text-indigo-400 hover:text-indigo-300">Assistir Vídeo →</a>
-          <button onclick="navigator.clipboard.writeText(window.location.origin + '/share/${v.id}'); alert('Link copiado!')" class="text-xs text-gray-400 hover:text-white">Copiar Link</button>
+        <div class="mt-4 pt-3 border-t border-[#31414D] flex items-center justify-between">
+          <a href="/share/${v.id}" class="text-xs font-bold text-[#3AD6C6] hover:text-[#65E6D8]">Assistir Vídeo →</a>
+          <button onclick="navigator.clipboard.writeText(window.location.origin + '/share/${v.id}'); alert('Link copiado!')" class="text-xs text-[#92A2AE] hover:text-[#F4F7FA]">Copiar Link</button>
         </div>
       </div>
     `).join('');
@@ -1019,30 +1011,28 @@ export class ShareServer {
 <html lang="pt-BR">
 <head>
   <meta charset="UTF-8">
-  <title>Aura Screen Studio - Galeria de Vídeos Compartilhados</title>
+  <title>Aura Screen Studio — Galeria de Vídeos</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-  <style>body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: #080a0f; color: #f1f5f9; }</style>
+  <style>body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: #0B1117; color: #F4F7FA; }</style>
 </head>
-<body class="min-h-screen p-8">
+<body class="min-h-screen p-8 selection:bg-[#12312F] selection:text-[#3AD6C6]">
   <div class="max-w-6xl mx-auto space-y-6">
-    <div class="flex items-center space-x-3 border-b border-slate-800 pb-5">
-      <div class="w-11 h-11 rounded-2xl bg-gradient-to-tr from-indigo-600 via-cyan-500 to-violet-500 p-0.5 shadow-lg shadow-cyan-500/20 flex items-center justify-center">
-        <div class="w-full h-full bg-[#0d111c] rounded-[14px] flex items-center justify-center">
-          <svg class="w-6 h-6 text-cyan-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <circle cx="12" cy="12" r="9" stroke="cyan" />
-            <circle cx="12" cy="12" r="3.5" fill="#f43f5e" />
-          </svg>
-        </div>
+    <div class="flex items-center space-x-3 border-b border-[#31414D] pb-5">
+      <div class="w-11 h-11 rounded-2xl bg-[#18242E] border border-[#31414D] p-0.5 shadow-lg flex items-center justify-center">
+        <svg class="w-6 h-6 text-[#3AD6C6]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <circle cx="12" cy="12" r="9" stroke="#3AD6C6" />
+          <circle cx="12" cy="12" r="3.5" fill="#FF5F6D" />
+        </svg>
       </div>
       <div>
-        <h1 class="text-xl font-bold text-white tracking-tight">Aura Web Hub</h1>
-        <p class="text-xs text-slate-400">Vídeos gravados com Aura Screen Studio disponíveis para reprodução e download</p>
+        <h1 class="text-xl font-bold text-[#F4F7FA] tracking-tight">Aura Screen Studio Hub</h1>
+        <p class="text-xs text-[#92A2AE]">Vídeos gravados com Aura Screen Studio disponíveis para reprodução e download</p>
       </div>
     </div>
 
     <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
-      ${itemsHtml || '<div class="col-span-full py-16 text-center text-slate-500 text-sm">Nenhum vídeo gravado ainda. Inicie sua primeira gravação com o Aura Screen Studio!</div>'}
+      ${itemsHtml || '<div class="col-span-full py-16 text-center text-[#92A2AE] text-sm">Nenhum vídeo gravado ainda. Inicie sua primeira gravação com o Aura Screen Studio!</div>'}
     </div>
   </div>
 </body>
@@ -1153,7 +1143,7 @@ export class ShareServer {
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>Aura Screen Studio — Transmissão ao Vivo (Zoom Pro Suite)</title>
+  <title>Aura Screen Studio — Transmissão ao Vivo (60 FPS Ultra HD)</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
@@ -1172,42 +1162,42 @@ export class ShareServer {
     }
   </style>
 </head>
-<body class="bg-[#07090e] text-slate-100 min-h-screen flex flex-col font-['Plus_Jakarta_Sans',sans-serif] selection:bg-indigo-500 selection:text-white">
-  <header class="border-b border-[#181d2a] bg-[#0c101a]/80 backdrop-blur-md px-4 sm:px-6 py-3 flex items-center justify-between sticky top-0 z-30">
+<body class="bg-[#0B1117] text-[#F4F7FA] min-h-screen flex flex-col font-['Plus_Jakarta_Sans',sans-serif] selection:bg-[#12312F] selection:text-[#3AD6C6]">
+  <header class="border-b border-[#31414D] bg-[#111A22]/90 backdrop-blur-md px-4 sm:px-6 py-3 flex items-center justify-between sticky top-0 z-30">
     <div class="flex items-center space-x-3">
-      <div class="w-8 h-8 rounded-xl bg-gradient-to-tr from-indigo-600 via-indigo-500 to-rose-500 flex items-center justify-center shadow-lg shadow-indigo-500/20">
-        <svg class="w-4 h-4 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+      <div class="w-8 h-8 rounded-xl bg-[#18242E] border border-[#31414D] flex items-center justify-center shadow-lg">
+        <svg class="w-4 h-4 text-[#3AD6C6]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
           <circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="2" />
-          <circle cx="12" cy="12" r="3.5" fill="currentColor" />
+          <circle cx="12" cy="12" r="3.5" fill="#FF5F6D" />
         </svg>
       </div>
       <div>
         <div class="flex items-center space-x-2">
-          <h1 class="text-sm font-bold text-white tracking-tight" id="liveTitle">${this.escapeHtml(this.liveTitle)}</h1>
-          <span id="liveBadge" class="inline-flex items-center space-x-1.5 px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider ${this.isLive ? (this.isLivePaused ? 'bg-amber-500/20 text-amber-400 border border-amber-500/40' : 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/40') : 'bg-slate-800 text-slate-400 border border-slate-700'}">
-            <span class="w-1.5 h-1.5 rounded-full ${this.isLive ? (this.isLivePaused ? 'bg-amber-400' : 'bg-emerald-400 animate-ping') : 'bg-slate-500'}"></span>
-            <span>${this.isLive ? (this.isLivePaused ? 'PAUSADO' : 'AO VIVO') : 'OFFLINE'}</span>
+          <h1 class="text-sm font-bold text-[#F4F7FA] tracking-tight" id="liveTitle">${this.escapeHtml(this.liveTitle)}</h1>
+          <span id="liveBadge" class="inline-flex items-center space-x-1.5 px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider ${this.isLive ? (this.isLivePaused ? 'bg-[#FFBD66]/20 text-[#FFBD66] border border-[#FFBD66]/40' : 'bg-[#12312F] text-[#3AD6C6] border border-[#3AD6C6]/40') : 'bg-[#18242E] text-[#92A2AE] border border-[#31414D]'}">
+            <span class="w-1.5 h-1.5 rounded-full ${this.isLive ? (this.isLivePaused ? 'bg-[#FFBD66]' : 'bg-[#3AD6C6] animate-ping') : 'bg-[#92A2AE]'}"></span>
+            <span>${this.isLive ? (this.isLivePaused ? 'PAUSADO' : 'AO VIVO 60 FPS') : 'OFFLINE'}</span>
           </span>
         </div>
-        <p class="text-[11px] text-slate-400">Transmissão em tempo real via Aura Screen Studio (Zoom Pro Suite)</p>
+        <p class="text-[11px] text-[#92A2AE]">Transmissão em tempo real fluida em 60 FPS via Aura Screen Studio</p>
       </div>
     </div>
 
     <div class="flex items-center space-x-3">
-      <div class="flex items-center space-x-1.5 bg-[#141926] border border-[#23293a] px-2.5 py-1 rounded-lg text-xs text-slate-300">
-        <svg class="w-3.5 h-3.5 text-indigo-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+      <div class="flex items-center space-x-1.5 bg-[#18242E] border border-[#31414D] px-2.5 py-1 rounded-lg text-xs text-[#C0CDD6]">
+        <svg class="w-3.5 h-3.5 text-[#3AD6C6]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
         </svg>
-        <span id="viewerCount" class="font-bold text-white">${this.activeLiveClients.size}</span>
-        <span class="hidden sm:inline text-slate-400">assistindo</span>
+        <span id="viewerCount" class="font-bold text-[#F4F7FA]">${this.activeLiveClients.size}</span>
+        <span class="hidden sm:inline text-[#92A2AE]">assistindo</span>
       </div>
 
-      <div class="hidden sm:flex items-center space-x-1.5 bg-[#141926] border border-[#23293a] px-2.5 py-1 rounded-lg text-xs text-slate-300 font-mono">
-        <span class="text-slate-400">Duração:</span>
-        <span id="uptimeDisplay" class="font-bold text-indigo-300">00:00</span>
+      <div class="hidden sm:flex items-center space-x-1.5 bg-[#18242E] border border-[#31414D] px-2.5 py-1 rounded-lg text-xs text-[#C0CDD6] font-mono">
+        <span class="text-[#92A2AE]">Duração:</span>
+        <span id="uptimeDisplay" class="font-bold text-[#3AD6C6]">00:00</span>
       </div>
 
-      <button id="fullscreenBtn" class="p-1.5 rounded-lg bg-[#141926] hover:bg-[#1e2538] border border-[#23293a] text-slate-300 hover:text-white transition-colors" title="Tela Cheia (F)">
+      <button id="fullscreenBtn" class="p-1.5 rounded-lg bg-[#18242E] hover:bg-[#202E39] border border-[#31414D] text-[#C0CDD6] hover:text-[#F4F7FA] transition-colors" title="Tela Cheia (F)">
         <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4" />
         </svg>
@@ -1216,44 +1206,44 @@ export class ShareServer {
   </header>
 
   <main class="flex-1 flex flex-col items-center justify-center p-3 sm:p-6 relative overflow-hidden">
-    <div id="videoContainer" class="relative w-full max-w-6xl aspect-video bg-[#030508] rounded-2xl overflow-hidden border border-[#1e2538] shadow-2xl flex items-center justify-center group">
+    <div id="videoContainer" class="relative w-full max-w-6xl aspect-video bg-black rounded-2xl overflow-hidden border border-[#31414D] shadow-2xl flex items-center justify-center group">
       
       <img id="streamImg" src="/live/stream" alt="Compartilhamento de Tela" class="w-full h-full object-contain select-none" />
 
-      <div id="pausedOverlay" class="${this.isLive && this.isLivePaused ? '' : 'hidden'} absolute inset-0 bg-[#07090e]/90 backdrop-blur-md flex flex-col items-center justify-center z-20 text-center p-6 transition-all duration-300">
-        <div class="w-16 h-16 rounded-2xl bg-amber-500/20 border border-amber-500/40 flex items-center justify-center text-amber-400 mb-4 animate-pulse shadow-lg shadow-amber-500/10">
+      <div id="pausedOverlay" class="${this.isLive && this.isLivePaused ? '' : 'hidden'} absolute inset-0 bg-[#0B1117]/90 backdrop-blur-md flex flex-col items-center justify-center z-20 text-center p-6 transition-all duration-300">
+        <div class="w-16 h-16 rounded-2xl bg-[#FFBD66]/20 border border-[#FFBD66]/40 flex items-center justify-center text-[#FFBD66] mb-4 animate-pulse shadow-lg shadow-[#FFBD66]/10">
           <svg class="w-8 h-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 9v6m4-6v6m7-3a9 9 0 11-18 0 9 9 0 0118 0z" />
           </svg>
         </div>
-        <h2 class="text-xl font-bold text-white mb-1.5">Compartilhamento de Tela Pausado</h2>
-        <p class="text-slate-400 text-sm max-w-sm">O apresentador pausou temporariamente a exibição da tela. A transmissão continuará em instantes.</p>
+        <h2 class="text-xl font-bold text-[#F4F7FA] mb-1.5">Compartilhamento de Tela Pausado</h2>
+        <p class="text-[#92A2AE] text-sm max-w-sm">O apresentador pausou temporariamente a exibição da tela. A transmissão continuará em instantes.</p>
       </div>
 
-      <div id="offlineOverlay" class="${this.isLive ? 'hidden' : ''} absolute inset-0 bg-[#07090e]/95 backdrop-blur-md flex flex-col items-center justify-center z-20 text-center p-6 transition-all duration-300">
-        <div class="w-16 h-16 rounded-2xl bg-indigo-500/20 border border-indigo-500/40 flex items-center justify-center text-indigo-400 mb-4 shadow-lg shadow-indigo-500/10">
+      <div id="offlineOverlay" class="${this.isLive ? 'hidden' : ''} absolute inset-0 bg-[#0B1117]/95 backdrop-blur-md flex flex-col items-center justify-center z-20 text-center p-6 transition-all duration-300">
+        <div class="w-16 h-16 rounded-2xl bg-[#12312F] border border-[#3AD6C6]/40 flex items-center justify-center text-[#3AD6C6] mb-4 shadow-lg shadow-[#3AD6C6]/10">
           <svg class="w-8 h-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z" />
           </svg>
         </div>
-        <h2 class="text-xl font-bold text-white mb-1.5">Aguardando Início da Transmissão</h2>
-        <p class="text-slate-400 text-sm max-w-sm">O apresentador ainda não iniciou a transmissão. Esta tela se conectará automaticamente assim que a live começar.</p>
+        <h2 class="text-xl font-bold text-[#F4F7FA] mb-1.5">Aguardando Início da Transmissão</h2>
+        <p class="text-[#92A2AE] text-sm max-w-sm">O apresentador ainda não iniciou a transmissão. Esta tela se conectará automaticamente assim que a live começar.</p>
       </div>
 
       <div id="reactionsLayer" class="absolute inset-0 pointer-events-none overflow-hidden z-30"></div>
     </div>
   </main>
 
-  <footer class="border-t border-[#181d2a] bg-[#0c101a]/90 backdrop-blur-md px-4 py-3 sticky bottom-0 z-30 flex flex-wrap items-center justify-between gap-3">
+  <footer class="border-t border-[#31414D] bg-[#111A22]/90 backdrop-blur-md px-4 py-3 sticky bottom-0 z-30 flex flex-wrap items-center justify-between gap-3">
     <div class="flex items-center space-x-2">
-      <span class="text-xs text-slate-400 hidden sm:inline">Reações ao vivo:</span>
-      <div class="flex items-center space-x-1.5 bg-[#141926] p-1 rounded-xl border border-[#23293a]">
-        <button onclick="sendReaction('👏')" class="px-2.5 py-1 rounded-lg hover:bg-slate-700/60 active:scale-95 transition-all text-base" title="Aplaudir">👏</button>
-        <button onclick="sendReaction('❤️')" class="px-2.5 py-1 rounded-lg hover:bg-slate-700/60 active:scale-95 transition-all text-base" title="Amei">❤️</button>
-        <button onclick="sendReaction('👍')" class="px-2.5 py-1 rounded-lg hover:bg-slate-700/60 active:scale-95 transition-all text-base" title="Gostei">👍</button>
-        <button onclick="sendReaction('🔥')" class="px-2.5 py-1 rounded-lg hover:bg-slate-700/60 active:scale-95 transition-all text-base" title="Incrível">🔥</button>
-        <button onclick="sendReaction('💡')" class="px-2.5 py-1 rounded-lg hover:bg-slate-700/60 active:scale-95 transition-all text-base" title="Ideia">💡</button>
-        <button onclick="sendReaction('❓')" class="px-2.5 py-1 rounded-lg hover:bg-slate-700/60 active:scale-95 transition-all text-base" title="Dúvida">❓</button>
+      <span class="text-xs text-[#92A2AE] hidden sm:inline">Reações ao vivo:</span>
+      <div class="flex items-center space-x-1.5 bg-[#18242E] p-1 rounded-xl border border-[#31414D]">
+        <button onclick="sendReaction('👏')" class="px-2.5 py-1 rounded-lg hover:bg-[#202E39] active:scale-95 transition-all text-base" title="Aplaudir">👏</button>
+        <button onclick="sendReaction('❤️')" class="px-2.5 py-1 rounded-lg hover:bg-[#202E39] active:scale-95 transition-all text-base" title="Amei">❤️</button>
+        <button onclick="sendReaction('👍')" class="px-2.5 py-1 rounded-lg hover:bg-[#202E39] active:scale-95 transition-all text-base" title="Gostei">👍</button>
+        <button onclick="sendReaction('🔥')" class="px-2.5 py-1 rounded-lg hover:bg-[#202E39] active:scale-95 transition-all text-base" title="Incrível">🔥</button>
+        <button onclick="sendReaction('💡')" class="px-2.5 py-1 rounded-lg hover:bg-[#202E39] active:scale-95 transition-all text-base" title="Ideia">💡</button>
+        <button onclick="sendReaction('❓')" class="px-2.5 py-1 rounded-lg hover:bg-[#202E39] active:scale-95 transition-all text-base" title="Dúvida">❓</button>
       </div>
     </div>
 
@@ -1262,9 +1252,9 @@ export class ShareServer {
         type="text"
         id="questionInput"
         placeholder="Fazer pergunta ao apresentador..."
-        class="bg-[#141926] border border-[#23293a] focus:border-indigo-500 rounded-xl px-3 py-1.5 text-xs text-white placeholder-slate-500 outline-none w-full sm:w-72 transition-colors"
+        class="bg-[#18242E] border border-[#31414D] focus:border-[#3AD6C6] rounded-xl px-3 py-1.5 text-xs text-[#F4F7FA] placeholder-[#92A2AE] outline-none w-full sm:w-72 transition-colors"
       />
-      <button type="submit" class="bg-indigo-600 hover:bg-indigo-500 active:scale-95 text-white font-medium px-3 py-1.5 rounded-xl text-xs transition-all shrink-0">
+      <button type="submit" class="bg-[#3AD6C6] hover:bg-[#65E6D8] active:scale-95 text-[#062B2A] font-bold px-3 py-1.5 rounded-xl text-xs transition-all shrink-0">
         Enviar
       </button>
     </form>
