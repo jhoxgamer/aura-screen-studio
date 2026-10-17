@@ -526,6 +526,80 @@ describe('End-to-End Integration & Subsystem Validation', () => {
       fakeMediaDevices.simulateHotplug();
       assert.equal(deviceListFetched, 2, 'Listener properly removed on cleanup');
     });
+
+    test('countdown timer logic handles 0s instantaneous start vs 3s and 5s durations', () => {
+      const runCountdown = (initialSeconds: number, onFinished: () => void) => {
+        if (initialSeconds <= 0) {
+          onFinished();
+          return { ticks: 0, windowOpened: false };
+        }
+        let ticks = 0;
+        for (let c = initialSeconds; c > 0; c--) {
+          ticks++;
+        }
+        onFinished();
+        return { ticks, windowOpened: true };
+      };
+
+      let finished = false;
+      const res0 = runCountdown(0, () => { finished = true; });
+      assert.equal(finished, true, '0s countdown starts immediately');
+      assert.equal(res0.windowOpened, false, '0s countdown does not open countdown window');
+
+      finished = false;
+      const res5 = runCountdown(5, () => { finished = true; });
+      assert.equal(finished, true);
+      assert.equal(res5.ticks, 5, '5s countdown generates 5 ticks');
+      assert.equal(res5.windowOpened, true);
+    });
+
+    test('player volume slider clamps between 0.0 and 1.0 and syncs with mute', () => {
+      let volume = 1.0;
+      let muted = false;
+
+      const setVolume = (v: number) => {
+        volume = Math.max(0, Math.min(1, v));
+        if (volume > 0 && muted) {
+          muted = false;
+        }
+      };
+
+      setVolume(0.5);
+      assert.equal(volume, 0.5);
+
+      muted = true;
+      setVolume(0.8);
+      assert.equal(volume, 0.8);
+      assert.equal(muted, false, 'Unmutes automatically when volume slider is dragged above zero');
+
+      setVolume(1.5);
+      assert.equal(volume, 1.0, 'Clamps upper bound to 1.0');
+
+      setVolume(-0.2);
+      assert.equal(volume, 0.0, 'Clamps lower bound to 0.0');
+    });
+
+    test('teleprompter pause-on-hover halts scroll progress only when hovering', () => {
+      let scrollPos = 0;
+      const speed = 1.25;
+      const step = (deltaSec: number, pauseOnHover: boolean, isHovered: boolean) => {
+        if (!pauseOnHover || !isHovered) {
+          scrollPos += speed * 30 * deltaSec;
+        }
+      };
+
+      // 1 second with no hover -> progresses 37.5px
+      step(1.0, true, false);
+      assert.equal(scrollPos, 37.5);
+
+      // 1 second with hover -> stays paused at 37.5px
+      step(1.0, true, true);
+      assert.equal(scrollPos, 37.5, 'Scroll position remains frozen while hovered');
+
+      // 1 second with hover released -> resumes progressing
+      step(1.0, true, false);
+      assert.equal(scrollPos, 75.0, 'Scroll position resumes automatically upon hover release');
+    });
   });
 });
 

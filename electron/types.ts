@@ -31,6 +31,7 @@ export interface RecordingOptions {
   cropArea?: CropArea;
   micVolume?: number;
   noiseSuppressionLevel?: 'off' | 'low' | 'medium' | 'high';
+  countdownSeconds?: number;
 }
 
 export interface VideoComment {

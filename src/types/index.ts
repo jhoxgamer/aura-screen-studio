@@ -30,6 +30,7 @@ export interface RecordingOptions {
   cropArea?: CropArea;
   micVolume?: number;
   noiseSuppressionLevel?: 'off' | 'low' | 'medium' | 'high';
+  countdownSeconds?: number;
 }
 
 export interface VideoComment {
@@ -131,6 +132,7 @@ declare global {
       onRecordingStateChanged: (callback: (state: string) => void) => () => void;
       onToggleMic?: (callback: () => void) => () => void;
       onCountdownTick: (callback: (count: number) => void) => () => void;
+      onCountdownInit?: (callback: (data: { total: number; current: number }) => void) => () => void;
       onBubbleSizeChanged: (callback: (size: BubbleSize) => void) => () => void;
       onDrawingToggled: (callback: (active: boolean) => void) => () => void;
       onPlaySound: (callback: (sound: string) => void) => () => void;

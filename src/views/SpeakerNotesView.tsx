@@ -24,7 +24,8 @@ import {
   Anchor,
   ListChecks,
   Sliders,
-  Type
+  Type,
+  MousePointer
 } from 'lucide-react';
 import { getShortcutLabel } from '../utils/shortcuts';
 
@@ -95,6 +96,10 @@ export const SpeakerNotesView: React.FC = () => {
   const [isMirrored, setIsMirrored] = useState<boolean>(() => {
     return localStorage.getItem('aura_prompter_mirrored') === 'true';
   });
+  const [pauseOnHover, setPauseOnHover] = useState<boolean>(() => {
+    return localStorage.getItem('aura_prompter_pause_on_hover') === 'true';
+  });
+  const [isHovered, setIsHovered] = useState<boolean>(false);
   const [isCollapsed, setIsCollapsed] = useState(false);
   const [currentLinePreview, setCurrentLinePreview] = useState('');
 
@@ -123,6 +128,10 @@ export const SpeakerNotesView: React.FC = () => {
   useEffect(() => {
     localStorage.setItem('aura_prompter_mirrored', String(isMirrored));
   }, [isMirrored]);
+
+  useEffect(() => {
+    localStorage.setItem('aura_prompter_pause_on_hover', String(pauseOnHover));
+  }, [pauseOnHover]);
 
   useEffect(() => {
     localStorage.setItem('aura_speaker_notes_bullets', JSON.stringify(bulletNotes));
@@ -156,6 +165,12 @@ export const SpeakerNotesView: React.FC = () => {
         } else if (e.code === 'KeyR') {
           e.preventDefault();
           handleReset();
+        } else if (e.key === '+' || e.key === '=') {
+          e.preventDefault();
+          setFontSize(prev => Math.min(48, prev + 2));
+        } else if (e.key === '-' || e.key === '_') {
+          e.preventDefault();
+          setFontSize(prev => Math.max(14, prev - 2));
         }
       }
 
@@ -168,7 +183,7 @@ export const SpeakerNotesView: React.FC = () => {
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [mode, isCollapsed]);
 
-  // Butter-smooth 60fps auto-scroll engine without CSS smooth-scroll collision
+  // Butter-smooth 60fps auto-scroll engine with smart pause-on-hover support
   useEffect(() => {
     if (!isPlaying || mode !== 'prompt' || isCollapsed) {
       if (scrollAnimRef.current) cancelAnimationFrame(scrollAnimRef.current);
@@ -182,16 +197,18 @@ export const SpeakerNotesView: React.FC = () => {
       lastTime = now;
 
       if (containerRef.current) {
-        // Base: 24 pixels per second per speed unit
-        const pixelsPerSecond = speed * 30;
-        scrollPosRef.current += pixelsPerSecond * delta;
-        containerRef.current.scrollTop = scrollPosRef.current;
+        if (!pauseOnHover || !isHovered) {
+          // Base: 24 pixels per second per speed unit
+          const pixelsPerSecond = speed * 30;
+          scrollPosRef.current += pixelsPerSecond * delta;
+          containerRef.current.scrollTop = scrollPosRef.current;
 
-        // Auto pause when reaching the end of the text
-        const maxScroll = containerRef.current.scrollHeight - containerRef.current.clientHeight;
-        if (scrollPosRef.current >= maxScroll - 4) {
-          setIsPlaying(false);
-          return;
+          // Auto pause when reaching the end of the text
+          const maxScroll = containerRef.current.scrollHeight - containerRef.current.clientHeight;
+          if (scrollPosRef.current >= maxScroll - 4) {
+            setIsPlaying(false);
+            return;
+          }
         }
       }
 
@@ -203,7 +220,7 @@ export const SpeakerNotesView: React.FC = () => {
     return () => {
       if (scrollAnimRef.current) cancelAnimationFrame(scrollAnimRef.current);
     };
-  }, [isPlaying, speed, mode, isCollapsed]);
+  }, [isPlaying, speed, mode, isCollapsed, pauseOnHover, isHovered]);
 
   // Sync scroll position when user manually scrolls
   const handleScroll = () => {
@@ -617,6 +634,19 @@ export const SpeakerNotesView: React.FC = () => {
                 </button>
               </div>
 
+              {/* Pause on Hover */}
+              <button
+                onClick={() => setPauseOnHover(!pauseOnHover)}
+                className={`p-1.5 rounded-lg transition-all ${
+                  pauseOnHover
+                    ? 'bg-amber-500/20 text-amber-300 border border-amber-500/40'
+                    : 'bg-[#171b26] border border-[#232838] hover:bg-slate-700 text-slate-400 hover:text-white'
+                }`}
+                title={pauseOnHover ? 'Pausar rolagem ao passar o mouse: ATIVADO' : 'Pausar rolagem ao passar o mouse: DESATIVADO'}
+              >
+                <MousePointer className="w-3.5 h-3.5" />
+              </button>
+
               {/* Mirror Horizontal */}
               <button
                 onClick={() => setIsMirrored(!isMirrored)}
@@ -642,6 +672,14 @@ export const SpeakerNotesView: React.FC = () => {
             <div className="h-[1px] flex-1 bg-gradient-to-r from-transparent via-indigo-500/40 to-transparent" />
           </div>
 
+          {/* Temporary Pause Badge when hovered */}
+          {pauseOnHover && isHovered && isPlaying && (
+            <div className="absolute top-20 left-1/2 -translate-x-1/2 bg-amber-500/90 text-slate-950 font-bold text-[10px] px-2.5 py-0.5 rounded-full shadow-lg z-30 tracking-wide uppercase flex items-center space-x-1 animate-in fade-in zoom-in-95">
+              <Pause className="w-2.5 h-2.5 fill-current" />
+              <span>Pausa por Mouse</span>
+            </div>
+          )}
+
           {/* Soft Vignette / Gradient Mask (Top & Bottom focus mask) */}
           <div className="absolute top-10 inset-x-0 h-10 bg-gradient-to-b from-[#0c0e14] to-transparent pointer-events-none z-10" />
           <div className="absolute bottom-6 inset-x-0 h-12 bg-gradient-to-t from-[#0c0e14] to-transparent pointer-events-none z-10" />
@@ -650,6 +688,8 @@ export const SpeakerNotesView: React.FC = () => {
           <div
             ref={containerRef}
             onScroll={handleScroll}
+            onMouseEnter={() => setIsHovered(true)}
+            onMouseLeave={() => setIsHovered(false)}
             className={`flex-1 p-6 overflow-y-auto ${
               isMirrored ? 'scale-x-[-1]' : ''
             }`}

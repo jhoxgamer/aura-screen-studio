@@ -183,6 +183,11 @@ export const electronAPI = {
     ipcRenderer.on('countdown:tick', handler);
     return () => ipcRenderer.removeListener('countdown:tick', handler);
   },
+  onCountdownInit: (callback: (data: { total: number; current: number }) => void) => {
+    const handler = (_: any, data: any) => callback(data);
+    ipcRenderer.on('countdown:init', handler);
+    return () => ipcRenderer.removeListener('countdown:init', handler);
+  },
   onBubbleSizeChanged: (callback: (size: BubbleSize) => void) => {
     const handler = (_: any, size: BubbleSize) => callback(size);
     ipcRenderer.on('bubble:size-changed', handler);

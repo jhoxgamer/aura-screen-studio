@@ -35,19 +35,31 @@ export function playCountdownChime(count: number) {
 
 export const CountdownView: React.FC = () => {
   const [count, setCount] = useState<number>(3);
+  const [totalCount, setTotalCount] = useState<number>(3);
 
   useEffect(() => {
-    const cleanup = window.electronAPI.onCountdownTick((newCount) => {
+    const cleanupInit = window.electronAPI.onCountdownInit?.((data) => {
+      if (data?.total) {
+        setTotalCount(data.total);
+        setCount(data.current);
+      }
+    });
+
+    const cleanupTick = window.electronAPI.onCountdownTick((newCount) => {
       setCount(newCount);
       playCountdownChime(newCount);
     });
-    return cleanup;
+
+    return () => {
+      cleanupInit?.();
+      cleanupTick();
+    };
   }, []);
 
   const radius = 80;
   const circumference = 2 * Math.PI * radius;
-  // Progress ratio (3 -> 100%, 2 -> 66%, 1 -> 33%, 0 -> 0%)
-  const progressRatio = Math.max(0, count) / 3;
+  // Progress ratio dynamically scaled to initial total count
+  const progressRatio = Math.max(0, count) / (totalCount || 3);
   const strokeDashoffset = circumference - progressRatio * circumference;
 
   return (

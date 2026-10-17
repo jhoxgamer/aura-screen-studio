@@ -271,7 +271,12 @@ function createDrawingOverlayWindow() {
 }
 
 // 5. Create Countdown Window
-function createCountdownWindow(onFinished: () => void) {
+function createCountdownWindow(initialCount: number = 3, onFinished: () => void) {
+  if (initialCount <= 0) {
+    onFinished();
+    return;
+  }
+
   const primaryDisplay = screen.getPrimaryDisplay();
   const { width, height } = primaryDisplay.bounds;
 
@@ -295,8 +300,12 @@ function createCountdownWindow(onFinished: () => void) {
   countdownWindow.setIgnoreMouseEvents(true);
   loadView(countdownWindow, 'countdown');
 
-  let count = 3;
+  let count = initialCount;
   broadcastSound('countdown');
+
+  countdownWindow.webContents.once('did-finish-load', () => {
+    countdownWindow?.webContents.send('countdown:init', { total: initialCount, current: count });
+  });
 
   const interval = setInterval(() => {
     count--;
@@ -589,8 +598,9 @@ function setupIpcHandlers() {
       preRecordingWindow.hide();
     }
 
-    // Launch countdown
-    createCountdownWindow(() => {
+    // Launch countdown (or start immediately if 0s)
+    const countdownDuration = typeof options.countdownSeconds === 'number' ? options.countdownSeconds : 3;
+    createCountdownWindow(countdownDuration, () => {
       broadcastSound('start');
       broadcastState('recording');
 

@@ -20,7 +20,8 @@ import {
   RotateCcw,
   Sparkles,
   Info,
-  Check
+  Check,
+  Clock
 } from 'lucide-react';
 import { CaptureSource, RecordingMode, RecordingOptions, CropArea } from '../types';
 import { LibraryView } from './LibraryView';
@@ -70,6 +71,10 @@ export const PreRecordingView: React.FC = () => {
   const [fps, setFps] = useState<number>(() => {
     const saved = localStorage.getItem('aura_fps');
     return saved ? Number(saved) : 60;
+  });
+  const [countdownSeconds, setCountdownSeconds] = useState<number>(() => {
+    const saved = localStorage.getItem('aura_countdown_seconds');
+    return saved !== null ? Number(saved) : 3;
   });
 
   // Advanced feature toggles
@@ -147,6 +152,10 @@ export const PreRecordingView: React.FC = () => {
   useEffect(() => {
     localStorage.setItem('aura_fps', String(fps));
   }, [fps]);
+
+  useEffect(() => {
+    localStorage.setItem('aura_countdown_seconds', String(countdownSeconds));
+  }, [countdownSeconds]);
 
   useEffect(() => {
     localStorage.setItem('aura_include_system_audio', String(includeSystemAudio));
@@ -554,6 +563,7 @@ export const PreRecordingView: React.FC = () => {
       highlightCursor,
       micVolume,
       noiseSuppressionLevel,
+      countdownSeconds,
       cropArea: mode === 'custom-area' && cropArea ? cropArea : undefined
     };
 
@@ -636,7 +646,7 @@ export const PreRecordingView: React.FC = () => {
           <div className="flex items-center space-x-2">
             <span className="font-semibold text-sm tracking-tight text-white">Aura Screen Studio</span>
             <span className="text-[10px] text-slate-400 bg-[#181c28] border border-[#262c3e] px-1.5 py-0.5 rounded font-mono">
-              v{appVersion || '1.7.6'}
+              v{appVersion || '1.7.7'}
             </span>
           </div>
         </div>
@@ -1233,6 +1243,31 @@ export const PreRecordingView: React.FC = () => {
                 </select>
               </div>
             </div>
+
+            {/* Countdown Duration Selector */}
+            <div className="flex items-center justify-between pt-1.5 border-t border-[#202534]">
+              <div className="flex items-center space-x-2">
+                <Clock className="w-4 h-4 text-indigo-400" />
+                <span className="text-xs font-medium text-white">Contagem Regressiva</span>
+              </div>
+              <div className="flex items-center space-x-1 bg-[#0c0e14] p-0.5 rounded-lg border border-[#262c3e]">
+                {([0, 3, 5] as const).map((secs) => (
+                  <button
+                    key={secs}
+                    type="button"
+                    onClick={() => setCountdownSeconds(secs)}
+                    className={`px-2 py-0.5 rounded text-[10px] font-semibold transition-all ${
+                      countdownSeconds === secs
+                        ? 'bg-indigo-600 text-white shadow-sm'
+                        : 'text-slate-400 hover:text-white'
+                    }`}
+                    title={secs === 0 ? 'Iniciar gravação imediatamente sem contagem' : `Contagem regressiva de ${secs} segundos`}
+                  >
+                    {secs === 0 ? '0s (Direto)' : `${secs}s`}
+                  </button>
+                ))}
+              </div>
+            </div>
           </div>
 
           {/* Global Share Link Status Pill */}
@@ -1292,7 +1327,7 @@ export const PreRecordingView: React.FC = () => {
             {/* App Version & Manual Update Check */}
             <div className="flex items-center justify-between pt-2 border-t border-[#202534] text-[11px] text-slate-500">
               <span className="font-mono flex items-center gap-1.5">
-                <span>v{appVersion || '1.7.6'}</span>
+                <span>v{appVersion || '1.7.7'}</span>
                 {updateFeedback && (
                   <span className="text-emerald-400 font-sans font-medium text-[10px] bg-emerald-950/60 border border-emerald-500/40 px-1.5 py-0.5 rounded">
                     {updateFeedback}

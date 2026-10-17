@@ -38,6 +38,10 @@ export const PreviewView: React.FC = () => {
   const [duration, setDuration] = useState(0);
   const [playbackRate, setPlaybackRate] = useState(1);
   const [isMuted, setIsMuted] = useState(false);
+  const [playerVolume, setPlayerVolume] = useState<number>(() => {
+    const saved = localStorage.getItem('aura_player_volume');
+    return saved !== null ? Number(saved) : 1;
+  });
   const [isLinkCopied, setIsLinkCopied] = useState(false);
 
   // Title editing state
@@ -196,9 +200,13 @@ export const PreviewView: React.FC = () => {
         if (videoRef.current) videoRef.current.playbackRate = 1;
       } else if (e.code === 'Digit2') {
         e.preventDefault();
+        setPlaybackRate(1.25);
+        if (videoRef.current) videoRef.current.playbackRate = 1.25;
+      } else if (e.code === 'Digit3') {
+        e.preventDefault();
         setPlaybackRate(1.5);
         if (videoRef.current) videoRef.current.playbackRate = 1.5;
-      } else if (e.code === 'Digit3') {
+      } else if (e.code === 'Digit4') {
         e.preventDefault();
         setPlaybackRate(2);
         if (videoRef.current) videoRef.current.playbackRate = 2;
@@ -260,8 +268,14 @@ export const PreviewView: React.FC = () => {
       const dur = videoRef.current.duration;
       setDuration(dur);
       setTrimEnd(dur);
+      videoRef.current.volume = playerVolume;
+      videoRef.current.muted = isMuted;
     }
   };
+
+  useEffect(() => {
+    localStorage.setItem('aura_player_volume', String(playerVolume));
+  }, [playerVolume]);
 
   const handleTimeUpdate = () => {
     if (videoRef.current) {
@@ -650,20 +664,47 @@ export const PreviewView: React.FC = () => {
                 {/* Speed Multiplier */}
                 <button
                   onClick={handleSpeedChange}
-                  title="Alternar Velocidade (1x, 1.5x, 2x) ou Teclas 1, 2, 3"
-                  className="text-xs font-bold bg-white/10 hover:bg-white/20 px-2 py-1 rounded-lg text-white transition-colors"
+                  title="Alternar Velocidade (1x, 1.25x, 1.5x, 2x) ou Teclas 1, 2, 3, 4"
+                  className="text-xs font-bold bg-white/10 hover:bg-white/20 px-2 py-1 rounded-lg text-white transition-colors font-mono"
                 >
                   {playbackRate}x
                 </button>
 
-                {/* Mute Button */}
-                <button
-                  onClick={toggleMute}
-                  title={isMuted ? 'Ativar Áudio (M)' : 'Silenciar Áudio (M)'}
-                  className="p-1.5 rounded-lg hover:bg-white/10 text-white transition-colors"
-                >
-                  {isMuted ? <VolumeX className="w-4 h-4 text-loom-coral" /> : <Volume2 className="w-4 h-4" />}
-                </button>
+                {/* Volume & Mute Control with Slider */}
+                <div className="flex items-center space-x-1.5 group/vol">
+                  <button
+                    onClick={toggleMute}
+                    title={isMuted ? 'Ativar Áudio (M)' : 'Silenciar Áudio (M)'}
+                    className="p-1.5 rounded-lg hover:bg-white/10 text-white transition-colors"
+                  >
+                    {isMuted || playerVolume === 0 ? (
+                      <VolumeX className="w-4 h-4 text-rose-400" />
+                    ) : (
+                      <Volume2 className="w-4 h-4" />
+                    )}
+                  </button>
+
+                  <input
+                    type="range"
+                    min="0"
+                    max="1"
+                    step="0.05"
+                    value={isMuted ? 0 : playerVolume}
+                    onChange={(e) => {
+                      const newVol = Number(e.target.value);
+                      setPlayerVolume(newVol);
+                      if (videoRef.current) {
+                        videoRef.current.volume = newVol;
+                        if (newVol > 0 && isMuted) {
+                          setIsMuted(false);
+                          videoRef.current.muted = false;
+                        }
+                      }
+                    }}
+                    title={`Volume: ${Math.round((isMuted ? 0 : playerVolume) * 100)}%`}
+                    className="w-16 h-1 bg-white/20 hover:bg-white/40 rounded-lg appearance-none cursor-pointer accent-indigo-400 transition-opacity"
+                  />
+                </div>
 
                 {/* Fullscreen */}
                 <button
