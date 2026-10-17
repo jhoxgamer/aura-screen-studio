@@ -24,11 +24,50 @@ import {
   Activity,
   Bookmark,
   Plus,
-  MoreHorizontal
+  MoreHorizontal,
+  Palette,
+  Camera,
+  ZoomIn,
+  ZoomOut,
+  Mic,
+  Sliders,
+  Layers,
+  Monitor,
+  Smartphone,
+  Square,
+  LayoutTemplate
 } from 'lucide-react';
 import { RecordingMeta, ChapterItem } from '../types';
 import confetti from 'canvas-confetti';
 import { getShortcutLabel } from '../utils/shortcuts';
+import {
+  VOICE_PRESENCE_PARAMS,
+  DE_ESSER_PARAMS,
+  STUDIO_WARMTH_PARAMS,
+  STUDIO_LIMITER_PARAMS
+} from '../utils/audioDsp';
+
+export type CanvasBackdrop = 'nocturne' | 'sunset' | 'cyberpunk' | 'emerald' | 'frosted' | 'none';
+export type CanvasAspectRatio = '16-9' | '9-16' | '1-1' | '4-3';
+export type FrameShadowStyle = 'none' | 'subtle' | 'cinematic' | 'glow';
+export type ZoomFocusPoint = 'center' | 'top-left' | 'top-right' | 'bottom-left' | 'bottom-right';
+
+interface BackdropPreset {
+  id: CanvasBackdrop;
+  name: string;
+  gradient: string;
+  dotColor: string;
+  desc: string;
+}
+
+const BACKDROP_PRESETS: BackdropPreset[] = [
+  { id: 'nocturne', name: 'Nocturne Obsidian', gradient: 'bg-gradient-to-br from-[#0B0E14] via-[#121722] to-[#1A2A47]', dotColor: '#78A5FF', desc: 'Assinatura Aura em tons índigo e obsidiana profunda' },
+  { id: 'sunset', name: 'Sunset Aura', gradient: 'bg-gradient-to-br from-[#2B0E13] via-[#4A1525] to-[#1A2A47]', dotColor: '#FF647C', desc: 'Gradiente carmesim e crepúsculo cinematográfico' },
+  { id: 'cyberpunk', name: 'Neon Cyberpunk', gradient: 'bg-gradient-to-br from-[#0B1426] via-[#1E1B4B] to-[#3B0764]', dotColor: '#A855F7', desc: 'Roxo elétrico e azul profundo de alta energia' },
+  { id: 'emerald', name: 'Emerald Forest', gradient: 'bg-gradient-to-br from-[#062419] via-[#0F382C] to-[#0B0E14]', dotColor: '#10B981', desc: 'Verde esmeralda sofisticado para tutoriais e código' },
+  { id: 'frosted', name: 'Frosted Glass', gradient: 'bg-[#121722]/90 backdrop-blur-xl border border-[#303A4B]', dotColor: '#929CAF', desc: 'Vidro jateado moderno com acabamento Apple' },
+  { id: 'none', name: 'Preto Puro (Flat)', gradient: 'bg-black', dotColor: '#303A4B', desc: 'Fundo preto neutro sem moldura externa' }
+];
 
 export const PreviewView: React.FC = () => {
   const [meta, setMeta] = useState<RecordingMeta | null>(null);
@@ -51,8 +90,45 @@ export const PreviewView: React.FC = () => {
   const [isEditingTitle, setIsEditingTitle] = useState(false);
   const [editedTitle, setEditedTitle] = useState('');
 
-  // Studio Mode: Player vs Trim
-  const [studioTab, setStudioTab] = useState<'player' | 'trim'>('player');
+  // Studio Mode: Player vs Canvas vs Trim
+  const [studioTab, setStudioTab] = useState<'player' | 'canvas' | 'trim'>('player');
+
+  // Screen Studio Presentation Canvas & Window Frame state
+  const [canvasBackdrop, setCanvasBackdrop] = useState<CanvasBackdrop>(() => {
+    return (localStorage.getItem('aura_canvas_backdrop') as CanvasBackdrop) || 'nocturne';
+  });
+  const [canvasPadding, setCanvasPadding] = useState<number>(() => {
+    const s = localStorage.getItem('aura_canvas_padding');
+    return s !== null ? Number(s) : 6;
+  });
+  const [frameRadius, setFrameRadius] = useState<number>(() => {
+    const s = localStorage.getItem('aura_canvas_radius');
+    return s !== null ? Number(s) : 16;
+  });
+  const [frameShadow, setFrameShadow] = useState<FrameShadowStyle>(() => {
+    return (localStorage.getItem('aura_canvas_shadow') as FrameShadowStyle) || 'cinematic';
+  });
+  const [hasWindowHeader, setHasWindowHeader] = useState<boolean>(() => {
+    return localStorage.getItem('aura_canvas_header') !== 'false';
+  });
+  const [aspectRatio, setAspectRatio] = useState<CanvasAspectRatio>(() => {
+    return (localStorage.getItem('aura_canvas_ratio') as CanvasAspectRatio) || '16-9';
+  });
+
+  // Cinematic Smooth Zoom & Pan Engine state
+  const [zoomScale, setZoomScale] = useState<number>(1.0);
+  const [zoomFocus, setZoomFocus] = useState<ZoomFocusPoint>('center');
+
+  // Descript-Style Studio Voice Engine states
+  const [isStudioVoice, setIsStudioVoice] = useState<boolean>(() => {
+    return localStorage.getItem('aura_studio_voice') === 'true';
+  });
+  const studioAudioCtxRef = useRef<AudioContext | null>(null);
+  const studioSourceNodeRef = useRef<MediaElementAudioSourceNode | null>(null);
+  const studioVoiceFilterRef = useRef<BiquadFilterNode | null>(null);
+  const studioDeEsserRef = useRef<BiquadFilterNode | null>(null);
+  const studioWarmthRef = useRef<BiquadFilterNode | null>(null);
+  const studioCompressorRef = useRef<DynamicsCompressorNode | null>(null);
 
   // Trimming states & controller
   const [trimStart, setTrimStart] = useState(0);
@@ -287,6 +363,15 @@ export const PreviewView: React.FC = () => {
         e.preventDefault();
         setPlaybackRate(2);
         if (videoRef.current) videoRef.current.playbackRate = 2;
+      } else if (e.key === 'p' || e.key === 'P') {
+        e.preventDefault();
+        handleCaptureFrame();
+      } else if (e.key === 'z' || e.key === 'Z') {
+        e.preventDefault();
+        cycleZoom();
+      } else if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'e') {
+        e.preventDefault();
+        toggleStudioVoice();
       } else if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'l') {
         e.preventDefault();
         handleShareLink();
@@ -358,6 +443,173 @@ export const PreviewView: React.FC = () => {
   useEffect(() => {
     localStorage.setItem('aura_player_volume', String(playerVolume));
   }, [playerVolume]);
+
+  useEffect(() => {
+    localStorage.setItem('aura_canvas_backdrop', canvasBackdrop);
+  }, [canvasBackdrop]);
+
+  useEffect(() => {
+    localStorage.setItem('aura_canvas_padding', String(canvasPadding));
+  }, [canvasPadding]);
+
+  useEffect(() => {
+    localStorage.setItem('aura_canvas_radius', String(frameRadius));
+  }, [frameRadius]);
+
+  useEffect(() => {
+    localStorage.setItem('aura_canvas_shadow', frameShadow);
+  }, [frameShadow]);
+
+  useEffect(() => {
+    localStorage.setItem('aura_canvas_header', String(hasWindowHeader));
+  }, [hasWindowHeader]);
+
+  useEffect(() => {
+    localStorage.setItem('aura_canvas_ratio', aspectRatio);
+  }, [aspectRatio]);
+
+  const getZoomOrigin = (focus: ZoomFocusPoint) => {
+    switch (focus) {
+      case 'top-left': return '15% 15%';
+      case 'top-right': return '85% 15%';
+      case 'bottom-left': return '15% 85%';
+      case 'bottom-right': return '85% 85%';
+      default: return '50% 50%';
+    }
+  };
+
+  const cycleZoom = () => {
+    const scales = [1.0, 1.4, 1.8, 2.2];
+    const nextIdx = (scales.indexOf(zoomScale) + 1) % scales.length;
+    const nextScale = scales[nextIdx];
+    setZoomScale(nextScale);
+    showToast(`Zoom Studio: ${nextScale}x`, 'info');
+  };
+
+  const getShadowClass = (shadow: FrameShadowStyle) => {
+    switch (shadow) {
+      case 'none': return 'shadow-none border border-[#303A4B]/60';
+      case 'subtle': return 'shadow-xl shadow-black/50 border border-[#303A4B]';
+      case 'cinematic': return 'shadow-[0_25px_60px_-15px_rgba(0,0,0,0.9)] ring-1 ring-white/10';
+      case 'glow': return 'shadow-[0_20px_55px_-10px_rgba(120,165,255,0.45)] ring-1 ring-[#78A5FF]/40';
+      default: return 'shadow-2xl';
+    }
+  };
+
+  const currentBackdrop = BACKDROP_PRESETS.find(b => b.id === canvasBackdrop) || BACKDROP_PRESETS[0];
+
+  const handleCaptureFrame = async () => {
+    if (!videoRef.current || videoRef.current.videoWidth === 0) {
+      showToast('Aguarde o vídeo carregar para capturar o frame.', 'error');
+      return;
+    }
+    try {
+      const video = videoRef.current;
+      const canvas = document.createElement('canvas');
+      canvas.width = video.videoWidth;
+      canvas.height = video.videoHeight;
+      const ctx = canvas.getContext('2d');
+      if (!ctx) return;
+      ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+
+      canvas.toBlob(async (blob) => {
+        if (!blob) return;
+        try {
+          await navigator.clipboard.write([
+            new ClipboardItem({ 'image/png': blob })
+          ]);
+          showToast(`📸 Frame ${formatTime(currentTime)} copiado (${canvas.width}x${canvas.height})!`, 'success');
+          confetti({ particleCount: 30, spread: 45, origin: { y: 0.8 } });
+        } catch (clipErr) {
+          const url = URL.createObjectURL(blob);
+          const a = document.createElement('a');
+          a.href = url;
+          a.download = `Aura_Frame_${formatTime(currentTime).replace(':', '_')}.png`;
+          a.click();
+          URL.revokeObjectURL(url);
+          showToast('📸 Frame salvo em arquivo PNG!', 'success');
+        }
+      }, 'image/png');
+    } catch (err) {
+      console.error('Frame capture failed:', err);
+      showToast('Erro ao capturar frame.', 'error');
+    }
+  };
+
+  const toggleStudioVoice = async () => {
+    const next = !isStudioVoice;
+    setIsStudioVoice(next);
+    localStorage.setItem('aura_studio_voice', String(next));
+
+    if (!studioAudioCtxRef.current && videoRef.current) {
+      try {
+        const ctx = new (window.AudioContext || (window as any).webkitAudioContext)();
+        studioAudioCtxRef.current = ctx;
+
+        if (!studioSourceNodeRef.current) {
+          studioSourceNodeRef.current = ctx.createMediaElementSource(videoRef.current);
+        }
+
+        const warmth = ctx.createBiquadFilter();
+        warmth.type = 'highpass';
+        warmth.frequency.value = STUDIO_WARMTH_PARAMS.frequency;
+        warmth.Q.value = STUDIO_WARMTH_PARAMS.Q;
+        studioWarmthRef.current = warmth;
+
+        const presence = ctx.createBiquadFilter();
+        presence.type = 'peaking';
+        presence.frequency.value = VOICE_PRESENCE_PARAMS.frequency;
+        presence.gain.value = next ? VOICE_PRESENCE_PARAMS.gain : 0;
+        presence.Q.value = VOICE_PRESENCE_PARAMS.Q;
+        studioVoiceFilterRef.current = presence;
+
+        const deEsser = ctx.createBiquadFilter();
+        deEsser.type = 'peaking';
+        deEsser.frequency.value = DE_ESSER_PARAMS.frequency;
+        deEsser.gain.value = next ? DE_ESSER_PARAMS.gain : 0;
+        deEsser.Q.value = DE_ESSER_PARAMS.Q;
+        studioDeEsserRef.current = deEsser;
+
+        const comp = ctx.createDynamicsCompressor();
+        comp.threshold.value = next ? STUDIO_LIMITER_PARAMS.threshold : 0;
+        comp.knee.value = STUDIO_LIMITER_PARAMS.knee;
+        comp.ratio.value = next ? STUDIO_LIMITER_PARAMS.ratio : 1.0;
+        comp.attack.value = STUDIO_LIMITER_PARAMS.attack;
+        comp.release.value = STUDIO_LIMITER_PARAMS.release;
+        studioCompressorRef.current = comp;
+
+        studioSourceNodeRef.current.connect(warmth);
+        warmth.connect(presence);
+        presence.connect(deEsser);
+        deEsser.connect(comp);
+        comp.connect(ctx.destination);
+      } catch (err) {
+        console.warn('Web Audio initialization fallback:', err);
+      }
+    }
+
+    if (studioAudioCtxRef.current && studioAudioCtxRef.current.state === 'suspended') {
+      await studioAudioCtxRef.current.resume().catch(() => {});
+    }
+
+    const t = studioAudioCtxRef.current?.currentTime || 0;
+    if (studioVoiceFilterRef.current) {
+      studioVoiceFilterRef.current.gain.setValueAtTime(next ? VOICE_PRESENCE_PARAMS.gain : 0, t);
+    }
+    if (studioDeEsserRef.current) {
+      studioDeEsserRef.current.gain.setValueAtTime(next ? DE_ESSER_PARAMS.gain : 0, t);
+    }
+    if (studioCompressorRef.current) {
+      studioCompressorRef.current.threshold.setValueAtTime(next ? STUDIO_LIMITER_PARAMS.threshold : 0, t);
+      studioCompressorRef.current.ratio.setValueAtTime(next ? STUDIO_LIMITER_PARAMS.ratio : 1.0, t);
+    }
+
+    if (next) {
+      showToast('🎙️ Voz de Estúdio Ativada: Presença Vocal (+3.5 dB) e De-Esser', 'success');
+    } else {
+      showToast('Voz de Estúdio Desativada (Áudio Original)', 'info');
+    }
+  };
 
   const handleTimeUpdate = () => {
     if (videoRef.current) {
@@ -859,6 +1111,17 @@ export const PreviewView: React.FC = () => {
               <span>Assistir & Capítulos</span>
             </button>
             <button
+              onClick={() => setStudioTab('canvas')}
+              className={`flex items-center space-x-2 px-3 py-1.5 rounded-lg text-xs font-semibold transition-all ${
+                studioTab === 'canvas'
+                  ? 'bg-[#78A5FF] text-[#101A32] shadow-sm'
+                  : 'text-[#929CAF] hover:text-[#F3F5F9]'
+              }`}
+            >
+              <Palette className="w-3.5 h-3.5" />
+              <span>Moldura & Canvas Studio</span>
+            </button>
+            <button
               onClick={() => {
                 setStudioTab('trim');
                 setIsTrimming(true);
@@ -875,139 +1138,515 @@ export const PreviewView: React.FC = () => {
               <span>Estúdio de Corte</span>
             </button>
           </div>
-          <div className="text-xs text-[#929CAF] font-mono hidden sm:block">
-            Duração Total: <span className="text-[#F3F5F9] font-bold">{formatTime(duration)}</span>
+          <div className="flex items-center space-x-3 text-xs text-[#929CAF] font-mono hidden sm:flex">
+            {isStudioVoice && (
+              <span className="inline-flex items-center space-x-1.5 px-2 py-0.5 rounded-full bg-[#1A2A47] text-[#78A5FF] border border-[#78A5FF]/40 text-[11px] font-sans font-semibold">
+                <Mic className="w-3 h-3" />
+                <span>Voz de Estúdio ON</span>
+              </span>
+            )}
+            <span>Duração Total: <strong className="text-[#F3F5F9] font-bold">{formatTime(duration)}</strong></span>
           </div>
         </div>
 
-        {/* Video Player Container */}
-        <div className="relative w-full aspect-video max-h-[50vh] bg-black rounded-2xl overflow-hidden border border-[#303A4B] shadow-2xl flex items-center justify-center group shrink-0">
-          {meta?.filePath ? (
-            <video
-              ref={videoRef}
-              src={
-                meta.id
-                  ? `http://localhost:${serverPort}/video/${meta.id}`
-                  : `file://${meta.filePath}`
-              }
-              onLoadedMetadata={handleLoadedMetadata}
-              onTimeUpdate={handleTimeUpdate}
-              onClick={togglePlay}
-              className="w-full h-full object-contain cursor-pointer"
-            />
-          ) : (
-            <div className="flex flex-col items-center justify-center text-[#929CAF] space-y-2">
-              <Play className="w-12 h-12 text-[#929CAF]" />
-              <span className="text-sm">Carregando visualização do vídeo...</span>
-            </div>
-          )}
+        {/* Presentation Canvas Wrapper */}
+        <div
+          className={`w-full flex items-center justify-center transition-all duration-300 ${
+            studioTab === 'canvas'
+              ? `${currentBackdrop.gradient} rounded-3xl border border-[#303A4B]/60 shadow-2xl p-6 sm:p-8 min-h-[380px] max-h-[56vh]`
+              : 'bg-transparent'
+          }`}
+        >
+          {/* Framed Window */}
+          <div
+            className={`relative w-full overflow-hidden flex flex-col transition-all duration-300 ${
+              studioTab === 'canvas'
+                ? `${getShadowClass(frameShadow)}`
+                : 'aspect-video max-h-[50vh] bg-black rounded-2xl border border-[#303A4B] shadow-2xl'
+            }`}
+            style={
+              studioTab === 'canvas'
+                ? {
+                    borderRadius: `${frameRadius}px`,
+                    maxWidth:
+                      aspectRatio === '9-16'
+                        ? '320px'
+                        : aspectRatio === '1-1'
+                        ? '440px'
+                        : aspectRatio === '4-3'
+                        ? '540px'
+                        : '100%',
+                    aspectRatio:
+                      aspectRatio === '16-9'
+                        ? '16 / 9'
+                        : aspectRatio === '9-16'
+                        ? '9 / 16'
+                        : aspectRatio === '1-1'
+                        ? '1 / 1'
+                        : '4 / 3'
+                  }
+                : undefined
+            }
+          >
+            {/* macOS Window Titlebar Header (when enabled in Canvas mode) */}
+            {studioTab === 'canvas' && hasWindowHeader && (
+              <div className="h-8 bg-[#121722]/95 border-b border-[#303A4B]/80 px-3.5 flex items-center justify-between shrink-0 select-none">
+                <div className="flex items-center space-x-1.5">
+                  <span className="w-2.5 h-2.5 rounded-full bg-[#FF5F56] border border-[#E0443E]/60 inline-block" />
+                  <span className="w-2.5 h-2.5 rounded-full bg-[#FFBD2E] border border-[#DEA123]/60 inline-block" />
+                  <span className="w-2.5 h-2.5 rounded-full bg-[#27C93F] border border-[#1AAB29]/60 inline-block" />
+                </div>
+                <div className="text-[11px] font-medium text-[#B7C0CE] truncate max-w-[220px] text-center">
+                  {meta?.title || 'Aura Screen Studio'}
+                </div>
+                <div className="flex items-center space-x-1.5">
+                  <span className="text-[9px] font-mono text-[#78A5FF] bg-[#1A2A47] px-1.5 py-0.5 rounded border border-[#78A5FF]/30 font-semibold">
+                    {meta?.resolution || 'HD'}
+                  </span>
+                </div>
+              </div>
+            )}
 
-          {/* Big Play Button Overlay when Paused */}
-          {!isPlaying && meta?.filePath && (
-            <button
-              onClick={togglePlay}
-              title="Reproduzir (Espaço)"
-              className="absolute w-16 h-16 rounded-full bg-[#78A5FF] text-[#101A32] flex items-center justify-center shadow-2xl hover:scale-110 active:scale-95 transition-all hover:bg-[#9AB9FF]"
-            >
-              <Play className="w-8 h-8 fill-current ml-1" />
-            </button>
-          )}
+            {/* Video Viewport with Smooth Cinematic Zoom & Pan */}
+            <div className="relative w-full flex-1 bg-black overflow-hidden flex items-center justify-center group shrink-0">
+              {meta?.filePath ? (
+                <video
+                  ref={videoRef}
+                  src={
+                    meta.id
+                      ? `http://localhost:${serverPort}/video/${meta.id}`
+                      : `file://${meta.filePath}`
+                  }
+                  onLoadedMetadata={handleLoadedMetadata}
+                  onTimeUpdate={handleTimeUpdate}
+                  onClick={togglePlay}
+                  style={{
+                    transform: `scale(${zoomScale})`,
+                    transformOrigin: getZoomOrigin(zoomFocus),
+                    transition: 'transform 0.45s cubic-bezier(0.2, 0.8, 0.2, 1)'
+                  }}
+                  className="w-full h-full object-contain cursor-pointer"
+                />
+              ) : (
+                <div className="flex flex-col items-center justify-center text-[#929CAF] space-y-2">
+                  <Play className="w-12 h-12 text-[#929CAF]" />
+                  <span className="text-sm">Carregando visualização do vídeo...</span>
+                </div>
+              )}
 
-          {/* Video Control Bar Overlay */}
-          <div className="absolute bottom-0 inset-x-0 bg-gradient-to-t from-black/90 via-black/50 to-transparent p-4 opacity-0 group-hover:opacity-100 transition-opacity">
-            {/* Scrubber / Progress Bar */}
-            <div className="mb-3">
-              <input
-                type="range"
-                min={0}
-                max={duration || 100}
-                step={0.1}
-                value={currentTime}
-                onChange={handleSeek}
-                title="Barra de Navegação (Setas Esquerda / Direita)"
-                className="w-full h-1.5 bg-white/20 accent-[#78A5FF] rounded-lg cursor-pointer appearance-none"
-              />
-            </div>
-
-            <div className="flex items-center justify-between">
-              {/* Play / Pause / Time */}
-              <div className="flex items-center space-x-3">
+              {/* Big Play Button Overlay when Paused */}
+              {!isPlaying && meta?.filePath && (
                 <button
                   onClick={togglePlay}
-                  title="Reproduzir / Pausar (Espaço)"
-                  className="p-1.5 rounded-lg hover:bg-white/10 text-white transition-colors"
+                  title="Reproduzir (Espaço)"
+                  className="absolute w-16 h-16 rounded-full bg-[#78A5FF] text-[#101A32] flex items-center justify-center shadow-2xl hover:scale-110 active:scale-95 transition-all hover:bg-[#9AB9FF]"
                 >
-                  {isPlaying ? <Pause className="w-5 h-5" /> : <Play className="w-5 h-5 fill-current" />}
+                  <Play className="w-8 h-8 fill-current ml-1" />
                 </button>
+              )}
 
-                <span className="text-xs font-mono font-medium text-[#F3F5F9]">
-                  {formatTime(currentTime)} / {formatTime(duration)}
-                </span>
-              </div>
-
-              {/* Speed & Volume & Fullscreen */}
-              <div className="flex items-center space-x-3">
-                {/* Speed Multiplier */}
-                <button
-                  onClick={handleSpeedChange}
-                  title="Alternar Velocidade (1x, 1.25x, 1.5x, 2x) ou Teclas 1, 2, 3, 4"
-                  className="text-xs font-bold bg-[#191F2B] hover:bg-[#222B39] border border-[#303A4B] px-2 py-1 rounded-lg text-[#78A5FF] transition-colors font-mono"
-                >
-                  {playbackRate}x
-                </button>
-
-                {/* Volume & Mute Control with Slider */}
-                <div className="flex items-center space-x-1.5 group/vol">
-                  <button
-                    onClick={toggleMute}
-                    title={isMuted ? 'Ativar Áudio (M)' : 'Silenciar Áudio (M)'}
-                    className="p-1.5 rounded-lg hover:bg-white/10 text-white transition-colors"
-                  >
-                    {isMuted || playerVolume === 0 ? (
-                      <VolumeX className="w-4 h-4 text-[#FF647C]" />
-                    ) : (
-                      <Volume2 className="w-4 h-4" />
-                    )}
-                  </button>
-
+              {/* Video Control Bar Overlay */}
+              <div className="absolute bottom-0 inset-x-0 bg-gradient-to-t from-black/90 via-black/50 to-transparent p-4 opacity-0 group-hover:opacity-100 transition-opacity z-20">
+                {/* Scrubber / Progress Bar */}
+                <div className="mb-3">
                   <input
                     type="range"
-                    min="0"
-                    max="1"
-                    step="0.05"
-                    value={isMuted ? 0 : playerVolume}
-                    onChange={(e) => {
-                      const newVol = Number(e.target.value);
-                      setPlayerVolume(newVol);
-                      if (videoRef.current) {
-                        videoRef.current.volume = newVol;
-                        if (newVol > 0 && isMuted) {
-                          setIsMuted(false);
-                          videoRef.current.muted = false;
-                        }
-                      }
-                    }}
-                    title={`Volume: ${Math.round((isMuted ? 0 : playerVolume) * 100)}%`}
-                    className="w-16 h-1 bg-white/20 hover:bg-white/40 rounded-lg appearance-none cursor-pointer accent-[#78A5FF] transition-opacity"
+                    min={0}
+                    max={duration || 100}
+                    step={0.1}
+                    value={currentTime}
+                    onChange={handleSeek}
+                    title="Barra de Navegação (Setas Esquerda / Direita)"
+                    className="w-full h-1.5 bg-white/20 accent-[#78A5FF] rounded-lg cursor-pointer appearance-none"
                   />
                 </div>
 
-                {/* Fullscreen */}
-                <button
-                  onClick={() => {
-                    if (videoRef.current) {
-                      videoRef.current.requestFullscreen();
-                    }
-                  }}
-                  title="Tela Cheia (F)"
-                  className="p-1.5 rounded-lg hover:bg-white/10 text-white transition-colors"
-                >
-                  <Maximize className="w-4 h-4" />
-                </button>
+                <div className="flex items-center justify-between flex-wrap gap-2">
+                  {/* Left Controls: Play / Pause / Time */}
+                  <div className="flex items-center space-x-3">
+                    <button
+                      onClick={togglePlay}
+                      title="Reproduzir / Pausar (Espaço)"
+                      className="p-1.5 rounded-lg hover:bg-white/10 text-white transition-colors"
+                    >
+                      {isPlaying ? <Pause className="w-5 h-5" /> : <Play className="w-5 h-5 fill-current" />}
+                    </button>
+
+                    <span className="text-xs font-mono font-medium text-[#F3F5F9]">
+                      {formatTime(currentTime)} / {formatTime(duration)}
+                    </span>
+                  </div>
+
+                  {/* Center Controls: Studio Voice & Snapshot */}
+                  <div className="flex items-center space-x-2">
+                    {/* Studio Voice Enhancer */}
+                    <button
+                      onClick={toggleStudioVoice}
+                      title={
+                        isStudioVoice
+                          ? 'Voz de Estúdio Ativa: Presença Vocal (+3.5 dB) e De-Esser (Ctrl+E)'
+                          : 'Ativar Voz de Estúdio Descript: Áudio com Presença Vocal e Sem Sibilância (Ctrl+E)'
+                      }
+                      className={`flex items-center space-x-1.5 px-2.5 py-1 rounded-lg text-xs font-semibold transition-all ${
+                        isStudioVoice
+                          ? 'bg-[#78A5FF] text-[#101A32] shadow-sm shadow-[#78A5FF]/40 font-bold'
+                          : 'bg-[#191F2B]/90 hover:bg-[#222B39] text-[#B7C0CE] border border-[#303A4B]'
+                      }`}
+                    >
+                      <Mic className="w-3.5 h-3.5" />
+                      <span className="hidden md:inline">Voz de Estúdio</span>
+                      {isStudioVoice && (
+                        <span className="flex space-x-0.5 items-end h-2.5">
+                          <span className="w-0.5 h-2 bg-[#101A32] animate-bounce" />
+                          <span className="w-0.5 h-2.5 bg-[#101A32] animate-pulse" />
+                          <span className="w-0.5 h-1.5 bg-[#101A32] animate-bounce" />
+                        </span>
+                      )}
+                    </button>
+
+                    {/* Instant Frame PNG Snapshot */}
+                    <button
+                      onClick={handleCaptureFrame}
+                      title="Capturar Frame Atual como Imagem PNG em Alta Resolução (Tecla P)"
+                      className="flex items-center space-x-1.5 bg-[#191F2B]/90 hover:bg-[#222B39] border border-[#303A4B] text-[#B7C0CE] hover:text-[#F3F5F9] px-2.5 py-1 rounded-lg text-xs font-medium transition-colors"
+                    >
+                      <Camera className="w-3.5 h-3.5 text-[#78A5FF]" />
+                      <span className="hidden md:inline">Frame PNG</span>
+                    </button>
+                  </div>
+
+                  {/* Right Controls: Zoom, Speed, Volume & Fullscreen */}
+                  <div className="flex items-center space-x-2.5">
+                    {/* Zoom Level Selector */}
+                    <div className="flex items-center bg-[#191F2B]/90 border border-[#303A4B] rounded-lg p-0.5" title="Zoom Cinematográfico (Tecla Z para alternar)">
+                      {[1.0, 1.4, 1.8, 2.2].map((lvl) => (
+                        <button
+                          key={lvl}
+                          onClick={() => {
+                            setZoomScale(lvl);
+                            showToast(`Zoom: ${lvl}x (Foco: ${zoomFocus})`, 'info');
+                          }}
+                          className={`px-1.5 py-0.5 rounded text-[10px] font-mono font-bold transition-colors ${
+                            zoomScale === lvl
+                              ? 'bg-[#78A5FF] text-[#101A32]'
+                              : 'text-[#929CAF] hover:text-[#F3F5F9]'
+                          }`}
+                        >
+                          {lvl}x
+                        </button>
+                      ))}
+                    </div>
+
+                    {/* Speed Multiplier */}
+                    <button
+                      onClick={handleSpeedChange}
+                      title="Alternar Velocidade (1x, 1.25x, 1.5x, 2x) ou Teclas 1, 2, 3, 4"
+                      className="text-xs font-bold bg-[#191F2B] hover:bg-[#222B39] border border-[#303A4B] px-2 py-1 rounded-lg text-[#78A5FF] transition-colors font-mono"
+                    >
+                      {playbackRate}x
+                    </button>
+
+                    {/* Volume & Mute Control with Slider */}
+                    <div className="flex items-center space-x-1.5 group/vol">
+                      <button
+                        onClick={toggleMute}
+                        title={isMuted ? 'Ativar Áudio (M)' : 'Silenciar Áudio (M)'}
+                        className="p-1.5 rounded-lg hover:bg-white/10 text-white transition-colors"
+                      >
+                        {isMuted || playerVolume === 0 ? (
+                          <VolumeX className="w-4 h-4 text-[#FF647C]" />
+                        ) : (
+                          <Volume2 className="w-4 h-4" />
+                        )}
+                      </button>
+
+                      <input
+                        type="range"
+                        min="0"
+                        max="1"
+                        step="0.05"
+                        value={isMuted ? 0 : playerVolume}
+                        onChange={(e) => {
+                          const newVol = Number(e.target.value);
+                          setPlayerVolume(newVol);
+                          if (videoRef.current) {
+                            videoRef.current.volume = newVol;
+                            if (newVol > 0 && isMuted) {
+                              setIsMuted(false);
+                              videoRef.current.muted = false;
+                            }
+                          }
+                        }}
+                        title={`Volume: ${Math.round((isMuted ? 0 : playerVolume) * 100)}%`}
+                        className="w-16 h-1 bg-white/20 hover:bg-white/40 rounded-lg appearance-none cursor-pointer accent-[#78A5FF] transition-opacity"
+                      />
+                    </div>
+
+                    {/* Fullscreen */}
+                    <button
+                      onClick={() => {
+                        if (videoRef.current) {
+                          videoRef.current.requestFullscreen();
+                        }
+                      }}
+                      title="Tela Cheia (F)"
+                      className="p-1.5 rounded-lg hover:bg-white/10 text-white transition-colors"
+                    >
+                      <Maximize className="w-4 h-4" />
+                    </button>
+                  </div>
+                </div>
               </div>
             </div>
           </div>
         </div>
+
+        {/* Canvas & Presentation Studio Controls */}
+        {studioTab === 'canvas' && (
+          <div className="w-full mt-4 bg-[#121722] border border-[#78A5FF] ring-2 ring-[#78A5FF]/30 rounded-2xl p-5 flex flex-col space-y-4 shadow-xl shrink-0">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-[#303A4B]">
+              <div className="flex items-center space-x-2.5">
+                <div className="w-8 h-8 rounded-xl bg-[#191F2B] border border-[#303A4B] flex items-center justify-center shrink-0">
+                  <Palette className="w-4 h-4 text-[#78A5FF]" />
+                </div>
+                <div>
+                  <div className="flex items-center space-x-2">
+                    <span className="text-xs font-bold text-[#F3F5F9]">Estúdio de Apresentação & Moldura Screen Studio</span>
+                    <span className="text-[10px] bg-[#1A2A47] text-[#78A5FF] border border-[#78A5FF]/30 px-2 py-0.5 rounded-full font-bold">
+                      Pro Presentation
+                    </span>
+                  </div>
+                  <span className="text-[11px] text-[#929CAF]">
+                    Personalize o plano de fundo, proporção e foco cinematográfico para compartilhar seu vídeo
+                  </span>
+                </div>
+              </div>
+
+              <button
+                onClick={handleCaptureFrame}
+                className="flex items-center space-x-1.5 bg-[#78A5FF] hover:bg-[#9AB9FF] active:scale-95 text-[#101A32] px-3 py-1.5 rounded-xl text-xs font-bold transition-all shadow-sm shrink-0"
+              >
+                <Camera className="w-3.5 h-3.5" />
+                <span>Copiar Frame PNG (P)</span>
+              </button>
+            </div>
+
+            {/* Presets Grid & Aspect Ratio */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              {/* Wallpaper Presets */}
+              <div className="space-y-2">
+                <label className="text-xs font-bold text-[#F3F5F9] flex items-center space-x-1.5">
+                  <Layers className="w-3.5 h-3.5 text-[#78A5FF]" />
+                  <span>Plano de Fundo (Wallpapers Studio)</span>
+                </label>
+                <div className="grid grid-cols-3 gap-2">
+                  {BACKDROP_PRESETS.map((bp) => (
+                    <button
+                      key={bp.id}
+                      onClick={() => setCanvasBackdrop(bp.id)}
+                      className={`flex flex-col p-2.5 rounded-xl border text-left transition-all ${
+                        canvasBackdrop === bp.id
+                          ? 'border-[#78A5FF] bg-[#191F2B] shadow-md ring-1 ring-[#78A5FF]/50'
+                          : 'border-[#303A4B] bg-[#0B0E14] hover:bg-[#191F2B]/60'
+                      }`}
+                    >
+                      <div className="flex items-center space-x-2 mb-1">
+                        <span
+                          className="w-3 h-3 rounded-full shrink-0 border border-white/20"
+                          style={{ backgroundColor: bp.dotColor }}
+                        />
+                        <span className="text-xs font-semibold text-[#F3F5F9] truncate">{bp.name}</span>
+                      </div>
+                      <span className="text-[10px] text-[#929CAF] line-clamp-1">{bp.desc}</span>
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              {/* Aspect Ratio & Frame Styling */}
+              <div className="space-y-3">
+                <label className="text-xs font-bold text-[#F3F5F9] flex items-center space-x-1.5">
+                  <LayoutTemplate className="w-3.5 h-3.5 text-[#78A5FF]" />
+                  <span>Formato & Proporção de Exportação</span>
+                </label>
+                <div className="grid grid-cols-4 gap-2">
+                  {[
+                    { id: '16-9', label: '16:9', desc: 'Widescreen', icon: Monitor },
+                    { id: '9-16', label: '9:16', desc: 'Shorts/Reels', icon: Smartphone },
+                    { id: '1-1', label: '1:1', desc: 'Quadrado', icon: Square },
+                    { id: '4-3', label: '4:3', desc: 'Pitch Deck', icon: LayoutTemplate }
+                  ].map((ratio) => {
+                    const IconComp = ratio.icon;
+                    return (
+                      <button
+                        key={ratio.id}
+                        onClick={() => setAspectRatio(ratio.id as CanvasAspectRatio)}
+                        className={`flex flex-col items-center justify-center p-2 rounded-xl border text-center transition-all ${
+                          aspectRatio === ratio.id
+                            ? 'border-[#78A5FF] bg-[#191F2B] text-[#78A5FF] ring-1 ring-[#78A5FF]/50'
+                            : 'border-[#303A4B] bg-[#0B0E14] text-[#929CAF] hover:text-[#F3F5F9] hover:bg-[#191F2B]/60'
+                        }`}
+                      >
+                        <IconComp className="w-4 h-4 mb-1" />
+                        <span className="text-xs font-bold">{ratio.label}</span>
+                        <span className="text-[9px] text-[#929CAF]">{ratio.desc}</span>
+                      </button>
+                    );
+                  })}
+                </div>
+
+                {/* macOS Titlebar Toggle & Frame Radius */}
+                <div className="grid grid-cols-2 gap-3 pt-1">
+                  <div className="flex items-center justify-between p-2.5 bg-[#191F2B] border border-[#303A4B] rounded-xl">
+                    <span className="text-xs text-[#B7C0CE]">Barra macOS</span>
+                    <button
+                      onClick={() => setHasWindowHeader(!hasWindowHeader)}
+                      className={`px-2.5 py-1 rounded-lg text-xs font-bold transition-all ${
+                        hasWindowHeader
+                          ? 'bg-[#78A5FF] text-[#101A32]'
+                          : 'bg-[#222B39] text-[#929CAF]'
+                      }`}
+                    >
+                      {hasWindowHeader ? 'Visível (🔴🟡🟢)' : 'Oculta'}
+                    </button>
+                  </div>
+
+                  <div className="flex items-center justify-between p-2.5 bg-[#191F2B] border border-[#303A4B] rounded-xl">
+                    <span className="text-xs text-[#B7C0CE]">Bordas</span>
+                    <div className="flex space-x-1">
+                      {[0, 12, 16, 24].map((rad) => (
+                        <button
+                          key={rad}
+                          onClick={() => setFrameRadius(rad)}
+                          className={`px-1.5 py-0.5 rounded text-[11px] font-mono font-bold transition-colors ${
+                            frameRadius === rad
+                              ? 'bg-[#78A5FF] text-[#101A32]'
+                              : 'text-[#929CAF] hover:text-[#F3F5F9]'
+                          }`}
+                        >
+                          {rad}px
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Smooth Zoom Focus Quadrant & Shadow Depth */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-2 border-t border-[#303A4B]">
+              {/* Cinematic Zoom Focus */}
+              <div className="space-y-2">
+                <label className="text-xs font-bold text-[#F3F5F9] flex items-center justify-between">
+                  <span className="flex items-center space-x-1.5">
+                    <ZoomIn className="w-3.5 h-3.5 text-[#78A5FF]" />
+                    <span>Foco Cinematográfico (Screen Studio Pan)</span>
+                  </span>
+                  <span className="text-[10px] text-[#78A5FF] font-mono font-bold">
+                    Escala: {zoomScale}x
+                  </span>
+                </label>
+                <div className="flex items-center space-x-2">
+                  <div className="grid grid-cols-3 gap-1.5 w-32 shrink-0">
+                    {[
+                      { id: 'top-left', label: 'TL' },
+                      { id: 'center', label: 'Centro' },
+                      { id: 'top-right', label: 'TR' },
+                      { id: 'bottom-left', label: 'BL' },
+                      { id: 'center', label: '●' },
+                      { id: 'bottom-right', label: 'BR' }
+                    ].map((pt, i) => (
+                      <button
+                        key={i}
+                        onClick={() => {
+                          setZoomFocus(pt.id as ZoomFocusPoint);
+                          showToast(`Foco de zoom: ${pt.id}`, 'info');
+                        }}
+                        className={`py-1 rounded text-[10px] font-bold transition-all ${
+                          zoomFocus === pt.id
+                            ? 'bg-[#78A5FF] text-[#101A32]'
+                            : 'bg-[#191F2B] border border-[#303A4B] text-[#929CAF] hover:text-[#F3F5F9]'
+                        }`}
+                      >
+                        {pt.label}
+                      </button>
+                    ))}
+                  </div>
+
+                  <div className="flex-1 space-y-1.5">
+                    <span className="text-[11px] text-[#929CAF] block">
+                      Aproxime e centralize a região do vídeo com transições suaves cubic-bezier.
+                    </span>
+                    <div className="flex space-x-1.5">
+                      {[1.0, 1.4, 1.8, 2.2].map((s) => (
+                        <button
+                          key={s}
+                          onClick={() => {
+                            setZoomScale(s);
+                            showToast(`Zoom: ${s}x`, 'info');
+                          }}
+                          className={`flex-1 py-1 rounded-lg text-xs font-bold transition-all ${
+                            zoomScale === s
+                              ? 'bg-[#78A5FF] text-[#101A32]'
+                              : 'bg-[#191F2B] border border-[#303A4B] text-[#929CAF] hover:text-[#F3F5F9]'
+                          }`}
+                        >
+                          {s}x
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Shadow Depth */}
+              <div className="space-y-2">
+                <label className="text-xs font-bold text-[#F3F5F9] flex items-center space-x-1.5">
+                  <Sliders className="w-3.5 h-3.5 text-[#78A5FF]" />
+                  <span>Profundidade de Sombra da Janela</span>
+                </label>
+                <div className="grid grid-cols-4 gap-2">
+                  {[
+                    { id: 'none', label: 'Nenhuma' },
+                    { id: 'subtle', label: 'Sutil 2D' },
+                    { id: 'cinematic', label: '3D Studio' },
+                    { id: 'glow', label: 'Aura Glow' }
+                  ].map((sh) => (
+                    <button
+                      key={sh.id}
+                      onClick={() => setFrameShadow(sh.id as FrameShadowStyle)}
+                      className={`p-2 rounded-xl border text-center transition-all ${
+                        frameShadow === sh.id
+                          ? 'border-[#78A5FF] bg-[#191F2B] text-[#78A5FF] font-bold ring-1 ring-[#78A5FF]/50'
+                          : 'border-[#303A4B] bg-[#0B0E14] text-[#929CAF] hover:text-[#F3F5F9] hover:bg-[#191F2B]/60'
+                      }`}
+                    >
+                      <span className="text-xs">{sh.label}</span>
+                    </button>
+                  ))}
+                </div>
+                <div className="p-2.5 bg-[#191F2B] rounded-xl border border-[#303A4B] flex items-center justify-between text-xs text-[#929CAF]">
+                  <span>Espaçamento Interno (Padding)</span>
+                  <div className="flex space-x-1">
+                    {[0, 4, 6, 10].map((pad) => (
+                      <button
+                        key={pad}
+                        onClick={() => setCanvasPadding(pad)}
+                        className={`px-2 py-0.5 rounded text-xs font-mono font-bold transition-colors ${
+                          canvasPadding === pad
+                            ? 'bg-[#78A5FF] text-[#101A32]'
+                            : 'text-[#929CAF] hover:text-[#F3F5F9]'
+                        }`}
+                      >
+                        {pad * 2}%
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
 
         {/* Real Audio Waveform Timeline & Precision Scrubber */}
         <div className="w-full mt-4 bg-[#121722] border border-[#303A4B] rounded-2xl p-4 shadow-xl flex flex-col space-y-3">

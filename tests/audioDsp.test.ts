@@ -4,7 +4,10 @@ import {
   volumeToGain,
   gainToDecibels,
   getNoiseReductionPreset,
-  STUDIO_LIMITER_PARAMS
+  STUDIO_LIMITER_PARAMS,
+  VOICE_PRESENCE_PARAMS,
+  DE_ESSER_PARAMS,
+  STUDIO_WARMTH_PARAMS
 } from '../src/utils/audioDsp.ts';
 
 describe('Audio DSP Utilities', () => {
@@ -93,6 +96,26 @@ describe('Audio DSP Utilities', () => {
       assert.equal(STUDIO_LIMITER_PARAMS.ratio, 16.0);
       assert.ok(STUDIO_LIMITER_PARAMS.attack <= 0.005, 'Attack must catch fast transients <= 5ms');
       assert.ok(STUDIO_LIMITER_PARAMS.release >= 0.1, 'Release must avoid pumping >= 100ms');
+    });
+  });
+
+  describe('STUDIO_VOICE_CHAIN_PARAMETERS', () => {
+    test('presence filter boosts speech intelligibility band', () => {
+      assert.equal(VOICE_PRESENCE_PARAMS.frequency, 3200);
+      assert.equal(VOICE_PRESENCE_PARAMS.gain, 3.5);
+      assert.ok(VOICE_PRESENCE_PARAMS.Q > 0.5 && VOICE_PRESENCE_PARAMS.Q < 2.0);
+    });
+
+    test('de-esser filter attenuates harsh sibilant frequencies', () => {
+      assert.equal(DE_ESSER_PARAMS.frequency, 6800);
+      assert.equal(DE_ESSER_PARAMS.gain, -3.0);
+      assert.ok(DE_ESSER_PARAMS.Q >= 1.0);
+    });
+
+    test('studio warmth filter maintains natural chest resonance without mud', () => {
+      assert.equal(STUDIO_WARMTH_PARAMS.frequency, 90);
+      assert.equal(STUDIO_WARMTH_PARAMS.gain, 1.5);
+      assert.equal(STUDIO_WARMTH_PARAMS.Q, 0.707);
     });
   });
 });

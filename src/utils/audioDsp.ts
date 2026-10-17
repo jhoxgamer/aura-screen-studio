@@ -59,3 +59,22 @@ export const STUDIO_LIMITER_PARAMS = {
   attack: 0.003,   // 3ms ultra-fast transient catcher
   release: 0.12    // 120ms natural musical release
 };
+
+export const VOICE_PRESENCE_PARAMS = {
+  frequency: 3200, // 3.2 kHz vocal clarity sweet spot
+  gain: 3.5,       // +3.5 dB boost for speech intelligibility
+  Q: 1.2
+};
+
+export const DE_ESSER_PARAMS = {
+  frequency: 6800, // 6.8 kHz sibilance notch
+  gain: -3.0,      // -3.0 dB attenuation for harsh 's' sounds
+  Q: 1.5
+};
+
+export const STUDIO_WARMTH_PARAMS = {
+  frequency: 90,   // 90 Hz gentle rolloff
+  gain: 1.5,       // +1.5 dB subtle chest resonance
+  Q: 0.707
+};
+
