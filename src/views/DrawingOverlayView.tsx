@@ -1146,14 +1146,14 @@ export const DrawingOverlayView: React.FC = () => {
       {/* Inline Text Input Bubble when typing */}
       {activeTextPrompt && (
         <div
-          className="absolute z-50 p-2 bg-[#0e121d] border border-indigo-500 rounded-xl shadow-2xl flex items-center gap-2"
+          className="absolute z-50 p-2 bg-[#121722] border border-[#78A5FF] rounded-xl shadow-2xl flex items-center gap-2"
           style={{
             left: `${Math.min(window.innerWidth - 260, Math.max(20, activeTextPrompt.x - 20))}px`,
             top: `${Math.min(window.innerHeight - 80, Math.max(20, activeTextPrompt.y - 20))}px`,
             WebkitAppRegion: 'no-drag'
           } as any}
         >
-          <Type className="w-4 h-4 text-indigo-400" />
+          <Type className="w-4 h-4 text-[#78A5FF]" />
           <input
             type="text"
             autoFocus
@@ -1168,7 +1168,7 @@ export const DrawingOverlayView: React.FC = () => {
           />
           <button
             onClick={commitTextNote}
-            className="bg-indigo-600 hover:bg-indigo-500 text-white text-[10px] px-2 py-1 rounded font-bold"
+            className="bg-[#78A5FF] hover:bg-[#9AB9FF] text-[#101A32] text-[10px] px-2 py-1 rounded font-bold"
           >
             OK
           </button>
@@ -1237,7 +1237,7 @@ export const DrawingOverlayView: React.FC = () => {
               onClick={() => setTool('arrow')}
               title="Seta Direcional (A)"
               className={`p-2 rounded-xl transition-all ${
-                tool === 'arrow' ? 'bg-indigo-600 text-white font-medium shadow-sm' : 'text-slate-400 hover:text-white hover:bg-[#1a1f2e]'
+                tool === 'arrow' ? 'bg-[#78A5FF] text-[#101A32] font-bold shadow-sm' : 'text-[#929CAF] hover:text-[#F3F5F9] hover:bg-[#222B39]'
               }`}
             >
               <ArrowUpRight className="w-3.5 h-3.5" />
@@ -1247,7 +1247,7 @@ export const DrawingOverlayView: React.FC = () => {
               onClick={() => setTool('darrow')}
               title="Seta Dupla (D)"
               className={`p-2 rounded-xl transition-all ${
-                tool === 'darrow' ? 'bg-indigo-600 text-white font-medium shadow-sm' : 'text-slate-400 hover:text-white hover:bg-[#1a1f2e]'
+                tool === 'darrow' ? 'bg-[#78A5FF] text-[#101A32] font-bold shadow-sm' : 'text-[#929CAF] hover:text-[#F3F5F9] hover:bg-[#222B39]'
               }`}
             >
               <ArrowLeftRight className="w-3.5 h-3.5" />
@@ -1257,7 +1257,7 @@ export const DrawingOverlayView: React.FC = () => {
               onClick={() => setTool('line')}
               title="Linha Reta (L)"
               className={`p-2 rounded-xl transition-all ${
-                tool === 'line' ? 'bg-indigo-600 text-white font-medium shadow-sm' : 'text-slate-400 hover:text-white hover:bg-[#1a1f2e]'
+                tool === 'line' ? 'bg-[#78A5FF] text-[#101A32] font-bold shadow-sm' : 'text-[#929CAF] hover:text-[#F3F5F9] hover:bg-[#222B39]'
               }`}
             >
               <Minus className="w-3.5 h-3.5" />
@@ -1267,7 +1267,7 @@ export const DrawingOverlayView: React.FC = () => {
               onClick={() => setTool('rectangle')}
               title="Retângulo / Caixa (R)"
               className={`p-2 rounded-xl transition-all ${
-                tool === 'rectangle' ? 'bg-indigo-600 text-white font-medium shadow-sm' : 'text-slate-400 hover:text-white hover:bg-[#1a1f2e]'
+                tool === 'rectangle' ? 'bg-[#78A5FF] text-[#101A32] font-bold shadow-sm' : 'text-[#929CAF] hover:text-[#F3F5F9] hover:bg-[#222B39]'
               }`}
             >
               <Square className="w-3.5 h-3.5" />
@@ -1277,7 +1277,7 @@ export const DrawingOverlayView: React.FC = () => {
               onClick={() => setTool('ellipse')}
               title="Círculo / Elipse (O)"
               className={`p-2 rounded-xl transition-all ${
-                tool === 'ellipse' ? 'bg-indigo-600 text-white font-medium shadow-sm' : 'text-slate-400 hover:text-white hover:bg-[#1a1f2e]'
+                tool === 'ellipse' ? 'bg-[#78A5FF] text-[#101A32] font-bold shadow-sm' : 'text-[#929CAF] hover:text-[#F3F5F9] hover:bg-[#222B39]'
               }`}
             >
               <Circle className="w-3.5 h-3.5" />
@@ -1287,7 +1287,7 @@ export const DrawingOverlayView: React.FC = () => {
               onClick={() => setTool('diamond')}
               title="Losango / Diamante (Geometria Pro)"
               className={`p-2 rounded-xl transition-all ${
-                tool === 'diamond' ? 'bg-indigo-600 text-white font-medium shadow-sm' : 'text-slate-400 hover:text-white hover:bg-[#1a1f2e]'
+                tool === 'diamond' ? 'bg-[#78A5FF] text-[#101A32] font-bold shadow-sm' : 'text-[#929CAF] hover:text-[#F3F5F9] hover:bg-[#222B39]'
               }`}
             >
               <Diamond className="w-3.5 h-3.5" />
@@ -1297,7 +1297,7 @@ export const DrawingOverlayView: React.FC = () => {
               onClick={() => setTool('triangle')}
               title="Triângulo Geométrico (Geometria Pro)"
               className={`p-2 rounded-xl transition-all ${
-                tool === 'triangle' ? 'bg-indigo-600 text-white font-medium shadow-sm' : 'text-slate-400 hover:text-white hover:bg-[#1a1f2e]'
+                tool === 'triangle' ? 'bg-[#78A5FF] text-[#101A32] font-bold shadow-sm' : 'text-[#929CAF] hover:text-[#F3F5F9] hover:bg-[#222B39]'
               }`}
             >
               <Triangle className="w-3.5 h-3.5" />
@@ -1308,8 +1308,8 @@ export const DrawingOverlayView: React.FC = () => {
               title="Mosaico de Privacidade / Redação (M) • Oculte senhas, tokens ou dados sensíveis em tempo real"
               className={`p-2 rounded-xl transition-all ${
                 tool === 'mosaic'
-                  ? 'bg-sky-600 text-white font-medium shadow-sm ring-1 ring-sky-300'
-                  : 'text-slate-400 hover:text-white hover:bg-[#1a1f2e]'
+                  ? 'bg-[#78A5FF] text-[#101A32] font-bold shadow-sm ring-1 ring-white/50'
+                  : 'text-[#929CAF] hover:text-[#F3F5F9] hover:bg-[#222B39]'
               }`}
             >
               <EyeOff className="w-3.5 h-3.5" />
@@ -1319,7 +1319,7 @@ export const DrawingOverlayView: React.FC = () => {
               onClick={() => setTool('text')}
               title="Texto na Tela (T) • Clique para adicionar notas tipográficas"
               className={`p-2 rounded-xl transition-all ${
-                tool === 'text' ? 'bg-indigo-600 text-white font-medium shadow-sm' : 'text-slate-400 hover:text-white hover:bg-[#1a1f2e]'
+                tool === 'text' ? 'bg-[#78A5FF] text-[#101A32] font-bold shadow-sm' : 'text-[#929CAF] hover:text-[#F3F5F9] hover:bg-[#222B39]'
               }`}
             >
               <Type className="w-3.5 h-3.5" />
@@ -1329,7 +1329,7 @@ export const DrawingOverlayView: React.FC = () => {
               onClick={() => setTool('highlighter')}
               title="Marca-texto Translúcido (H)"
               className={`p-2 rounded-xl transition-all ${
-                tool === 'highlighter' ? 'bg-indigo-600 text-white font-medium shadow-sm' : 'text-slate-400 hover:text-white hover:bg-[#1a1f2e]'
+                tool === 'highlighter' ? 'bg-[#78A5FF] text-[#101A32] font-bold shadow-sm' : 'text-[#929CAF] hover:text-[#F3F5F9] hover:bg-[#222B39]'
               }`}
             >
               <Highlighter className="w-3.5 h-3.5" />
@@ -1339,7 +1339,7 @@ export const DrawingOverlayView: React.FC = () => {
               onClick={() => setTool('eraser')}
               title="Borracha (E)"
               className={`p-2 rounded-xl transition-all ${
-                tool === 'eraser' ? 'bg-rose-600 text-white shadow-sm font-medium' : 'text-slate-400 hover:text-white hover:bg-[#1a1f2e]'
+                tool === 'eraser' ? 'bg-[#FF647C] text-white shadow-sm font-bold' : 'text-[#929CAF] hover:text-[#F3F5F9] hover:bg-[#222B39]'
               }`}
             >
               <Eraser className="w-3.5 h-3.5" />
@@ -1356,7 +1356,7 @@ export const DrawingOverlayView: React.FC = () => {
               }}
               title="Selo Checkmark (✓)"
               className={`p-1.5 rounded-lg transition-all ${
-                tool === 'stamp' && stampType === 'check' ? 'bg-emerald-600 text-white' : 'text-slate-400 hover:text-emerald-400'
+                tool === 'stamp' && stampType === 'check' ? 'bg-[#78A5FF] text-[#101A32]' : 'text-[#929CAF] hover:text-[#83B8FF]'
               }`}
             >
               <CheckCircle2 className="w-3.5 h-3.5" />
@@ -1370,7 +1370,7 @@ export const DrawingOverlayView: React.FC = () => {
               }}
               title="Selo X / Cruz (✗)"
               className={`p-1.5 rounded-lg transition-all ${
-                tool === 'stamp' && stampType === 'cross' ? 'bg-rose-600 text-white' : 'text-slate-400 hover:text-rose-400'
+                tool === 'stamp' && stampType === 'cross' ? 'bg-[#FF647C] text-white' : 'text-[#929CAF] hover:text-[#FF647C]'
               }`}
             >
               <XCircle className="w-3.5 h-3.5" />
@@ -1384,7 +1384,7 @@ export const DrawingOverlayView: React.FC = () => {
               }}
               title="Selo Estrela (★)"
               className={`p-1.5 rounded-lg transition-all ${
-                tool === 'stamp' && stampType === 'star' ? 'bg-amber-600 text-white' : 'text-slate-400 hover:text-amber-400'
+                tool === 'stamp' && stampType === 'star' ? 'bg-[#F2B66D] text-[#101A32]' : 'text-[#929CAF] hover:text-[#F2B66D]'
               }`}
             >
               <Star className="w-3.5 h-3.5" />
@@ -1398,7 +1398,7 @@ export const DrawingOverlayView: React.FC = () => {
               }}
               title="Selo Coração (♥)"
               className={`p-1.5 rounded-lg transition-all ${
-                tool === 'stamp' && stampType === 'heart' ? 'bg-pink-600 text-white' : 'text-slate-400 hover:text-pink-400'
+                tool === 'stamp' && stampType === 'heart' ? 'bg-[#FF647C] text-white' : 'text-[#929CAF] hover:text-[#FF647C]'
               }`}
             >
               <Heart className="w-3.5 h-3.5" />
@@ -1412,7 +1412,7 @@ export const DrawingOverlayView: React.FC = () => {
               }}
               title={`Selo Numerado de Passos (#${nextStampNumber})`}
               className={`px-1.5 py-1 rounded-lg transition-all flex items-center gap-0.5 font-mono text-[10px] font-bold ${
-                tool === 'stamp' && stampType === 'number' ? 'bg-indigo-600 text-white' : 'text-slate-400 hover:text-indigo-400'
+                tool === 'stamp' && stampType === 'number' ? 'bg-[#78A5FF] text-[#101A32]' : 'text-[#929CAF] hover:text-[#78A5FF]'
               }`}
             >
               <Hash className="w-3 h-3" />
@@ -1422,12 +1422,12 @@ export const DrawingOverlayView: React.FC = () => {
 
           {/* Fill Mode for Shapes (Outline / Tint / Solid) */}
           {['rectangle', 'ellipse', 'diamond', 'triangle', 'smartpen'].includes(tool) && (
-            <div className="flex items-center space-x-1 border-r border-[#232838] pr-1.5">
+            <div className="flex items-center space-x-1 border-r border-[#222B39] pr-1.5">
               <button
                 onClick={() => setFillMode('outline')}
                 title="Apenas Contorno (Transparente)"
                 className={`px-1.5 py-1 rounded-lg text-[10px] font-medium transition-all ${
-                  fillMode === 'outline' ? 'bg-indigo-600 text-white font-bold' : 'text-slate-400 hover:text-white hover:bg-[#1a1f2e]'
+                  fillMode === 'outline' ? 'bg-[#78A5FF] text-[#101A32] font-bold' : 'text-[#929CAF] hover:text-[#F3F5F9] hover:bg-[#222B39]'
                 }`}
               >
                 Vazado
@@ -1436,7 +1436,7 @@ export const DrawingOverlayView: React.FC = () => {
                 onClick={() => setFillMode('tint')}
                 title="Preenchimento Translúcido (25%)"
                 className={`px-1.5 py-1 rounded-lg text-[10px] font-medium transition-all ${
-                  fillMode === 'tint' ? 'bg-indigo-600 text-white font-bold' : 'text-slate-400 hover:text-white hover:bg-[#1a1f2e]'
+                  fillMode === 'tint' ? 'bg-[#78A5FF] text-[#101A32] font-bold' : 'text-[#929CAF] hover:text-[#F3F5F9] hover:bg-[#222B39]'
                 }`}
               >
                 Translúcido
@@ -1445,7 +1445,7 @@ export const DrawingOverlayView: React.FC = () => {
                 onClick={() => setFillMode('solid')}
                 title="Preenchimento Sólido (100%)"
                 className={`px-1.5 py-1 rounded-lg text-[10px] font-medium transition-all ${
-                  fillMode === 'solid' ? 'bg-indigo-600 text-white font-bold' : 'text-slate-400 hover:text-white hover:bg-[#1a1f2e]'
+                  fillMode === 'solid' ? 'bg-[#78A5FF] text-[#101A32] font-bold' : 'text-[#929CAF] hover:text-[#F3F5F9] hover:bg-[#222B39]'
                 }`}
               >
                 Sólido
@@ -1490,14 +1490,14 @@ export const DrawingOverlayView: React.FC = () => {
           )}
 
           {/* Stroke Width Selector */}
-          <div className="flex items-center space-x-1 border-r border-[#232838] pr-1.5">
+          <div className="flex items-center space-x-1 border-r border-[#222B39] pr-1.5">
             {[2, 4, 8].map((w) => (
               <button
                 key={w}
                 onClick={() => setStrokeWidth(w)}
                 title={`Espessura: ${w}px`}
                 className={`w-6 h-6 rounded-lg flex items-center justify-center transition-all ${
-                  strokeWidth === w ? 'bg-indigo-600 text-white font-medium' : 'text-slate-500 hover:text-white hover:bg-[#1a1f2e]'
+                  strokeWidth === w ? 'bg-[#78A5FF] text-[#101A32] font-bold' : 'text-[#929CAF] hover:text-[#F3F5F9] hover:bg-[#222B39]'
                 }`}
               >
                 <div className="rounded-full bg-current" style={{ width: `${w * 1.4}px`, height: `${w * 1.4}px` }} />
@@ -1513,8 +1513,8 @@ export const DrawingOverlayView: React.FC = () => {
               whiteboardMode === 'whiteboard'
                 ? 'bg-white text-slate-900 border-white font-bold shadow-sm'
                 : whiteboardMode === 'blackboard'
-                ? 'bg-slate-900 text-emerald-400 border-emerald-500/50 font-bold shadow-sm'
-                : 'text-slate-400 border-[#232838] hover:text-white hover:bg-[#1a1f2e]'
+                ? 'bg-[#121722] text-[#83B8FF] border-[#78A5FF]/50 font-bold shadow-sm'
+                : 'text-[#929CAF] border-[#222B39] hover:text-[#F3F5F9] hover:bg-[#222B39]'
             }`}
           >
             <Grid className="w-3.5 h-3.5" />
@@ -1524,14 +1524,14 @@ export const DrawingOverlayView: React.FC = () => {
           </button>
 
           {/* Focus & Spotlight Toggles */}
-          <div className="flex items-center space-x-1 border-r border-[#232838] pr-1.5">
+          <div className="flex items-center space-x-1 border-r border-[#222B39] pr-1.5">
             <button
               onClick={() => setMouseSpotlight(!mouseSpotlight)}
               title="Holofote de Mouse (Halo luminoso)"
               className={`p-1.5 rounded-xl transition-all ${
                 mouseSpotlight
-                  ? 'bg-indigo-500/20 text-indigo-300 border border-indigo-500/40 shadow-sm'
-                  : 'text-slate-400 hover:text-white hover:bg-[#1a1f2e]'
+                  ? 'bg-[#78A5FF]/20 text-[#83B8FF] border border-[#78A5FF]/40 shadow-sm'
+                  : 'text-[#929CAF] hover:text-[#F3F5F9] hover:bg-[#222B39]'
               }`}
             >
               <MousePointer className="w-3.5 h-3.5" />
@@ -1542,8 +1542,8 @@ export const DrawingOverlayView: React.FC = () => {
               title="Foco de Luz Cinematográfico (Dimmer de Fundo)"
               className={`p-1.5 rounded-xl transition-all ${
                 backgroundDimmer
-                  ? 'bg-indigo-500/20 text-indigo-300 border border-indigo-500/40 shadow-sm'
-                  : 'text-slate-400 hover:text-white hover:bg-[#1a1f2e]'
+                  ? 'bg-[#78A5FF]/20 text-[#83B8FF] border border-[#78A5FF]/40 shadow-sm'
+                  : 'text-[#929CAF] hover:text-[#F3F5F9] hover:bg-[#222B39]'
               }`}
             >
               <Focus className="w-3.5 h-3.5" />
@@ -1556,20 +1556,20 @@ export const DrawingOverlayView: React.FC = () => {
             title="Tinta Inteligente Auto-apagar em 3 segundos"
             className={`flex items-center space-x-1 px-2 py-1 rounded-xl text-[10px] font-medium transition-all ${
               vanishingInk
-                ? 'bg-indigo-500/20 text-indigo-300 border border-indigo-500/30'
-                : 'text-slate-400 hover:text-white bg-[#1a1f2e]/60'
+                ? 'bg-[#78A5FF]/20 text-[#83B8FF] border border-[#78A5FF]/30'
+                : 'text-[#929CAF] hover:text-[#F3F5F9] bg-[#191F2B]'
             }`}
           >
-            <Clock className="w-3 h-3 text-indigo-400" />
+            <Clock className="w-3 h-3 text-[#78A5FF]" />
             <span>3s Fade</span>
-            {vanishingInk && <Check className="w-2.5 h-2.5 text-indigo-300" />}
+            {vanishingInk && <Check className="w-2.5 h-2.5 text-[#83B8FF]" />}
           </button>
 
           {/* Undo & Redo (Zoom CAnnoCmdStack) */}
           <button
             onClick={handleUndo}
             title="Desfazer (Ctrl+Z ou U)"
-            className="p-1.5 rounded-xl text-slate-400 hover:text-white hover:bg-[#1a1f2e] transition-colors active:scale-95"
+            className="p-1.5 rounded-xl text-[#929CAF] hover:text-[#F3F5F9] hover:bg-[#222B39] transition-colors active:scale-95"
           >
             <Undo2 className="w-3.5 h-3.5" />
           </button>
@@ -1577,7 +1577,7 @@ export const DrawingOverlayView: React.FC = () => {
           <button
             onClick={handleRedo}
             title="Refazer (Ctrl+Y ou Ctrl+Shift+Z)"
-            className="p-1.5 rounded-xl text-slate-400 hover:text-white hover:bg-[#1a1f2e] transition-colors active:scale-95"
+            className="p-1.5 rounded-xl text-[#929CAF] hover:text-[#F3F5F9] hover:bg-[#222B39] transition-colors active:scale-95"
           >
             <Redo2 className="w-3.5 h-3.5" />
           </button>
@@ -1586,7 +1586,7 @@ export const DrawingOverlayView: React.FC = () => {
           <button
             onClick={handleSaveAnnotation}
             title="Copiar Anotação para Área de Transferência / Snapshot Aura"
-            className="p-1.5 rounded-xl text-emerald-400 hover:text-emerald-300 hover:bg-emerald-950/40 transition-colors active:scale-95"
+            className="p-1.5 rounded-xl text-[#83B8FF] hover:text-[#9AB9FF] hover:bg-[#78A5FF]/10 transition-colors active:scale-95"
           >
             <Camera className="w-3.5 h-3.5" />
           </button>
@@ -1595,7 +1595,7 @@ export const DrawingOverlayView: React.FC = () => {
           <button
             onClick={handleClear}
             title="Limpar todos os desenhos (C)"
-            className="p-1.5 rounded-xl text-slate-400 hover:text-rose-400 hover:bg-rose-950/30 transition-colors"
+            className="p-1.5 rounded-xl text-[#929CAF] hover:text-[#FF647C] hover:bg-[#FF647C]/10 transition-colors"
           >
             <Trash2 className="w-3.5 h-3.5" />
           </button>
@@ -1604,7 +1604,7 @@ export const DrawingOverlayView: React.FC = () => {
           <button
             onClick={() => setDockPosition(dockPosition === 'top' ? 'bottom' : 'top')}
             title={dockPosition === 'top' ? 'Fixar Barra no Rodapé' : 'Fixar Barra no Topo'}
-            className="p-1.5 rounded-xl text-slate-400 hover:text-white hover:bg-[#1a1f2e] transition-colors"
+            className="p-1.5 rounded-xl text-[#929CAF] hover:text-[#F3F5F9] hover:bg-[#222B39] transition-colors"
           >
             {dockPosition === 'top' ? <ChevronDown className="w-3.5 h-3.5" /> : <ChevronUp className="w-3.5 h-3.5" />}
           </button>
@@ -1612,7 +1612,7 @@ export const DrawingOverlayView: React.FC = () => {
           <button
             onClick={() => setIsMinimized(true)}
             title="Minimizar Barra Flutuante"
-            className="p-1.5 rounded-xl text-slate-400 hover:text-white hover:bg-[#1a1f2e] transition-colors"
+            className="p-1.5 rounded-xl text-[#929CAF] hover:text-[#F3F5F9] hover:bg-[#222B39] transition-colors"
           >
             <Minimize2 className="w-3.5 h-3.5" />
           </button>
@@ -1620,7 +1620,7 @@ export const DrawingOverlayView: React.FC = () => {
           {/* Done / Close Drawing Mode */}
           <button
             onClick={handleClose}
-            className="flex items-center space-x-1 bg-indigo-600 hover:bg-indigo-500 text-white font-medium px-2.5 py-1 rounded-xl text-xs transition-colors shadow-sm active:scale-95 ml-1"
+            className="flex items-center space-x-1 bg-[#78A5FF] hover:bg-[#9AB9FF] text-[#101A32] font-bold px-2.5 py-1 rounded-xl text-xs transition-colors shadow-sm active:scale-95 ml-1"
           >
             <span>Concluir</span>
             <X className="w-3 h-3" />
@@ -1633,7 +1633,7 @@ export const DrawingOverlayView: React.FC = () => {
         <div
           className={`absolute ${
             dockPosition === 'top' ? 'top-14' : 'bottom-14'
-          } left-1/2 -translate-x-1/2 bg-[#0e111a]/95 backdrop-blur-xl border border-indigo-500/40 text-indigo-200 text-xs font-semibold px-4 py-1.5 rounded-full shadow-2xl z-40 pointer-events-none animate-in fade-in zoom-in-95`}
+          } left-1/2 -translate-x-1/2 bg-[#121722]/95 backdrop-blur-xl border border-[#78A5FF]/40 text-[#83B8FF] text-xs font-semibold px-4 py-1.5 rounded-full shadow-2xl z-40 pointer-events-none animate-in fade-in zoom-in-95`}
           style={{ WebkitAppRegion: 'no-drag' } as any}
         >
           <span>{toolToast}</span>

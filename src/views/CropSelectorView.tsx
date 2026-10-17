@@ -171,11 +171,11 @@ export const CropSelectorView: React.FC = () => {
     >
       {/* Dynamic Crosshair Guidelines */}
       <div
-        className="fixed top-0 bottom-0 pointer-events-none border-l border-indigo-500/30 z-10"
+        className="fixed top-0 bottom-0 pointer-events-none border-l border-[#78A5FF]/30 z-10"
         style={{ left: `${mousePos.x}px` }}
       />
       <div
-        className="fixed left-0 right-0 pointer-events-none border-t border-indigo-500/30 z-10"
+        className="fixed left-0 right-0 pointer-events-none border-t border-[#78A5FF]/30 z-10"
         style={{ top: `${mousePos.y}px` }}
       />
 

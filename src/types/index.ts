@@ -128,7 +128,9 @@ declare global {
       downloadRecording: (id: string) => Promise<boolean>;
       trimRecording: (id: string, bufferOrOptions: any, newDurationMs?: number) => Promise<any>;
       openPreview: (idOrMeta: string | RecordingMeta) => void;
-      openPreRecording: () => void;
+      openPreRecording: (tab?: 'record' | 'library') => void;
+      openLibrary?: () => void;
+      onSwitchTab?: (callback: (tab: 'record' | 'library') => void) => () => void;
       openExternalUrl: (url: string) => void;
       toggleSpeakerNotes: () => void;
       resizeSpeakerNotes: (width: number, height: number) => void;

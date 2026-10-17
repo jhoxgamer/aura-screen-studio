@@ -61,10 +61,10 @@ export const SpeakerNotesView: React.FC = () => {
   const [text, setText] = useState<string>(() => {
     return localStorage.getItem('aura_speaker_notes_v2') ||
       localStorage.getItem('aura_speaker_notes') ||
-      `📝 Bem-vindo ao Teleprompter Aura!\n\nCole ou digite aqui seu roteiro de apresentação.\n\n• Pressione [ESPAÇO] para iniciar ou pausar a rolagem suave sem travar.\n• Use [SETA CIMA] e [SETA BAIXO] para acelerar ou desacelerar.\n• Mantenha o olhar na linha guia visual (índigo) para contato visual perfeito com a câmera!\n• Mude para a aba "Tópicos" se preferir falar por tópicos e marcar os itens abordados.`;
+      `📝 Bem-vindo ao Teleprompter Aura!\n\nCole ou digite aqui seu roteiro de apresentação.\n\n• Pressione [ESPAÇO] para iniciar ou pausar a rolagem suave sem travar.\n• Use [SETA CIMA] e [SETA BAIXO] para acelerar ou desacelerar.\n• Mantenha o olhar na linha guia visual (azul Nocturne) para contato visual perfeito com a câmera!\n• Mude para a aba "Tópicos" se preferir falar por tópicos e marcar os itens abordados.`;
   });
 
-  // Bullet Notes list (Loom Style checklist)
+  // Bullet Notes list (Studio checklist)
   const [bulletNotes, setBulletNotes] = useState<BulletNote[]>(() => {
     try {
       const saved = localStorage.getItem('aura_speaker_notes_bullets');

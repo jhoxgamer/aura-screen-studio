@@ -23,7 +23,8 @@ import {
   CheckCircle2,
   Activity,
   Bookmark,
-  Plus
+  Plus,
+  MoreHorizontal
 } from 'lucide-react';
 import { RecordingMeta, ChapterItem } from '../types';
 import confetti from 'canvas-confetti';
@@ -44,10 +45,14 @@ export const PreviewView: React.FC = () => {
   });
   const [isLinkCopied, setIsLinkCopied] = useState(false);
   const [isPathCopied, setIsPathCopied] = useState(false);
+  const [showMoreMenu, setShowMoreMenu] = useState(false);
 
   // Title editing state
   const [isEditingTitle, setIsEditingTitle] = useState(false);
   const [editedTitle, setEditedTitle] = useState('');
+
+  // Studio Mode: Player vs Trim
+  const [studioTab, setStudioTab] = useState<'player' | 'trim'>('player');
 
   // Trimming states & controller
   const [trimStart, setTrimStart] = useState(0);
@@ -299,8 +304,13 @@ export const PreviewView: React.FC = () => {
     await window.electronAPI.downloadRecording(meta.id);
   };
 
+  const handleBackToLibrary = () => {
+    window.electronAPI.openPreRecording('library');
+    window.electronAPI.closeCurrentWindow();
+  };
+
   const handleNewRecording = () => {
-    window.electronAPI.openPreRecording();
+    window.electronAPI.openPreRecording('record');
     window.electronAPI.closeCurrentWindow();
   };
 
@@ -308,7 +318,7 @@ export const PreviewView: React.FC = () => {
     if (!meta) return;
     try {
       await window.electronAPI.deleteRecording(meta.id);
-      window.electronAPI.openPreRecording();
+      window.electronAPI.openPreRecording('library');
       window.electronAPI.closeCurrentWindow();
     } catch (err) {
       showToast('Erro ao excluir gravação.', 'error');
@@ -627,11 +637,23 @@ export const PreviewView: React.FC = () => {
 
   return (
     <div className="w-full h-full min-h-screen bg-[#0B0E14] text-[#F3F5F9] flex flex-col select-none overflow-hidden font-sans">
-      {/* Top Header */}
+      {/* Top Header & Breadcrumb Navigation */}
       <div className="h-16 bg-[#121722] border-b border-[#303A4B] px-6 flex items-center justify-between shrink-0">
+        {/* Navigation Breadcrumb & Back Button */}
         <div className="flex items-center space-x-3 min-w-0">
-          <div className="w-8 h-8 rounded-lg bg-[#191F2B] border border-[#303A4B] flex items-center justify-center shrink-0">
-            <div className="w-4 h-4 rounded-full border-2 border-[#78A5FF] flex items-center justify-center">
+          <button
+            onClick={handleBackToLibrary}
+            className="flex items-center space-x-1.5 px-3 py-1.5 rounded-xl bg-[#191F2B] hover:bg-[#222B39] text-[#B7C0CE] hover:text-[#78A5FF] text-xs font-semibold transition-all border border-[#303A4B] shrink-0"
+            title="Voltar à Biblioteca de Gravações"
+          >
+            <ArrowLeft className="w-3.5 h-3.5 text-[#78A5FF]" />
+            <span>Biblioteca</span>
+          </button>
+
+          <span className="text-[#303A4B] font-mono text-sm hidden sm:inline">/</span>
+
+          <div className="w-7 h-7 rounded-lg bg-[#191F2B] border border-[#303A4B] flex items-center justify-center shrink-0">
+            <div className="w-3.5 h-3.5 rounded-full border-2 border-[#78A5FF] flex items-center justify-center">
               <div className="w-1.5 h-1.5 rounded-full bg-[#FF647C]" />
             </div>
           </div>
@@ -659,7 +681,7 @@ export const PreviewView: React.FC = () => {
               </div>
             ) : (
               <div className="flex items-center space-x-2 group cursor-pointer" onClick={() => setIsEditingTitle(true)}>
-                <h1 className="text-sm font-semibold text-[#F3F5F9] leading-tight truncate max-w-sm hover:text-[#78A5FF] transition-colors">
+                <h1 className="text-sm font-semibold text-[#F3F5F9] leading-tight truncate max-w-xs md:max-w-sm hover:text-[#78A5FF] transition-colors" title={meta?.title || 'Gravação Concluída'}>
                   {meta?.title || 'Gravação Concluída'}
                 </h1>
                 <Edit2 className="w-3 h-3 text-[#929CAF] group-hover:text-[#78A5FF] transition-colors shrink-0" />
@@ -684,26 +706,16 @@ export const PreviewView: React.FC = () => {
           </div>
         </div>
 
-        {/* Action Buttons */}
+        {/* Responsive Toolbar */}
         <div className="flex items-center space-x-2 shrink-0">
           {/* Share Link Button */}
           <button
             onClick={handleShareLink}
             title={`Copiar Link Público (${getShortcutLabel('l')})`}
-            className="flex items-center space-x-1.5 bg-[#78A5FF] hover:bg-[#9AB9FF] active:scale-95 text-[#101A32] px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all shadow-sm"
+            className="flex items-center space-x-1.5 bg-[#78A5FF] hover:bg-[#9AB9FF] active:scale-95 text-[#101A32] px-3 py-1.5 rounded-xl text-xs font-bold transition-all shadow-sm"
           >
             {isLinkCopied ? <Check className="w-3.5 h-3.5" /> : <Share2 className="w-3.5 h-3.5" />}
-            <span>{isLinkCopied ? 'Link Copiado!' : 'Copiar Link Público'}</span>
-          </button>
-
-          {/* Open in Browser */}
-          <button
-            onClick={handleOpenInBrowser}
-            className="flex items-center space-x-1.5 bg-[#191F2B] hover:bg-[#222B39] border border-[#303A4B] px-3 py-1.5 rounded-xl text-xs font-medium text-[#F3F5F9] transition-all shadow-sm"
-            title="Abrir página pública no navegador"
-          >
-            <ExternalLink className="w-3.5 h-3.5 text-[#78A5FF]" />
-            <span>Ver no Navegador</span>
+            <span className="hidden sm:inline">{isLinkCopied ? 'Link Copiado!' : 'Copiar Link'}</span>
           </button>
 
           {/* Download Video */}
@@ -713,32 +725,16 @@ export const PreviewView: React.FC = () => {
             title="Salvar arquivo de vídeo no computador"
           >
             <Download className="w-3.5 h-3.5 text-[#83B8FF]" />
-            <span>Baixar Vídeo</span>
+            <span className="hidden md:inline">Baixar</span>
           </button>
 
           {/* Open Folder */}
           <button
             onClick={handleOpenFolder}
-            className="p-2 rounded-xl bg-[#191F2B] hover:bg-[#222B39] border border-[#303A4B] text-[#B7C0CE] hover:text-[#F3F5F9] transition-all shadow-sm"
+            className="p-2 rounded-xl bg-[#191F2B] hover:bg-[#222B39] border border-[#303A4B] text-[#B7C0CE] hover:text-[#F3F5F9] transition-all shadow-sm hidden lg:flex"
             title="Abrir pasta no Windows Explorer"
           >
             <FolderOpen className="w-3.5 h-3.5" />
-          </button>
-
-          {/* Copy local file path */}
-          <button
-            onClick={() => {
-              if (meta?.filePath) {
-                navigator.clipboard.writeText(meta.filePath);
-                setIsPathCopied(true);
-                showToast('Caminho do arquivo copiado!', 'success');
-                setTimeout(() => setIsPathCopied(false), 2000);
-              }
-            }}
-            className="p-2 rounded-xl bg-[#191F2B] hover:bg-[#222B39] border border-[#303A4B] text-[#B7C0CE] hover:text-[#78A5FF] transition-all shadow-sm"
-            title="Copiar Caminho do Arquivo (C:\...)"
-          >
-            {isPathCopied ? <Check className="w-3.5 h-3.5 text-[#83B8FF]" /> : <Copy className="w-3.5 h-3.5" />}
           </button>
 
           {/* New Recording */}
@@ -748,17 +744,63 @@ export const PreviewView: React.FC = () => {
             title="Iniciar nova gravação"
           >
             <PlusCircle className="w-3.5 h-3.5 text-[#78A5FF]" />
-            <span>Nova Gravação</span>
+            <span className="hidden sm:inline">Nova Gravação</span>
           </button>
 
-          {/* Delete */}
-          <button
-            onClick={() => setIsConfirmingDelete(true)}
-            className="p-2 rounded-xl bg-[#191F2B] hover:bg-[#B83A48]/30 border border-[#303A4B] text-[#929CAF] hover:text-[#FF647C] transition-all shadow-sm"
-            title="Excluir gravação"
-          >
-            <Trash2 className="w-3.5 h-3.5" />
-          </button>
+          {/* More Actions Dropdown Menu */}
+          <div className="relative">
+            <button
+              onClick={() => setShowMoreMenu(!showMoreMenu)}
+              className="p-2 rounded-xl bg-[#191F2B] hover:bg-[#222B39] border border-[#303A4B] text-[#B7C0CE] hover:text-[#F3F5F9] transition-all shadow-sm"
+              title="Mais opções e ações do vídeo"
+            >
+              <MoreHorizontal className="w-3.5 h-3.5" />
+            </button>
+
+            {showMoreMenu && (
+              <div
+                className="absolute right-0 top-full mt-2 w-52 bg-[#121722] border border-[#303A4B] rounded-xl shadow-2xl p-1.5 z-50 space-y-1"
+                onClick={() => setShowMoreMenu(false)}
+              >
+                <button
+                  onClick={handleOpenInBrowser}
+                  className="w-full flex items-center space-x-2 px-2.5 py-1.5 rounded-lg text-xs text-[#B7C0CE] hover:text-[#F3F5F9] hover:bg-[#191F2B] transition-colors text-left"
+                >
+                  <ExternalLink className="w-3.5 h-3.5 text-[#78A5FF]" />
+                  <span>Ver no Navegador</span>
+                </button>
+                <button
+                  onClick={handleOpenFolder}
+                  className="w-full flex items-center space-x-2 px-2.5 py-1.5 rounded-lg text-xs text-[#B7C0CE] hover:text-[#F3F5F9] hover:bg-[#191F2B] transition-colors text-left"
+                >
+                  <FolderOpen className="w-3.5 h-3.5 text-[#83B8FF]" />
+                  <span>Abrir Pasta do Arquivo</span>
+                </button>
+                <button
+                  onClick={() => {
+                    if (meta?.filePath) {
+                      navigator.clipboard.writeText(meta.filePath);
+                      setIsPathCopied(true);
+                      showToast('Caminho do arquivo copiado!', 'success');
+                      setTimeout(() => setIsPathCopied(false), 2000);
+                    }
+                  }}
+                  className="w-full flex items-center space-x-2 px-2.5 py-1.5 rounded-lg text-xs text-[#B7C0CE] hover:text-[#F3F5F9] hover:bg-[#191F2B] transition-colors text-left"
+                >
+                  <Copy className="w-3.5 h-3.5 text-[#929CAF]" />
+                  <span>Copiar Caminho no Disco</span>
+                </button>
+                <div className="border-t border-[#303A4B] my-1" />
+                <button
+                  onClick={() => setIsConfirmingDelete(true)}
+                  className="w-full flex items-center space-x-2 px-2.5 py-1.5 rounded-lg text-xs text-[#FF647C] hover:bg-[#B83A48]/20 transition-colors text-left font-medium"
+                >
+                  <Trash2 className="w-3.5 h-3.5" />
+                  <span>Excluir Gravação</span>
+                </button>
+              </div>
+            )}
+          </div>
         </div>
       </div>
 
@@ -782,6 +824,42 @@ export const PreviewView: React.FC = () => {
 
       {/* Main Content Area: Video Player & Editor */}
       <div className="flex-1 flex flex-col p-6 items-center justify-start max-w-5xl mx-auto w-full overflow-y-auto">
+        {/* Studio Mode Switcher (Apple HIG Segmented Control) */}
+        <div className="w-full flex items-center justify-between mb-3 shrink-0">
+          <div className="inline-flex p-1 bg-[#121722] border border-[#303A4B] rounded-xl shadow-inner">
+            <button
+              onClick={() => setStudioTab('player')}
+              className={`flex items-center space-x-2 px-3 py-1.5 rounded-lg text-xs font-semibold transition-all ${
+                studioTab === 'player'
+                  ? 'bg-[#78A5FF] text-[#101A32] shadow-sm'
+                  : 'text-[#929CAF] hover:text-[#F3F5F9]'
+              }`}
+            >
+              <Play className="w-3.5 h-3.5 fill-current" />
+              <span>Assistir & Capítulos</span>
+            </button>
+            <button
+              onClick={() => {
+                setStudioTab('trim');
+                setIsTrimming(true);
+                if (trimEnd === 0 && duration > 0) setTrimEnd(duration);
+                document.getElementById('trim-studio-section')?.scrollIntoView({ behavior: 'smooth' });
+              }}
+              className={`flex items-center space-x-2 px-3 py-1.5 rounded-lg text-xs font-semibold transition-all ${
+                studioTab === 'trim'
+                  ? 'bg-[#78A5FF] text-[#101A32] shadow-sm'
+                  : 'text-[#929CAF] hover:text-[#F3F5F9]'
+              }`}
+            >
+              <Scissors className="w-3.5 h-3.5" />
+              <span>Estúdio de Corte</span>
+            </button>
+          </div>
+          <div className="text-xs text-[#929CAF] font-mono hidden sm:block">
+            Duração Total: <span className="text-[#F3F5F9] font-bold">{formatTime(duration)}</span>
+          </div>
+        </div>
+
         {/* Video Player Container */}
         <div className="relative w-full aspect-video bg-black rounded-2xl overflow-hidden border border-[#303A4B] shadow-2xl flex items-center justify-center group shrink-0">
           {meta?.filePath ? (
@@ -1021,7 +1099,12 @@ export const PreviewView: React.FC = () => {
         </div>
 
         {/* Trimming & Video Editing Studio Controls */}
-        <div className="w-full mt-4 bg-[#121722] border border-[#303A4B] rounded-xl p-4 flex flex-col gap-3 shrink-0 shadow-lg">
+        <div
+          id="trim-studio-section"
+          className={`w-full mt-4 bg-[#121722] border ${
+            studioTab === 'trim' ? 'border-[#78A5FF] ring-2 ring-[#78A5FF]/30' : 'border-[#303A4B]'
+          } rounded-xl p-4 flex flex-col gap-3 shrink-0 shadow-lg transition-all`}
+        >
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
             <div className="flex items-center space-x-2.5">
               <div className="w-8 h-8 rounded-lg bg-[#191F2B] border border-[#303A4B] flex items-center justify-center shrink-0">

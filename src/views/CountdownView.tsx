@@ -88,7 +88,7 @@ export const CountdownView: React.FC = () => {
             cy="100"
             r={radius}
             fill="transparent"
-            stroke={count === 0 ? '#f43f5e' : '#6366f1'}
+            stroke={count === 0 ? '#FF647C' : '#78A5FF'}
             strokeWidth="6"
             strokeDasharray={circumference}
             strokeDashoffset={strokeDashoffset}
@@ -98,20 +98,20 @@ export const CountdownView: React.FC = () => {
         </svg>
 
         {/* Center Circular Card */}
-        <div className="w-40 h-40 rounded-full bg-[#0e111a] border border-[#232838] shadow-2xl flex flex-col items-center justify-center absolute">
+        <div className="w-40 h-40 rounded-full bg-[#121722] border border-[#222B39] shadow-2xl flex flex-col items-center justify-center absolute">
           {count > 0 ? (
             <span className="text-6xl font-black font-mono text-white tracking-tight drop-shadow-lg animate-in zoom-in-75 duration-200">
               {count}
             </span>
           ) : (
             <div className="flex flex-col items-center space-y-1 animate-pulse">
-              <span className="text-xs font-black font-mono text-rose-400 tracking-widest uppercase bg-rose-500/10 border border-rose-500/30 px-3 py-1 rounded-full">
+              <span className="text-xs font-black font-mono text-[#FF647C] tracking-widest uppercase bg-[#FF647C]/10 border border-[#FF647C]/30 px-3 py-1 rounded-full">
                 GRAVANDO
               </span>
             </div>
           )}
           <div className="flex items-center space-x-1.5 mt-2">
-            <span className={`w-2 h-2 rounded-full inline-block ${count === 0 ? 'bg-rose-500 animate-ping' : 'bg-indigo-400'}`} />
+            <span className={`w-2 h-2 rounded-full inline-block ${count === 0 ? 'bg-[#FF647C] animate-ping' : 'bg-[#78A5FF]'}`} />
             <span className="text-[10px] font-medium tracking-widest uppercase text-slate-400">
               Aura Studio
             </span>
@@ -121,8 +121,8 @@ export const CountdownView: React.FC = () => {
 
       {/* ESC Cancel Hint Pill */}
       {count > 0 && (
-        <div className="mt-5 px-3 py-1 rounded-full bg-[#10131d]/90 border border-[#232838] text-[10px] font-mono text-slate-400 flex items-center space-x-1.5 shadow-lg backdrop-blur-md animate-in fade-in duration-300">
-          <span className="text-indigo-400 font-bold">[ESC]</span>
+        <div className="mt-5 px-3 py-1 rounded-full bg-[#121722]/90 border border-[#222B39] text-[10px] font-mono text-slate-400 flex items-center space-x-1.5 shadow-lg backdrop-blur-md animate-in fade-in duration-300">
+          <span className="text-[#78A5FF] font-bold">[ESC]</span>
           <span>Cancelar</span>
         </div>
       )}

@@ -10,6 +10,7 @@ import { CropSelectorView } from './views/CropSelectorView';
 import { ScreenshotStudioView } from './views/ScreenshotStudioView';
 import { ZoomShareBarView } from './views/ZoomShareBarView';
 import { ZoomShareBorderView } from './views/ZoomShareBorderView';
+import { LibraryView } from './views/LibraryView';
 import { audioService } from './services/audioService';
 
 export const App: React.FC = () => {
@@ -20,6 +21,7 @@ export const App: React.FC = () => {
 
   const searchParams = new URLSearchParams(window.location.search);
   const view = searchParams.get('view') || 'pre-recording';
+  const initialTab = (searchParams.get('tab') as 'record' | 'library') || 'record';
 
   switch (view) {
     case 'camera-bubble':
@@ -42,8 +44,10 @@ export const App: React.FC = () => {
       return <ZoomShareBarView />;
     case 'zoom-share-border':
       return <ZoomShareBorderView />;
+    case 'library':
+      return <LibraryView isStandalone={true} />;
     case 'pre-recording':
     default:
-      return <PreRecordingView />;
+      return <PreRecordingView initialTab={initialTab} />;
   }
 };

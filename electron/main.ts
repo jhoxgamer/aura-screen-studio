@@ -73,24 +73,29 @@ function getPreloadPath(): string {
   return path.join(__dirname, 'preload.js');
 }
 
-function loadView(window: BrowserWindow, view: string) {
+function loadView(window: BrowserWindow, view: string, extraQuery?: Record<string, string>) {
+  const queryObj = { view, ...(extraQuery || {}) };
+  const queryString = new URLSearchParams(queryObj).toString();
   const distHtml = path.join(__dirname, '../dist/index.html');
   if (process.env.VITE_DEV_SERVER_URL) {
-    window.loadURL(`${process.env.VITE_DEV_SERVER_URL}/?view=${view}`);
+    window.loadURL(`${process.env.VITE_DEV_SERVER_URL}/?${queryString}`);
   } else if (fs.existsSync(distHtml)) {
     window.loadFile(distHtml, {
-      query: { view }
+      query: queryObj
     });
   } else {
-    window.loadURL(`${VITE_DEV_SERVER_URL}/?view=${view}`);
+    window.loadURL(`${VITE_DEV_SERVER_URL}/?${queryString}`);
   }
 }
 
 // 1. Create Pre-Recording Launcher Window
-function createPreRecordingWindow() {
+function createPreRecordingWindow(initialTab?: string) {
   if (preRecordingWindow && !preRecordingWindow.isDestroyed()) {
     preRecordingWindow.show();
     preRecordingWindow.focus();
+    if (initialTab) {
+      preRecordingWindow.webContents.send('window:switch-tab', initialTab);
+    }
     return;
   }
 
@@ -99,9 +104,9 @@ function createPreRecordingWindow() {
 
   preRecordingWindow = new BrowserWindow({
     width: 460,
-    height: 730,
+    height: Math.min(730, Math.max(580, height - 30)),
     x: Math.round(width - 490),
-    y: Math.max(20, Math.round(height - 760)),
+    y: Math.max(10, Math.round(height - 760)),
     frame: false,
     transparent: true,
     resizable: false,
@@ -115,7 +120,13 @@ function createPreRecordingWindow() {
     }
   });
 
-  loadView(preRecordingWindow, 'pre-recording');
+  loadView(preRecordingWindow, 'pre-recording', initialTab ? { tab: initialTab } : undefined);
+
+  preRecordingWindow.webContents.once('did-finish-load', () => {
+    if (initialTab) {
+      preRecordingWindow?.webContents.send('window:switch-tab', initialTab);
+    }
+  });
 
   preRecordingWindow.on('closed', () => {
     preRecordingWindow = null;
@@ -1197,12 +1208,15 @@ async function trimVideoWithFfmpeg(inputPath: string, outputPath: string, startS
     }
   });
 
-  ipcMain.on('window:open-pre-recording', () => {
+  ipcMain.on('window:open-pre-recording', (_, tab?: string) => {
     if (preRecordingWindow && !preRecordingWindow.isDestroyed()) {
       preRecordingWindow.show();
       preRecordingWindow.focus();
+      if (tab) {
+        preRecordingWindow.webContents.send('window:switch-tab', tab);
+      }
     } else {
-      createPreRecordingWindow();
+      createPreRecordingWindow(tab);
     }
   });
 
@@ -1326,7 +1340,7 @@ function createSystemTray() {
         {
           label: '📁 Biblioteca de Vídeos Aura',
           click: () => {
-            createPreRecordingWindow();
+            createPreRecordingWindow('library');
           }
         },
         {

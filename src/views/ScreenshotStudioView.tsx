@@ -32,11 +32,11 @@ interface Annotation {
 }
 
 const COLORS = [
-  { id: 'mint', hex: '#78A5FF', name: 'Signal Mint' },
-  { id: 'coral', hex: '#FF647C', name: 'Coral Gravador' },
+  { id: 'blue', hex: '#78A5FF', name: 'Azul Nocturne' },
+  { id: 'coral', hex: '#FF647C', name: 'Coral Gravação' },
   { id: 'amber', hex: '#F2B66D', name: 'Âmbar Alerta' },
-  { id: 'green', hex: '#83B8FF', name: 'Verde Sucesso' },
-  { id: 'ice', hex: '#9AB9FF', name: 'Signal Mint Claro' }
+  { id: 'light-blue', hex: '#83B8FF', name: 'Azul Sucesso' },
+  { id: 'ice', hex: '#9AB9FF', name: 'Azul Gelo' }
 ];
 
 export const ScreenshotStudioView: React.FC = () => {

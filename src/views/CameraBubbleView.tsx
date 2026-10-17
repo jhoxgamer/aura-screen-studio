@@ -231,8 +231,8 @@ export const CameraBubbleView: React.FC = () => {
   // Dynamic audio-reactive ring glow scale
   const ringScale = 1 + (audioLevel > 0.05 ? audioLevel * 0.08 : 0);
   const ringGlow = audioLevel > 0.08
-    ? `0 0 ${10 + audioLevel * 18}px rgba(99, 102, 241, ${0.4 + audioLevel * 0.4})`
-    : '0 0 12px rgba(99, 102, 241, 0.2)';
+    ? `0 0 ${10 + audioLevel * 18}px rgba(120, 165, 255, ${0.4 + audioLevel * 0.4})`
+    : '0 0 12px rgba(120, 165, 255, 0.2)';
 
   return (
     <div
@@ -253,7 +253,7 @@ export const CameraBubbleView: React.FC = () => {
           style={{
             transform: `scale(${ringScale})`,
             boxShadow: ringGlow,
-            border: `2px solid rgba(58, 214, 198, ${0.35 + audioLevel * 0.5})`
+            border: `2px solid rgba(120, 165, 255, ${0.35 + audioLevel * 0.5})`
           }}
         />
 

@@ -88,8 +88,16 @@ export const electronAPI = {
   openPreview: (idOrMeta: string | RecordingMeta) => {
     ipcRenderer.send('recordings:open-preview', idOrMeta);
   },
-  openPreRecording: () => {
-    ipcRenderer.send('window:open-pre-recording');
+  openPreRecording: (tab?: 'record' | 'library') => {
+    ipcRenderer.send('window:open-pre-recording', tab);
+  },
+  openLibrary: () => {
+    ipcRenderer.send('window:open-pre-recording', 'library');
+  },
+  onSwitchTab: (callback: (tab: 'record' | 'library') => void) => {
+    const handler = (_: any, tab: 'record' | 'library') => callback(tab);
+    ipcRenderer.on('window:switch-tab', handler);
+    return () => ipcRenderer.removeListener('window:switch-tab', handler);
   },
   openExternalUrl: (url: string) => {
     ipcRenderer.send('window:open-external', url);

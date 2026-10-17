@@ -19,7 +19,12 @@ import {
 import { RecordingMeta } from '../types';
 import { formatRelativeDate, sortRecordings, LibrarySortCriteria } from '../utils/formatters';
 
-export const LibraryView: React.FC = () => {
+export interface LibraryViewProps {
+  onNavigateToRecord?: () => void;
+  isStandalone?: boolean;
+}
+
+export const LibraryView: React.FC<LibraryViewProps> = ({ onNavigateToRecord, isStandalone = false }) => {
   const [recordings, setRecordings] = useState<RecordingMeta[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
@@ -109,7 +114,23 @@ export const LibraryView: React.FC = () => {
   }
 
   return (
-    <div className="flex-1 flex flex-col p-4 overflow-hidden space-y-3 font-sans">
+    <div className={`flex-1 flex flex-col ${isStandalone ? 'w-full h-full min-h-screen bg-[#0B0E14]' : ''} p-4 overflow-hidden space-y-3 font-sans`}>
+      {isStandalone && (
+        <div className="h-10 bg-[#121722] -mx-4 -mt-4 px-4 flex items-center justify-between border-b border-[#303A4B] mb-2" style={{ WebkitAppRegion: 'drag' } as any}>
+          <div className="flex items-center space-x-2">
+            <Film className="w-4 h-4 text-[#78A5FF]" />
+            <h1 className="text-xs font-bold text-[#F3F5F9]">Aura Screen Studio — Biblioteca de Vídeos</h1>
+          </div>
+          <button
+            onClick={() => window.electronAPI?.closeCurrentWindow?.()}
+            className="p-1 hover:bg-[#B83A48]/20 hover:text-[#FF647C] rounded text-[#929CAF] transition-colors"
+            style={{ WebkitAppRegion: 'no-drag' } as any}
+          >
+            <X className="w-3.5 h-3.5" />
+          </button>
+        </div>
+      )}
+
       {/* Search & Stats Bar */}
       <div className="space-y-2 shrink-0">
         <div className="relative">
@@ -184,15 +205,29 @@ export const LibraryView: React.FC = () => {
             <p className="text-xs font-semibold text-[#F3F5F9]">
               {searchQuery ? 'Nenhum vídeo com esse nome' : 'Nenhuma gravação encontrada'}
             </p>
-            <p className="text-[11px] max-w-[240px] text-[#929CAF]">
-              {searchQuery ? 'Tente buscar com outras palavras-chave.' : 'Inicie sua primeira gravação na aba "Nova Gravação".'}
+            <p className="text-[11px] max-w-[260px] text-[#929CAF]">
+              {searchQuery ? 'Tente buscar com outras palavras-chave ou limpe o filtro.' : 'Suas gravações salvas aparecerão aqui com acesso direto ao player e ao estúdio de corte.'}
             </p>
-            {searchQuery && (
+            {searchQuery ? (
               <button
                 onClick={() => setSearchQuery('')}
                 className="mt-2 px-3 py-1 bg-[#1A2A47] hover:bg-[#1A2A47]/80 border border-[#78A5FF]/30 text-[#78A5FF] text-xs rounded-lg transition-colors font-medium"
               >
                 Limpar Busca
+              </button>
+            ) : (
+              <button
+                onClick={() => {
+                  if (onNavigateToRecord) {
+                    onNavigateToRecord();
+                  } else if (window.electronAPI?.openPreRecording) {
+                    window.electronAPI.openPreRecording('record');
+                  }
+                }}
+                className="mt-2 px-3.5 py-1.5 bg-[#78A5FF] hover:bg-[#9AB9FF] text-[#101A32] text-xs rounded-xl font-bold transition-all shadow-md flex items-center space-x-1.5"
+              >
+                <Play className="w-3.5 h-3.5 fill-current" />
+                <span>Nova Gravação</span>
               </button>
             )}
           </div>
