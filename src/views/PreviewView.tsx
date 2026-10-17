@@ -628,7 +628,7 @@ export const PreviewView: React.FC = () => {
         <div className="w-full mt-4 bg-loom-panel border border-loom-border rounded-2xl p-4 shadow-xl flex flex-col space-y-3">
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-2">
-              <Activity className="w-4 h-4 text-cyan-400" />
+              <Activity className="w-4 h-4 text-indigo-400" />
               <span className="text-xs font-bold text-white tracking-wide uppercase">
                 Linha do Tempo com Waveform Real
               </span>
@@ -639,7 +639,7 @@ export const PreviewView: React.FC = () => {
               )}
             </div>
             <div className="flex items-center space-x-3 text-xs font-mono">
-              <span className="text-cyan-400 font-bold">{formatTime(currentTime)}</span>
+              <span className="text-indigo-400 font-bold">{formatTime(currentTime)}</span>
               <span className="text-slate-500">/</span>
               <span className="text-slate-400">{formatTime(duration)}</span>
             </div>
@@ -669,7 +669,7 @@ export const PreviewView: React.FC = () => {
                 let barColor = 'bg-slate-700/50';
                 if (isInsideTrim) {
                   barColor = isPlayed
-                    ? 'bg-gradient-to-t from-cyan-500 to-indigo-400 shadow-sm shadow-cyan-500/50'
+                    ? 'bg-indigo-500 shadow-sm shadow-indigo-500/30'
                     : 'bg-slate-500 hover:bg-slate-400';
                 } else {
                   barColor = 'bg-slate-800/30';
@@ -687,10 +687,10 @@ export const PreviewView: React.FC = () => {
 
             {/* Playhead Vertical Line */}
             <div
-              className="absolute top-0 bottom-0 w-0.5 bg-cyan-400 shadow-[0_0_8px_rgba(6,182,212,0.9)] pointer-events-none transition-all duration-75"
+              className="absolute top-0 bottom-0 w-0.5 bg-indigo-400 shadow-[0_0_6px_rgba(99,102,241,0.6)] pointer-events-none transition-all duration-75"
               style={{ left: `${duration > 0 ? (currentTime / duration) * 100 : 0}%` }}
             >
-              <div className="w-2.5 h-2.5 -ml-1 rounded-full bg-cyan-400 shadow-md" />
+              <div className="w-2.5 h-2.5 -ml-1 rounded-full bg-indigo-400 shadow-sm" />
             </div>
 
             {/* Chapter Markers Ticks on Waveform */}
@@ -736,11 +736,11 @@ export const PreviewView: React.FC = () => {
         {/* Trimming & Video Editing Section */}
         <div className="w-full mt-4 bg-loom-panel border border-loom-border rounded-xl p-4 flex flex-col md:flex-row md:items-center justify-between gap-3 shrink-0">
           <div className="flex items-center space-x-2">
-            <Scissors className="w-4 h-4 text-cyan-400 shrink-0" />
+            <Scissors className="w-4 h-4 text-indigo-400 shrink-0" />
             <div>
               <div className="flex items-center space-x-2">
                 <span className="text-xs font-bold text-white block">Ajustar e Cortar Vídeo (Trimming)</span>
-                <span className="text-[10px] bg-cyan-500/10 text-cyan-400 border border-cyan-500/20 px-1.5 py-0.2 rounded font-mono font-semibold">
+                <span className="text-[10px] bg-indigo-500/10 text-indigo-300 border border-indigo-500/20 px-1.5 py-0.2 rounded font-mono font-medium">
                   Final: {Math.max(0, trimEnd - trimStart).toFixed(1)}s
                 </span>
               </div>
@@ -762,7 +762,7 @@ export const PreviewView: React.FC = () => {
                   setTrimStart(val);
                   if (videoRef.current) videoRef.current.currentTime = val;
                 }}
-                className="w-16 bg-loom-card border border-loom-border rounded px-2 py-1 text-white font-mono text-xs focus:border-cyan-500 outline-none"
+                className="w-16 bg-loom-card border border-loom-border rounded px-2 py-1 text-white font-mono text-xs focus:border-indigo-500 outline-none"
               />
               <span className="text-loom-muted">s</span>
             </div>
@@ -779,7 +779,7 @@ export const PreviewView: React.FC = () => {
                   const val = Number(e.target.value);
                   setTrimEnd(val);
                 }}
-                className="w-16 bg-loom-card border border-loom-border rounded px-2 py-1 text-white font-mono text-xs focus:border-cyan-500 outline-none"
+                className="w-16 bg-loom-card border border-loom-border rounded px-2 py-1 text-white font-mono text-xs focus:border-indigo-500 outline-none"
               />
               <span className="text-loom-muted">s</span>
             </div>
@@ -798,7 +798,7 @@ export const PreviewView: React.FC = () => {
             <button
               onClick={handleSaveTrim}
               disabled={isTrimmingSaving || (trimStart === 0 && trimEnd === duration)}
-              className="px-3.5 py-1.5 rounded-xl text-xs font-bold bg-gradient-to-r from-rose-500 to-rose-600 hover:brightness-110 disabled:opacity-40 disabled:cursor-not-allowed text-white shadow-md shadow-rose-600/30 transition-all"
+              className="px-3.5 py-1.5 rounded-xl text-xs font-semibold bg-rose-600 hover:bg-rose-500 disabled:opacity-40 disabled:cursor-not-allowed text-white shadow-sm transition-colors"
             >
               {isTrimmingSaving ? 'Cortando...' : 'Salvar Corte'}
             </button>
@@ -820,7 +820,7 @@ export const PreviewView: React.FC = () => {
 
           {/* Interactive Chapters Card */}
           <div className="bg-loom-panel border border-loom-border rounded-xl p-4 space-y-3 flex flex-col max-h-56">
-            <div className="flex items-center justify-between text-cyan-400 text-xs font-bold uppercase tracking-wider">
+            <div className="flex items-center justify-between text-indigo-400 text-xs font-bold uppercase tracking-wider">
               <div className="flex items-center space-x-1.5">
                 <Bookmark className="w-4 h-4" />
                 <span>Capítulos ({chapters.length})</span>
@@ -828,7 +828,7 @@ export const PreviewView: React.FC = () => {
               <button
                 onClick={handleSaveChapters}
                 disabled={isSavingChapters}
-                className="text-[10px] bg-cyan-500/20 hover:bg-cyan-500/30 text-cyan-300 border border-cyan-500/40 px-2 py-0.5 rounded-lg font-semibold transition-colors"
+                className="text-[10px] bg-indigo-600 hover:bg-indigo-500 text-white px-2 py-0.5 rounded-lg font-medium transition-colors shadow-sm"
               >
                 {isSavingChapters ? 'Salvando...' : 'Salvar'}
               </button>
@@ -844,7 +844,7 @@ export const PreviewView: React.FC = () => {
                 onKeyDown={(e) => {
                   if (e.key === 'Enter') handleAddChapterAtCurrentTime();
                 }}
-                className="flex-1 bg-loom-card border border-loom-border rounded-lg px-2 py-1 text-xs text-white placeholder-slate-500 outline-none focus:border-cyan-500"
+                className="flex-1 bg-loom-card border border-loom-border rounded-lg px-2 py-1 text-xs text-white placeholder-slate-500 outline-none focus:border-indigo-500"
               />
               <button
                 onClick={handleAddChapterAtCurrentTime}
@@ -873,7 +873,7 @@ export const PreviewView: React.FC = () => {
                           setIsPlaying(true);
                         }
                       }}
-                      className="font-mono text-cyan-400 hover:text-white bg-cyan-500/10 hover:bg-cyan-500/30 px-1.5 py-0.5 rounded text-[11px] font-bold shrink-0 transition-colors"
+                      className="font-mono text-indigo-400 hover:text-white bg-indigo-500/10 hover:bg-indigo-500/25 px-1.5 py-0.5 rounded text-[11px] font-bold shrink-0 transition-colors"
                       title="Pular para este segundo"
                     >
                       {formatTime(chap.time)}
@@ -882,7 +882,7 @@ export const PreviewView: React.FC = () => {
                       type="text"
                       value={chap.title}
                       onChange={(e) => handleUpdateChapterTitle(chap.id, e.target.value)}
-                      className="flex-1 bg-transparent text-xs text-gray-200 focus:text-white outline-none border-b border-transparent focus:border-cyan-500/50"
+                      className="flex-1 bg-transparent text-xs text-gray-200 focus:text-white outline-none border-b border-transparent focus:border-indigo-500/50"
                     />
                     <button
                       onClick={() => handleRemoveChapter(chap.id)}

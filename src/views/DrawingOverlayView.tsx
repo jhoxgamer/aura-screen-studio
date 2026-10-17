@@ -43,7 +43,7 @@ interface ClickRipple {
 export const DrawingOverlayView: React.FC = () => {
   const [active, setActive] = useState(false);
   const [tool, setTool] = useState<DrawingTool>('pen');
-  const [color, setColor] = useState('#06b6d4'); // Aura Cyan
+  const [color, setColor] = useState('#f43f5e'); // Studio Coral/Rose
   const [strokeWidth, setStrokeWidth] = useState(4);
   const [vanishingInk, setVanishingInk] = useState(true);
   const [mouseSpotlight, setMouseSpotlight] = useState(false);
@@ -59,11 +59,11 @@ export const DrawingOverlayView: React.FC = () => {
   const nextStampRef = useRef(1);
 
   const colors = [
-    { name: 'Ciano Elétrico', hex: '#06b6d4' },
-    { name: 'Violeta Cósmico', hex: '#8b5cf6' },
-    { name: 'Rosa Neon', hex: '#f43f5e' },
-    { name: 'Esmeralda', hex: '#10b981' },
+    { name: 'Coral Rose', hex: '#f43f5e' },
     { name: 'Âmbar Dourado', hex: '#f59e0b' },
+    { name: 'Índigo Studio', hex: '#6366f1' },
+    { name: 'Esmeralda', hex: '#10b981' },
+    { name: 'Céu Claro', hex: '#38bdf8' },
     { name: 'Branco Puro', hex: '#ffffff' }
   ];
 
@@ -250,9 +250,9 @@ export const DrawingOverlayView: React.FC = () => {
         mousePosRef.current.y,
         70
       );
-      spotGrad.addColorStop(0, 'rgba(6, 182, 212, 0.4)');
-      spotGrad.addColorStop(0.5, 'rgba(6, 182, 212, 0.15)');
-      spotGrad.addColorStop(1, 'rgba(6, 182, 212, 0)');
+      spotGrad.addColorStop(0, 'rgba(99, 102, 241, 0.35)');
+      spotGrad.addColorStop(0.5, 'rgba(99, 102, 241, 0.12)');
+      spotGrad.addColorStop(1, 'rgba(99, 102, 241, 0)');
 
       ctx.fillStyle = spotGrad;
       ctx.beginPath();
@@ -348,10 +348,10 @@ export const DrawingOverlayView: React.FC = () => {
       ctx.save();
       ctx.beginPath();
       ctx.arc(r.x, r.y, r.radius, 0, Math.PI * 2);
-      ctx.strokeStyle = `rgba(6, 182, 212, ${r.alpha})`;
-      ctx.lineWidth = 3;
-      ctx.shadowColor = '#06b6d4';
-      ctx.shadowBlur = 10;
+      ctx.strokeStyle = `rgba(99, 102, 241, ${r.alpha})`;
+      ctx.lineWidth = 2.5;
+      ctx.shadowColor = '#6366f1';
+      ctx.shadowBlur = 8;
       ctx.stroke();
       ctx.restore();
       r.radius += 2.2;
@@ -460,16 +460,16 @@ export const DrawingOverlayView: React.FC = () => {
 
       {/* Floating Toolbar Dock at Top Center */}
       <div
-        className="absolute top-4 left-1/2 -translate-x-1/2 flex items-center space-x-2 bg-[#0b0e17]/95 backdrop-blur-2xl border border-cyan-500/40 px-3.5 py-2 rounded-2xl shadow-2xl text-white z-50 cursor-default"
+        className="absolute top-4 left-1/2 -translate-x-1/2 flex items-center space-x-2 bg-[#121520]/95 backdrop-blur-2xl border border-[#232838] px-3.5 py-2 rounded-2xl shadow-2xl text-white z-50 cursor-default"
         style={{ WebkitAppRegion: 'no-drag' } as any}
       >
         {/* Tool Selector Buttons */}
-        <div className="flex items-center space-x-1 border-r border-slate-800 pr-2.5">
+        <div className="flex items-center space-x-1 border-r border-[#232838] pr-2.5">
           <button
             onClick={() => setTool('pen')}
             title="Caneta Livre (P)"
             className={`p-2 rounded-xl transition-all ${
-              tool === 'pen' ? 'bg-cyan-500 text-slate-950 font-bold shadow-md shadow-cyan-500/25' : 'text-slate-400 hover:text-white hover:bg-slate-800'
+              tool === 'pen' ? 'bg-indigo-600 text-white font-medium shadow-sm' : 'text-slate-400 hover:text-white hover:bg-[#1a1f2e]'
             }`}
           >
             <Pen className="w-4 h-4" />
@@ -479,7 +479,7 @@ export const DrawingOverlayView: React.FC = () => {
             onClick={() => setTool('arrow')}
             title="Seta Direcional (A)"
             className={`p-2 rounded-xl transition-all ${
-              tool === 'arrow' ? 'bg-cyan-500 text-slate-950 font-bold shadow-md shadow-cyan-500/25' : 'text-slate-400 hover:text-white hover:bg-slate-800'
+              tool === 'arrow' ? 'bg-indigo-600 text-white font-medium shadow-sm' : 'text-slate-400 hover:text-white hover:bg-[#1a1f2e]'
             }`}
           >
             <ArrowUpRight className="w-4 h-4" />
@@ -489,7 +489,7 @@ export const DrawingOverlayView: React.FC = () => {
             onClick={() => setTool('rectangle')}
             title="Caixa de Destaque / Retângulo (R)"
             className={`p-2 rounded-xl transition-all ${
-              tool === 'rectangle' ? 'bg-cyan-500 text-slate-950 font-bold shadow-md shadow-cyan-500/25' : 'text-slate-400 hover:text-white hover:bg-slate-800'
+              tool === 'rectangle' ? 'bg-indigo-600 text-white font-medium shadow-sm' : 'text-slate-400 hover:text-white hover:bg-[#1a1f2e]'
             }`}
           >
             <Square className="w-4 h-4" />
@@ -498,8 +498,8 @@ export const DrawingOverlayView: React.FC = () => {
           <button
             onClick={() => setTool('stamp')}
             title={`Selo Numerado de Passos (S) • Próximo: ${nextStampNumber}`}
-            className={`p-2 rounded-xl transition-all flex items-center gap-1 font-mono font-bold text-xs ${
-              tool === 'stamp' ? 'bg-cyan-500 text-slate-950 shadow-md shadow-cyan-500/25' : 'text-slate-400 hover:text-white hover:bg-slate-800'
+            className={`p-2 rounded-xl transition-all flex items-center gap-1 font-mono font-medium text-xs ${
+              tool === 'stamp' ? 'bg-indigo-600 text-white shadow-sm' : 'text-slate-400 hover:text-white hover:bg-[#1a1f2e]'
             }`}
           >
             <Hash className="w-4 h-4" />
@@ -510,7 +510,7 @@ export const DrawingOverlayView: React.FC = () => {
             onClick={() => setTool('highlighter')}
             title="Marca-texto Translúcido (H)"
             className={`p-2 rounded-xl transition-all ${
-              tool === 'highlighter' ? 'bg-cyan-500 text-slate-950 font-bold shadow-md shadow-cyan-500/25' : 'text-slate-400 hover:text-white hover:bg-slate-800'
+              tool === 'highlighter' ? 'bg-indigo-600 text-white font-medium shadow-sm' : 'text-slate-400 hover:text-white hover:bg-[#1a1f2e]'
             }`}
           >
             <Highlighter className="w-4 h-4" />
@@ -520,7 +520,7 @@ export const DrawingOverlayView: React.FC = () => {
             onClick={() => setTool('eraser')}
             title="Borracha (E)"
             className={`p-2 rounded-xl transition-all ${
-              tool === 'eraser' ? 'bg-rose-500 text-white shadow-md shadow-rose-500/25 font-bold' : 'text-slate-400 hover:text-white hover:bg-slate-800'
+              tool === 'eraser' ? 'bg-rose-600 text-white shadow-sm font-medium' : 'text-slate-400 hover:text-white hover:bg-[#1a1f2e]'
             }`}
           >
             <Eraser className="w-4 h-4" />
@@ -529,7 +529,7 @@ export const DrawingOverlayView: React.FC = () => {
 
         {/* Color Palette */}
         {tool !== 'eraser' && (
-          <div className="flex items-center space-x-1.5 border-r border-slate-800 pr-2.5">
+          <div className="flex items-center space-x-1.5 border-r border-[#232838] pr-2.5">
             {colors.map((c) => (
               <button
                 key={c.hex}
@@ -545,14 +545,14 @@ export const DrawingOverlayView: React.FC = () => {
         )}
 
         {/* Stroke Width Selector */}
-        <div className="flex items-center space-x-1 border-r border-slate-800 pr-2.5">
+        <div className="flex items-center space-x-1 border-r border-[#232838] pr-2.5">
           {[2, 4, 8].map((w) => (
             <button
               key={w}
               onClick={() => setStrokeWidth(w)}
               title={`Espessura: ${w}px`}
               className={`w-7 h-7 rounded-lg flex items-center justify-center transition-all ${
-                strokeWidth === w ? 'bg-slate-800 text-white font-bold' : 'text-slate-500 hover:text-white'
+                strokeWidth === w ? 'bg-indigo-600 text-white font-medium' : 'text-slate-500 hover:text-white hover:bg-[#1a1f2e]'
               }`}
             >
               <div
@@ -564,14 +564,14 @@ export const DrawingOverlayView: React.FC = () => {
         </div>
 
         {/* Visual FX Toggles: Spotlight Halo & Dimmer */}
-        <div className="flex items-center space-x-1 border-r border-slate-800 pr-2.5">
+        <div className="flex items-center space-x-1 border-r border-[#232838] pr-2.5">
           <button
             onClick={() => setMouseSpotlight(!mouseSpotlight)}
             title="Holofote de Mouse (Halo luminoso que segue o ponteiro)"
             className={`p-2 rounded-xl transition-all ${
               mouseSpotlight
-                ? 'bg-cyan-500/20 text-cyan-300 border border-cyan-500/40 shadow-sm'
-                : 'text-slate-400 hover:text-white hover:bg-slate-800'
+                ? 'bg-indigo-500/20 text-indigo-300 border border-indigo-500/40 shadow-sm'
+                : 'text-slate-400 hover:text-white hover:bg-[#1a1f2e]'
             }`}
           >
             <MousePointer className="w-4 h-4" />
@@ -582,8 +582,8 @@ export const DrawingOverlayView: React.FC = () => {
             title="Foco de Luz Cinematográfico (Escurece o fundo ao redor)"
             className={`p-2 rounded-xl transition-all ${
               backgroundDimmer
-                ? 'bg-indigo-600/30 text-indigo-300 border border-indigo-500/40 shadow-sm'
-                : 'text-slate-400 hover:text-white hover:bg-slate-800'
+                ? 'bg-indigo-500/20 text-indigo-300 border border-indigo-500/40 shadow-sm'
+                : 'text-slate-400 hover:text-white hover:bg-[#1a1f2e]'
             }`}
           >
             <Focus className="w-4 h-4" />
@@ -594,22 +594,22 @@ export const DrawingOverlayView: React.FC = () => {
         <button
           onClick={() => setVanishingInk(!vanishingInk)}
           title="Tinta inteligente que desaparece em 3 segundos (Aura Evanescent Ink)"
-          className={`flex items-center space-x-1.5 px-2.5 py-1.5 rounded-xl text-xs font-semibold transition-all ${
+          className={`flex items-center space-x-1.5 px-2.5 py-1.5 rounded-xl text-xs font-medium transition-all ${
             vanishingInk
-              ? 'bg-cyan-500/20 text-cyan-300 border border-cyan-500/40 shadow-sm'
-              : 'text-slate-400 hover:text-white bg-slate-800/40'
+              ? 'bg-indigo-500/15 text-indigo-300 border border-indigo-500/30 shadow-sm'
+              : 'text-slate-400 hover:text-white bg-[#1a1f2e]/60'
           }`}
         >
-          <Clock className="w-3.5 h-3.5 text-cyan-400" />
+          <Clock className="w-3.5 h-3.5 text-indigo-400" />
           <span>3s Auto-apagar</span>
-          {vanishingInk && <Check className="w-3 h-3 text-cyan-300 ml-0.5" />}
+          {vanishingInk && <Check className="w-3 h-3 text-indigo-300 ml-0.5" />}
         </button>
 
         {/* Clear Canvas */}
         <button
           onClick={handleClear}
           title="Limpar todos os desenhos"
-          className="p-2 rounded-xl text-slate-400 hover:text-white hover:bg-slate-800 transition-colors"
+          className="p-2 rounded-xl text-slate-400 hover:text-white hover:bg-[#1a1f2e] transition-colors"
         >
           <Trash2 className="w-4 h-4" />
         </button>
@@ -617,7 +617,7 @@ export const DrawingOverlayView: React.FC = () => {
         {/* Done / Close Drawing Mode */}
         <button
           onClick={handleClose}
-          className="flex items-center space-x-1 bg-gradient-to-r from-cyan-500 to-indigo-600 hover:brightness-110 text-slate-950 font-bold px-3 py-1.5 rounded-xl text-xs transition-all shadow-md active:scale-95"
+          className="flex items-center space-x-1.5 bg-indigo-600 hover:bg-indigo-500 text-white font-medium px-3.5 py-1.5 rounded-xl text-xs transition-colors shadow-sm active:scale-95"
         >
           <span>Concluir</span>
           <X className="w-3.5 h-3.5" />

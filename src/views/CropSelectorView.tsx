@@ -139,29 +139,29 @@ export const CropSelectorView: React.FC = () => {
     >
       {/* Dynamic Crosshair Guidelines */}
       <div
-        className="fixed top-0 bottom-0 pointer-events-none border-l border-cyan-500/25 z-10"
+        className="fixed top-0 bottom-0 pointer-events-none border-l border-indigo-500/30 z-10"
         style={{ left: `${mousePos.x}px` }}
       />
       <div
-        className="fixed left-0 right-0 pointer-events-none border-t border-cyan-500/25 z-10"
+        className="fixed left-0 right-0 pointer-events-none border-t border-indigo-500/30 z-10"
         style={{ top: `${mousePos.y}px` }}
       />
 
       {/* Top Floating Control Toolbar */}
       <div className="absolute top-6 inset-x-0 flex justify-center pointer-events-none z-50">
-        <div className="no-drag-area pointer-events-auto bg-[#0a0d14]/95 backdrop-blur-xl border border-cyan-500/30 px-4 py-2 rounded-2xl shadow-2xl shadow-cyan-950/50 flex items-center space-x-3 text-xs text-white">
-          <div className="flex items-center space-x-2 text-cyan-400 font-bold border-r border-slate-700/80 pr-3">
+        <div className="no-drag-area pointer-events-auto bg-[#0e111a]/95 backdrop-blur-xl border border-[#232838] px-4 py-2 rounded-2xl shadow-2xl flex items-center space-x-3 text-xs text-white font-sans">
+          <div className="flex items-center space-x-2 text-indigo-400 font-medium border-r border-[#262c3e] pr-3">
             <Crop className="w-4 h-4" />
             <span>Recorte de Área</span>
           </div>
 
           {/* Aspect Ratio Presets */}
-          <div className="flex items-center space-x-1 border-r border-slate-700/80 pr-3">
+          <div className="flex items-center space-x-1 border-r border-[#262c3e] pr-3">
             <button
               onClick={() => setAspectRatio('free')}
-              className={`px-2.5 py-1 rounded-lg text-[11px] font-semibold transition-all ${
+              className={`px-2.5 py-1 rounded-lg text-[11px] font-medium transition-all ${
                 aspectRatio === 'free'
-                  ? 'bg-cyan-500 text-slate-950 shadow-sm shadow-cyan-500/40'
+                  ? 'bg-indigo-600 text-white shadow-sm'
                   : 'text-slate-400 hover:text-white hover:bg-slate-800'
               }`}
             >
@@ -175,9 +175,9 @@ export const CropSelectorView: React.FC = () => {
                   setArea({ ...area, height: h });
                 }
               }}
-              className={`flex items-center space-x-1 px-2.5 py-1 rounded-lg text-[11px] font-semibold transition-all ${
+              className={`flex items-center space-x-1 px-2.5 py-1 rounded-lg text-[11px] font-medium transition-all ${
                 aspectRatio === '16:9'
-                  ? 'bg-cyan-500 text-slate-950 shadow-sm shadow-cyan-500/40'
+                  ? 'bg-indigo-600 text-white shadow-sm'
                   : 'text-slate-400 hover:text-white hover:bg-slate-800'
               }`}
             >
@@ -192,9 +192,9 @@ export const CropSelectorView: React.FC = () => {
                   setArea({ ...area, height: h });
                 }
               }}
-              className={`flex items-center space-x-1 px-2.5 py-1 rounded-lg text-[11px] font-semibold transition-all ${
+              className={`flex items-center space-x-1 px-2.5 py-1 rounded-lg text-[11px] font-medium transition-all ${
                 aspectRatio === '9:16'
-                  ? 'bg-cyan-500 text-slate-950 shadow-sm shadow-cyan-500/40'
+                  ? 'bg-indigo-600 text-white shadow-sm'
                   : 'text-slate-400 hover:text-white hover:bg-slate-800'
               }`}
             >
@@ -209,9 +209,9 @@ export const CropSelectorView: React.FC = () => {
                   setArea({ ...area, width: side, height: side });
                 }
               }}
-              className={`flex items-center space-x-1 px-2.5 py-1 rounded-lg text-[11px] font-semibold transition-all ${
+              className={`flex items-center space-x-1 px-2.5 py-1 rounded-lg text-[11px] font-medium transition-all ${
                 aspectRatio === '1:1'
-                  ? 'bg-cyan-500 text-slate-950 shadow-sm shadow-cyan-500/40'
+                  ? 'bg-indigo-600 text-white shadow-sm'
                   : 'text-slate-400 hover:text-white hover:bg-slate-800'
               }`}
             >
@@ -237,7 +237,7 @@ export const CropSelectorView: React.FC = () => {
       {/* Selected Box cutout */}
       {area && area.width > 5 && area.height > 5 && (
         <div
-          className="absolute border-2 border-cyan-400 bg-transparent rounded-lg shadow-[0_0_0_9999px_rgba(4,6,11,0.65)] pointer-events-auto transition-shadow"
+          className="absolute border-2 border-indigo-500 bg-transparent rounded-lg shadow-[0_0_0_9999px_rgba(4,6,11,0.7)] pointer-events-auto transition-shadow"
           style={{
             left: `${area.x}px`,
             top: `${area.y}px`,
@@ -245,28 +245,28 @@ export const CropSelectorView: React.FC = () => {
             height: `${area.height}px`
           }}
         >
-          {/* Neon Corner Handles */}
-          <div className="absolute -top-1.5 -left-1.5 w-3 h-3 rounded-full bg-cyan-400 shadow-md shadow-cyan-400/80" />
-          <div className="absolute -top-1.5 -right-1.5 w-3 h-3 rounded-full bg-cyan-400 shadow-md shadow-cyan-400/80" />
-          <div className="absolute -bottom-1.5 -left-1.5 w-3 h-3 rounded-full bg-cyan-400 shadow-md shadow-cyan-400/80" />
-          <div className="absolute -bottom-1.5 -right-1.5 w-3 h-3 rounded-full bg-cyan-400 shadow-md shadow-cyan-400/80" />
+          {/* Studio Corner Handles */}
+          <div className="absolute -top-1.5 -left-1.5 w-3 h-3 rounded-full bg-indigo-400 border border-white/50 shadow-sm" />
+          <div className="absolute -top-1.5 -right-1.5 w-3 h-3 rounded-full bg-indigo-400 border border-white/50 shadow-sm" />
+          <div className="absolute -bottom-1.5 -left-1.5 w-3 h-3 rounded-full bg-indigo-400 border border-white/50 shadow-sm" />
+          <div className="absolute -bottom-1.5 -right-1.5 w-3 h-3 rounded-full bg-indigo-400 border border-white/50 shadow-sm" />
 
           {/* Center Move Handle */}
           <div
             onMouseDown={startMovingBox}
-            className="absolute inset-0 flex items-center justify-center cursor-move group opacity-0 hover:opacity-100 transition-opacity bg-cyan-500/10"
+            className="absolute inset-0 flex items-center justify-center cursor-move group opacity-0 hover:opacity-100 transition-opacity bg-indigo-500/10"
           >
-            <div className="bg-[#0b0e17]/90 px-3 py-1.5 rounded-xl border border-cyan-500/40 shadow-lg text-xs font-semibold text-cyan-300 flex items-center space-x-1.5">
+            <div className="bg-[#0e111a]/95 px-3 py-1.5 rounded-xl border border-[#232838] shadow-lg text-xs font-medium text-indigo-300 flex items-center space-x-1.5">
               <Move className="w-3.5 h-3.5" />
               <span>Arraste para Mover</span>
             </div>
           </div>
 
           {/* Dimension Tag */}
-          <div className="absolute -top-8 left-0 flex items-center space-x-1.5 bg-cyan-500 text-slate-950 text-[11px] font-mono font-bold px-2.5 py-0.5 rounded-lg shadow-lg shadow-cyan-500/30">
+          <div className="absolute -top-8 left-0 flex items-center space-x-1.5 bg-[#121520] border border-[#262c3e] text-indigo-300 text-[11px] font-mono font-medium px-2.5 py-0.5 rounded-lg shadow-lg">
             <span>{Math.round(area.width)} × {Math.round(area.height)} px</span>
             {aspectRatio !== 'free' && (
-              <span className="bg-slate-950/30 text-slate-900 px-1 rounded text-[10px] font-sans font-extrabold uppercase">
+              <span className="bg-[#1a1f2e] text-slate-300 px-1 rounded text-[10px] font-sans uppercase">
                 {aspectRatio}
               </span>
             )}
@@ -275,7 +275,7 @@ export const CropSelectorView: React.FC = () => {
           {/* Action Confirmation Bar below the box */}
           {!selecting && (
             <div
-              className="no-drag-area absolute -bottom-14 right-0 flex items-center space-x-2 bg-[#0a0d14]/95 border border-cyan-500/40 p-2 rounded-2xl shadow-2xl shadow-cyan-950/70"
+              className="no-drag-area absolute -bottom-14 right-0 flex items-center space-x-2 bg-[#0e111a]/95 border border-[#232838] p-2 rounded-2xl shadow-2xl"
               style={{ zIndex: 100 }}
             >
               <button
@@ -283,7 +283,7 @@ export const CropSelectorView: React.FC = () => {
                   e.stopPropagation();
                   handleCancel();
                 }}
-                className="px-3 py-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-xs font-semibold text-slate-300 hover:text-white transition-colors"
+                className="px-3 py-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-xs font-medium text-slate-300 hover:text-white transition-colors"
               >
                 Cancelar
               </button>
@@ -292,7 +292,7 @@ export const CropSelectorView: React.FC = () => {
                   e.stopPropagation();
                   handleConfirm();
                 }}
-                className="flex items-center space-x-1.5 px-4 py-1.5 rounded-xl bg-gradient-to-r from-cyan-500 to-indigo-600 hover:brightness-110 text-xs font-bold text-slate-950 shadow-md shadow-cyan-500/30 transition-all active:scale-95"
+                className="flex items-center space-x-1.5 px-4 py-1.5 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-xs font-semibold text-white shadow-sm transition-all active:scale-95"
               >
                 <Check className="w-4 h-4 stroke-[2.5]" />
                 <span>Gravar Esta Área</span>

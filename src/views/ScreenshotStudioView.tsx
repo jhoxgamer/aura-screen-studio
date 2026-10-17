@@ -369,22 +369,22 @@ export const ScreenshotStudioView: React.FC = () => {
 
       {/* Toast Notification */}
       {toastMessage && (
-        <div className="absolute top-6 left-1/2 -translate-x-1/2 z-50 bg-[#0d111c]/95 border border-cyan-500/40 text-white px-5 py-2.5 rounded-2xl shadow-2xl flex items-center space-x-2 text-xs font-semibold backdrop-blur-md animate-in fade-in slide-in-from-top-2">
-          <Sparkles className="w-4 h-4 text-cyan-400" />
+        <div className="absolute top-6 left-1/2 -translate-x-1/2 z-50 bg-[#0e111a]/95 border border-[#232838] text-white px-5 py-2.5 rounded-2xl shadow-2xl flex items-center space-x-2 text-xs font-medium backdrop-blur-md">
+          <Sparkles className="w-4 h-4 text-indigo-400" />
           <span>{toastMessage}</span>
         </div>
       )}
 
       {/* Floating Modern Annotation Toolbar */}
-      <div className="absolute bottom-6 left-1/2 -translate-x-1/2 z-40 bg-[#0b0e17]/95 border border-slate-700/70 backdrop-blur-xl px-4 py-2.5 rounded-2xl shadow-2xl flex items-center space-x-3">
+      <div className="absolute bottom-6 left-1/2 -translate-x-1/2 z-40 bg-[#0e111a]/95 border border-[#232838] backdrop-blur-xl px-4 py-2 rounded-2xl shadow-2xl flex items-center space-x-3">
         {/* Tools */}
-        <div className="flex items-center space-x-1 border-r border-slate-800 pr-3">
+        <div className="flex items-center space-x-1 border-r border-[#222838] pr-3">
           <button
             onClick={() => setActiveTool('crop')}
             title="Recortar Área (Crop)"
             className={`p-2 rounded-xl transition-all ${
               activeTool === 'crop'
-                ? 'bg-cyan-500 text-slate-950 font-bold shadow-md shadow-cyan-500/30'
+                ? 'bg-indigo-600 text-white font-medium shadow-sm'
                 : 'text-slate-400 hover:text-white hover:bg-slate-800/60'
             }`}
           >
@@ -396,7 +396,7 @@ export const ScreenshotStudioView: React.FC = () => {
             title="Seta Direcional (Arrow)"
             className={`p-2 rounded-xl transition-all ${
               activeTool === 'arrow'
-                ? 'bg-cyan-500 text-slate-950 font-bold shadow-md shadow-cyan-500/30'
+                ? 'bg-indigo-600 text-white font-medium shadow-sm'
                 : 'text-slate-400 hover:text-white hover:bg-slate-800/60'
             }`}
           >
@@ -408,7 +408,7 @@ export const ScreenshotStudioView: React.FC = () => {
             title="Destaque Retângulo (Box)"
             className={`p-2 rounded-xl transition-all ${
               activeTool === 'rect'
-                ? 'bg-cyan-500 text-slate-950 font-bold shadow-md shadow-cyan-500/30'
+                ? 'bg-indigo-600 text-white font-medium shadow-sm'
                 : 'text-slate-400 hover:text-white hover:bg-slate-800/60'
             }`}
           >
@@ -420,7 +420,7 @@ export const ScreenshotStudioView: React.FC = () => {
             title="Etapas Numeradas (1, 2, 3...)"
             className={`p-2 rounded-xl transition-all ${
               activeTool === 'step'
-                ? 'bg-cyan-500 text-slate-950 font-bold shadow-md shadow-cyan-500/30'
+                ? 'bg-indigo-600 text-white font-medium shadow-sm'
                 : 'text-slate-400 hover:text-white hover:bg-slate-800/60'
             }`}
           >
@@ -432,7 +432,7 @@ export const ScreenshotStudioView: React.FC = () => {
             title="Desenho Livre (Pen)"
             className={`p-2 rounded-xl transition-all ${
               activeTool === 'pen'
-                ? 'bg-cyan-500 text-slate-950 font-bold shadow-md shadow-cyan-500/30'
+                ? 'bg-indigo-600 text-white font-medium shadow-sm'
                 : 'text-slate-400 hover:text-white hover:bg-slate-800/60'
             }`}
           >
@@ -444,7 +444,7 @@ export const ScreenshotStudioView: React.FC = () => {
             title="Tarja de Confidencialidade (Redact)"
             className={`p-2 rounded-xl transition-all ${
               activeTool === 'blur'
-                ? 'bg-cyan-500 text-slate-950 font-bold shadow-md shadow-cyan-500/30'
+                ? 'bg-indigo-600 text-white font-medium shadow-sm'
                 : 'text-slate-400 hover:text-white hover:bg-slate-800/60'
             }`}
           >
@@ -456,7 +456,7 @@ export const ScreenshotStudioView: React.FC = () => {
             title="Anotação de Texto"
             className={`p-2 rounded-xl transition-all ${
               activeTool === 'text'
-                ? 'bg-cyan-500 text-slate-950 font-bold shadow-md shadow-cyan-500/30'
+                ? 'bg-indigo-600 text-white font-medium shadow-sm'
                 : 'text-slate-400 hover:text-white hover:bg-slate-800/60'
             }`}
           >
@@ -465,7 +465,7 @@ export const ScreenshotStudioView: React.FC = () => {
         </div>
 
         {/* Colors */}
-        <div className="flex items-center space-x-1.5 border-r border-slate-800 pr-3">
+        <div className="flex items-center space-x-1.5 border-r border-[#222838] pr-3">
           {COLORS.map((c) => (
             <button
               key={c.id}
@@ -491,7 +491,7 @@ export const ScreenshotStudioView: React.FC = () => {
         {/* Copy Image Button */}
         <button
           onClick={handleCopy}
-          className="flex items-center space-x-1.5 bg-gradient-to-r from-cyan-500 to-indigo-600 hover:brightness-110 active:scale-95 text-white px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all shadow-md shadow-indigo-600/30"
+          className="flex items-center space-x-1.5 bg-indigo-600 hover:bg-indigo-500 active:scale-95 text-white px-3.5 py-1.5 rounded-xl text-xs font-semibold transition-all shadow-sm"
           title="Copiar imagem para área de transferência (Ctrl+C)"
         >
           {isCopied ? <Check className="w-3.5 h-3.5" /> : <Copy className="w-3.5 h-3.5" />}
@@ -501,7 +501,7 @@ export const ScreenshotStudioView: React.FC = () => {
         {/* Save PNG Button */}
         <button
           onClick={handleSave}
-          className="p-2 rounded-xl text-slate-300 hover:text-cyan-400 hover:bg-slate-800/60 transition-all"
+          className="p-2 rounded-xl text-slate-300 hover:text-indigo-400 hover:bg-slate-800/60 transition-all"
           title="Salvar arquivo PNG em Fotos"
         >
           <Download className="w-4 h-4" />
