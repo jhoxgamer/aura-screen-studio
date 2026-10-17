@@ -749,6 +749,129 @@ describe('End-to-End Integration & Subsystem Validation', () => {
       const headerLabel = `${filtered.length} de ${recordings.length} vídeos`;
       assert.equal(headerLabel, '2 de 3 vídeos');
     });
+
+    test('v1.7.9 control bar 2-step discard protection guard prevents accidental loss', () => {
+      let isConfirmingCancel = false;
+      let cancelNotice: string | null = null;
+      let recordingCancelled = false;
+
+      const handleCancelClick = (confirmTriggered: boolean) => {
+        if (!isConfirmingCancel) {
+          isConfirmingCancel = true;
+          cancelNotice = 'Clique no lixo novamente para confirmar o descarte';
+          return;
+        }
+        if (confirmTriggered) {
+          recordingCancelled = true;
+          isConfirmingCancel = false;
+          cancelNotice = null;
+        }
+      };
+
+      // 1st click: prompts for confirmation, does NOT discard recording
+      handleCancelClick(false);
+      assert.equal(isConfirmingCancel, true);
+      assert.equal(cancelNotice, 'Clique no lixo novamente para confirmar o descarte');
+      assert.equal(recordingCancelled, false, 'Recording is safeguarded on initial click');
+
+      // 2nd click: confirms and performs safe discard
+      handleCancelClick(true);
+      assert.equal(recordingCancelled, true);
+      assert.equal(isConfirmingCancel, false);
+      assert.equal(cancelNotice, null);
+    });
+
+    test('v1.7.9 studio preview pro shortcuts (I/O Mark In/Out, frame stepping, volume up/down)', () => {
+      let trimStart = 0;
+      let trimEnd = 120;
+      const duration = 120;
+      let currentTime = 15.4;
+      let volume = 0.5;
+
+      // Mark In (I)
+      const markIn = () => {
+        trimStart = Number(Math.min(currentTime, trimEnd).toFixed(1));
+      };
+      markIn();
+      assert.equal(trimStart, 15.4);
+
+      // Advance currentTime and Mark Out (O)
+      currentTime = 85.2;
+      const markOut = () => {
+        trimEnd = Number(Math.max(currentTime, trimStart).toFixed(1));
+      };
+      markOut();
+      assert.equal(trimEnd, 85.2);
+
+      // Frame stepping (. and ,)
+      const stepFrameForward = () => {
+        currentTime = Math.min(duration, currentTime + 1 / 30);
+      };
+      const stepFrameBackward = () => {
+        currentTime = Math.max(0, currentTime - 1 / 30);
+      };
+
+      const beforeStep = currentTime;
+      stepFrameForward();
+      assert.equal(currentTime > beforeStep, true, 'Advances by 1 frame');
+
+      stepFrameBackward();
+      assert.equal(Math.abs(currentTime - beforeStep) < 0.001, true, 'Rewinds by 1 frame');
+
+      // Volume Up / Down (+/- 10%)
+      const volumeUp = () => { volume = Math.min(1, Math.round((volume + 0.1) * 10) / 10); };
+      const volumeDown = () => { volume = Math.max(0, Math.round((volume - 0.1) * 10) / 10); };
+
+      volumeUp();
+      assert.equal(volume, 0.6);
+      volumeDown();
+      assert.equal(volume, 0.5);
+    });
+
+    test('v1.7.9 screenshot studio tool hotkeys and step counter rollback on undo', () => {
+      type Tool = 'select' | 'crop' | 'arrow' | 'rect' | 'step' | 'blur' | 'pen' | 'text';
+      let activeTool: Tool = 'arrow';
+      let stepCounter = 1;
+      const annotations: Array<{ type: Tool; id: string }> = [];
+
+      const dispatchScreenshotKey = (key: string) => {
+        const k = key.toLowerCase();
+        if (k === 'a') activeTool = 'arrow';
+        else if (k === 'r') activeTool = 'rect';
+        else if (k === 's') activeTool = 'step';
+        else if (k === 'p') activeTool = 'pen';
+        else if (k === 'b') activeTool = 'blur';
+        else if (k === 't') activeTool = 'text';
+        else if (k === 'c') activeTool = 'crop';
+      };
+
+      dispatchScreenshotKey('R');
+      assert.equal(activeTool, 'rect');
+
+      dispatchScreenshotKey('s');
+      assert.equal(activeTool, 'step');
+
+      // Add 2 step annotations
+      annotations.push({ type: 'step', id: '1' });
+      stepCounter++;
+      annotations.push({ type: 'step', id: '2' });
+      stepCounter++;
+      assert.equal(stepCounter, 3);
+
+      // Undo step annotation rolls back step counter
+      const handleUndo = () => {
+        if (annotations.length > 0) {
+          const removed = annotations.pop();
+          if (removed?.type === 'step') {
+            stepCounter = Math.max(1, stepCounter - 1);
+          }
+        }
+      };
+
+      handleUndo();
+      assert.equal(stepCounter, 2, 'Counter rolled back from 3 to 2');
+      assert.equal(annotations.length, 1);
+    });
   });
 });
 

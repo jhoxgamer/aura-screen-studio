@@ -71,6 +71,8 @@ export const ScreenshotStudioView: React.FC = () => {
     });
 
     const handleKeyDown = (e: KeyboardEvent) => {
+      if (['INPUT', 'TEXTAREA'].includes((e.target as HTMLElement)?.tagName)) return;
+
       if (e.key === 'Escape') {
         window.electronAPI.closeCurrentWindow();
       } else if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'z') {
@@ -79,6 +81,32 @@ export const ScreenshotStudioView: React.FC = () => {
       } else if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'c') {
         e.preventDefault();
         handleCopy();
+      } else if (!e.ctrlKey && !e.metaKey && !e.altKey) {
+        const k = e.key.toLowerCase();
+        if (k === 'a') {
+          setActiveTool('arrow');
+          showToast('Ferramenta: Seta (Tecla A)');
+        } else if (k === 'r') {
+          setActiveTool('rect');
+          showToast('Ferramenta: Retângulo (Tecla R)');
+        } else if (k === 's') {
+          setActiveTool('step');
+          showToast(`Ferramenta: Passo #${stepCounter} (Tecla S)`);
+        } else if (k === 'p') {
+          setActiveTool('pen');
+          showToast('Ferramenta: Caneta Livre (Tecla P)');
+        } else if (k === 'b') {
+          setActiveTool('blur');
+          showToast('Ferramenta: Tarja Confidencial (Tecla B)');
+        } else if (k === 't') {
+          setActiveTool('text');
+          showToast('Ferramenta: Texto (Tecla T)');
+        } else if (k === 'c') {
+          setActiveTool('crop');
+          showToast('Ferramenta: Recortar (Tecla C)');
+        } else if (k === 'u') {
+          handleUndo();
+        }
       }
     };
 
@@ -87,7 +115,7 @@ export const ScreenshotStudioView: React.FC = () => {
       cleanup();
       window.removeEventListener('keydown', handleKeyDown);
     };
-  }, [annotations, cropRect]);
+  }, [annotations, cropRect, stepCounter]);
 
   const drawAll = () => {
     const canvas = canvasRef.current;
@@ -381,7 +409,7 @@ export const ScreenshotStudioView: React.FC = () => {
         <div className="flex items-center space-x-1 border-r border-[#222838] pr-3">
           <button
             onClick={() => setActiveTool('crop')}
-            title="Recortar Área (Crop)"
+            title="Recortar Área (Tecla C)"
             className={`p-2 rounded-xl transition-all ${
               activeTool === 'crop'
                 ? 'bg-indigo-600 text-white font-medium shadow-sm'
@@ -393,7 +421,7 @@ export const ScreenshotStudioView: React.FC = () => {
 
           <button
             onClick={() => setActiveTool('arrow')}
-            title="Seta Direcional (Arrow)"
+            title="Seta Direcional (Tecla A)"
             className={`p-2 rounded-xl transition-all ${
               activeTool === 'arrow'
                 ? 'bg-indigo-600 text-white font-medium shadow-sm'
@@ -405,7 +433,7 @@ export const ScreenshotStudioView: React.FC = () => {
 
           <button
             onClick={() => setActiveTool('rect')}
-            title="Destaque Retângulo (Box)"
+            title="Destaque Retângulo (Tecla R)"
             className={`p-2 rounded-xl transition-all ${
               activeTool === 'rect'
                 ? 'bg-indigo-600 text-white font-medium shadow-sm'
@@ -417,7 +445,7 @@ export const ScreenshotStudioView: React.FC = () => {
 
           <button
             onClick={() => setActiveTool('step')}
-            title="Etapas Numeradas (1, 2, 3...)"
+            title="Etapas Numeradas (Tecla S)"
             className={`p-2 rounded-xl transition-all ${
               activeTool === 'step'
                 ? 'bg-indigo-600 text-white font-medium shadow-sm'
@@ -429,7 +457,7 @@ export const ScreenshotStudioView: React.FC = () => {
 
           <button
             onClick={() => setActiveTool('pen')}
-            title="Desenho Livre (Pen)"
+            title="Desenho Livre (Tecla P)"
             className={`p-2 rounded-xl transition-all ${
               activeTool === 'pen'
                 ? 'bg-indigo-600 text-white font-medium shadow-sm'
@@ -441,7 +469,7 @@ export const ScreenshotStudioView: React.FC = () => {
 
           <button
             onClick={() => setActiveTool('blur')}
-            title="Tarja de Confidencialidade (Redact)"
+            title="Tarja de Confidencialidade (Tecla B)"
             className={`p-2 rounded-xl transition-all ${
               activeTool === 'blur'
                 ? 'bg-indigo-600 text-white font-medium shadow-sm'
@@ -453,7 +481,7 @@ export const ScreenshotStudioView: React.FC = () => {
 
           <button
             onClick={() => setActiveTool('text')}
-            title="Anotação de Texto"
+            title="Anotação de Texto (Tecla T)"
             className={`p-2 rounded-xl transition-all ${
               activeTool === 'text'
                 ? 'bg-indigo-600 text-white font-medium shadow-sm'
@@ -482,7 +510,7 @@ export const ScreenshotStudioView: React.FC = () => {
         {/* Undo */}
         <button
           onClick={handleUndo}
-          title="Desfazer (Ctrl+Z)"
+          title="Desfazer (Ctrl+Z ou U)"
           className="p-2 rounded-xl text-slate-400 hover:text-white hover:bg-slate-800/60 transition-all"
         >
           <Undo2 className="w-4 h-4" />

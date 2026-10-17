@@ -30,6 +30,8 @@ export const ControlBarView: React.FC = () => {
   const [micLevel, setMicLevel] = useState(0);
   const [isStopping, setIsStopping] = useState(false);
   const [retakeNotice, setRetakeNotice] = useState<string | null>(null);
+  const [isConfirmingCancel, setIsConfirmingCancel] = useState(false);
+  const confirmTimerRef = useRef<NodeJS.Timeout | null>(null);
   const optionsRef = useRef<RecordingOptions | null>(null);
 
   useEffect(() => {
@@ -77,6 +79,7 @@ export const ControlBarView: React.FC = () => {
     return () => {
       recorderService.setMicLevelListener(undefined);
       recorderService.setOnTrackEnded(undefined);
+      if (confirmTimerRef.current) clearTimeout(confirmTimerRef.current);
       cleanupToggleMic?.();
       cleanupOptions();
       cleanupDrawing();
@@ -158,7 +161,18 @@ export const ControlBarView: React.FC = () => {
     }
   };
 
-  const handleCancel = () => {
+  const handleCancelClick = () => {
+    if (!isConfirmingCancel) {
+      setIsConfirmingCancel(true);
+      setRetakeNotice('Clique no lixo novamente para confirmar o descarte');
+      if (confirmTimerRef.current) clearTimeout(confirmTimerRef.current);
+      confirmTimerRef.current = setTimeout(() => {
+        setIsConfirmingCancel(false);
+        setRetakeNotice(null);
+      }, 3500);
+      return;
+    }
+    if (confirmTimerRef.current) clearTimeout(confirmTimerRef.current);
     recorderService.cleanup();
     window.electronAPI.cancelRecording();
   };
@@ -360,12 +374,16 @@ export const ControlBarView: React.FC = () => {
           </button>
         </div>
 
-        {/* Cancel / Trash Recording */}
+        {/* Cancel / Trash Recording with Confirmation Guard */}
         <div style={{ WebkitAppRegion: 'no-drag' } as any}>
           <button
-            onClick={handleCancel}
-            title="Descartar Gravação"
-            className="p-2 rounded-xl text-slate-400 hover:text-rose-400 hover:bg-rose-500/10 transition-all"
+            onClick={handleCancelClick}
+            title={isConfirmingCancel ? "Confirmar descarte definitivo da gravação" : "Descartar Gravação"}
+            className={`p-2 rounded-xl transition-all ${
+              isConfirmingCancel
+                ? 'bg-rose-600 text-white font-bold ring-2 ring-rose-400 animate-pulse'
+                : 'text-slate-400 hover:text-rose-400 hover:bg-rose-500/10'
+            }`}
           >
             <Trash2 className="w-3.5 h-3.5" />
           </button>

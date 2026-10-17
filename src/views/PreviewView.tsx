@@ -43,6 +43,7 @@ export const PreviewView: React.FC = () => {
     return saved !== null ? Number(saved) : 1;
   });
   const [isLinkCopied, setIsLinkCopied] = useState(false);
+  const [isPathCopied, setIsPathCopied] = useState(false);
 
   // Title editing state
   const [isEditingTitle, setIsEditingTitle] = useState(false);
@@ -184,6 +185,52 @@ export const PreviewView: React.FC = () => {
         e.preventDefault();
         if (videoRef.current) {
           videoRef.current.currentTime = Math.min(duration, videoRef.current.currentTime + 5);
+        }
+      } else if (e.code === 'ArrowUp') {
+        e.preventDefault();
+        setPlayerVolume(prev => {
+          const next = Math.min(1, Math.round((prev + 0.1) * 10) / 10);
+          if (videoRef.current) {
+            videoRef.current.volume = next;
+            if (isMuted && next > 0) {
+              setIsMuted(false);
+              videoRef.current.muted = false;
+            }
+          }
+          showToast(`Volume: ${Math.round(next * 100)}%`, 'info');
+          return next;
+        });
+      } else if (e.code === 'ArrowDown') {
+        e.preventDefault();
+        setPlayerVolume(prev => {
+          const next = Math.max(0, Math.round((prev - 0.1) * 10) / 10);
+          if (videoRef.current) {
+            videoRef.current.volume = next;
+          }
+          showToast(next === 0 ? 'Volume: Mudo' : `Volume: ${Math.round(next * 100)}%`, 'info');
+          return next;
+        });
+      } else if (e.key === 'i' || e.key === 'I') {
+        e.preventDefault();
+        const cur = videoRef.current ? videoRef.current.currentTime : 0;
+        const nextStart = Number(cur.toFixed(1));
+        setTrimStart(nextStart);
+        showToast(`Ponto Inicial: ${formatTime(nextStart)} (Tecla I)`, 'info');
+      } else if (e.key === 'o' || e.key === 'O') {
+        e.preventDefault();
+        const cur = videoRef.current ? videoRef.current.currentTime : duration;
+        const nextEnd = Number(cur.toFixed(1));
+        setTrimEnd(nextEnd);
+        showToast(`Ponto Final: ${formatTime(nextEnd)} (Tecla O)`, 'info');
+      } else if (e.key === '.' || e.key === '>') {
+        e.preventDefault();
+        if (videoRef.current) {
+          videoRef.current.currentTime = Math.min(duration, videoRef.current.currentTime + (1 / 30));
+        }
+      } else if (e.key === ',' || e.key === '<') {
+        e.preventDefault();
+        if (videoRef.current) {
+          videoRef.current.currentTime = Math.max(0, videoRef.current.currentTime - (1 / 30));
         }
       } else if (e.code === 'KeyF') {
         e.preventDefault();
@@ -553,6 +600,22 @@ export const PreviewView: React.FC = () => {
             <FolderOpen className="w-3.5 h-3.5" />
           </button>
 
+          {/* Copy local file path */}
+          <button
+            onClick={() => {
+              if (meta?.filePath) {
+                navigator.clipboard.writeText(meta.filePath);
+                setIsPathCopied(true);
+                showToast('Caminho do arquivo copiado!', 'success');
+                setTimeout(() => setIsPathCopied(false), 2000);
+              }
+            }}
+            className="p-2 rounded-xl bg-[#171b26] hover:bg-[#202536] border border-[#262c3e] text-slate-400 hover:text-indigo-300 transition-all shadow-sm"
+            title="Copiar Caminho do Arquivo (C:\...)"
+          >
+            {isPathCopied ? <Check className="w-3.5 h-3.5 text-emerald-400" /> : <Copy className="w-3.5 h-3.5" />}
+          </button>
+
           {/* New Recording */}
           <button
             onClick={handleNewRecording}
@@ -869,11 +932,12 @@ export const PreviewView: React.FC = () => {
                 onClick={() => {
                   const point = Math.min(currentTime, trimEnd);
                   setTrimStart(Number(point.toFixed(1)));
+                  showToast(`Ponto Inicial: ${formatTime(point)} (I)`, 'info');
                 }}
-                title="Marcar início no segundo atual do player"
+                title="Marcar início no segundo atual do player (Atalho: Tecla I)"
                 className="px-1.5 py-1 text-[10px] font-semibold bg-slate-800 hover:bg-indigo-600/30 text-indigo-300 hover:text-white rounded border border-slate-700 hover:border-indigo-500/40 transition-colors"
               >
-                Atual
+                Atual (I)
               </button>
             </div>
 
@@ -897,11 +961,12 @@ export const PreviewView: React.FC = () => {
                 onClick={() => {
                   const point = Math.max(currentTime, trimStart);
                   setTrimEnd(Number(point.toFixed(1)));
+                  showToast(`Ponto Final: ${formatTime(point)} (O)`, 'info');
                 }}
-                title="Marcar fim no segundo atual do player"
+                title="Marcar fim no segundo atual do player (Atalho: Tecla O)"
                 className="px-1.5 py-1 text-[10px] font-semibold bg-slate-800 hover:bg-indigo-600/30 text-indigo-300 hover:text-white rounded border border-slate-700 hover:border-indigo-500/40 transition-colors"
               >
-                Atual
+                Atual (O)
               </button>
             </div>
 

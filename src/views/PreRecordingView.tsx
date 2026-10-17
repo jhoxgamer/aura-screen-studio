@@ -646,7 +646,7 @@ export const PreRecordingView: React.FC = () => {
           <div className="flex items-center space-x-2">
             <span className="font-semibold text-sm tracking-tight text-white">Aura Screen Studio</span>
             <span className="text-[10px] text-slate-400 bg-[#181c28] border border-[#262c3e] px-1.5 py-0.5 rounded font-mono">
-              v{appVersion || '1.7.8'}
+              v{appVersion || '1.7.9'}
             </span>
           </div>
         </div>
@@ -1327,7 +1327,7 @@ export const PreRecordingView: React.FC = () => {
             {/* App Version & Manual Update Check */}
             <div className="flex items-center justify-between pt-2 border-t border-[#202534] text-[11px] text-slate-500">
               <span className="font-mono flex items-center gap-1.5">
-                <span>v{appVersion || '1.7.8'}</span>
+                <span>v{appVersion || '1.7.9'}</span>
                 {updateFeedback && (
                   <span className="text-emerald-400 font-sans font-medium text-[10px] bg-emerald-950/60 border border-emerald-500/40 px-1.5 py-0.5 rounded">
                     {updateFeedback}
