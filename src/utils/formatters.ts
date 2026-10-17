@@ -77,3 +77,25 @@ export function formatRelativeDate(timestampMs: number): string {
   const d = new Date(timestampMs);
   return d.toLocaleDateString('pt-BR', { day: '2-digit', month: 'short' });
 }
+
+export type LibrarySortCriteria = 'newest' | 'oldest' | 'duration' | 'size';
+
+export function sortRecordings<T extends { createdAt?: number; durationMs?: number; fileSize?: number }>(
+  items: T[],
+  criteria: LibrarySortCriteria
+): T[] {
+  const sorted = [...items];
+  switch (criteria) {
+    case 'newest':
+      return sorted.sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0));
+    case 'oldest':
+      return sorted.sort((a, b) => (a.createdAt || 0) - (b.createdAt || 0));
+    case 'duration':
+      return sorted.sort((a, b) => (b.durationMs || 0) - (a.durationMs || 0));
+    case 'size':
+      return sorted.sort((a, b) => (b.fileSize || 0) - (a.fileSize || 0));
+    default:
+      return sorted;
+  }
+}
+

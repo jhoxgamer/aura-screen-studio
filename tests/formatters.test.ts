@@ -6,7 +6,8 @@ import {
   formatFileSize,
   getResolutionDimensions,
   getAspectRatio,
-  formatRelativeDate
+  formatRelativeDate,
+  sortRecordings
 } from '../src/utils/formatters.ts';
 
 describe('Formatters Utilities', () => {
@@ -130,4 +131,44 @@ describe('Formatters Utilities', () => {
       assert.equal(formatRelativeDate(Date.now() - 25 * 3600 * 1000), 'Ontem');
     });
   });
+
+  describe('sortRecordings', () => {
+    const sampleRecordings = [
+      { id: '1', title: 'A', createdAt: 1000, durationMs: 60000, fileSize: 10485760 },
+      { id: '2', title: 'B', createdAt: 5000, durationMs: 15000, fileSize: 52428800 },
+      { id: '3', title: 'C', createdAt: 3000, durationMs: 120000, fileSize: 2097152 }
+    ];
+
+    test('sorts by newest first', () => {
+      const sorted = sortRecordings(sampleRecordings, 'newest');
+      assert.deepEqual(sorted.map(r => r.id), ['2', '3', '1']);
+    });
+
+    test('sorts by oldest first', () => {
+      const sorted = sortRecordings(sampleRecordings, 'oldest');
+      assert.deepEqual(sorted.map(r => r.id), ['1', '3', '2']);
+    });
+
+    test('sorts by duration descending', () => {
+      const sorted = sortRecordings(sampleRecordings, 'duration');
+      assert.deepEqual(sorted.map(r => r.id), ['3', '1', '2']);
+    });
+
+    test('sorts by file size descending', () => {
+      const sorted = sortRecordings(sampleRecordings, 'size');
+      assert.deepEqual(sorted.map(r => r.id), ['2', '1', '3']);
+    });
+
+    test('handles missing or zero fields safely without crashing', () => {
+      const partial = [
+        { id: '1' },
+        { id: '2', createdAt: 2000 },
+        { id: '3', fileSize: 5000 }
+      ];
+      assert.doesNotThrow(() => sortRecordings(partial as any, 'newest'));
+      assert.doesNotThrow(() => sortRecordings(partial as any, 'duration'));
+      assert.doesNotThrow(() => sortRecordings(partial as any, 'size'));
+    });
+  });
 });
+
