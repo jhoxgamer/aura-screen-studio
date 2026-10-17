@@ -7,6 +7,8 @@
   "scripts": {
     "dev": "vite",
     "test": "node --experimental-strip-types --test tests/**/*.test.ts",
+    "test:ui": "node -e \"const { spawn } = require('child_process'); const p = spawn('node_modules/electron/dist/electron.exe', ['scripts/test-ui-runner.cjs'], { stdio: 'inherit' }); p.on('exit', c => process.exit(c));\"",
+    "test:qa": "node scripts/run-all-qa.cjs",
     "build": "tsc && vite build",
     "build:electron": "tsc -p tsconfig.electron.json && node -e \"require('fs').writeFileSync('dist-electron/package.json', JSON.stringify({ type: 'commonjs' }))\"",
     "start": "electron dist-electron/main.js",

@@ -100,6 +100,7 @@ declare global {
       openFileFolder: (filePath: string) => void;
       getShareUrl: (id: string) => Promise<string>;
       getPublicUrl: () => Promise<string | null>;
+      getServerPort?: () => Promise<number>;
       updateTitle: (id: string, newTitle: string) => Promise<boolean>;
       updateChapters: (id: string, chapters: ChapterItem[]) => Promise<boolean>;
       downloadRecording: (id: string) => Promise<boolean>;

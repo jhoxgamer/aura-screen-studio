@@ -3,7 +3,7 @@ import * as fs from 'fs';
 import * as path from 'path';
 import * as os from 'os';
 import { spawn, ChildProcess } from 'child_process';
-import { RecordingMeta, VideoComment, VideoReaction } from './types';
+import type { RecordingMeta, VideoComment, VideoReaction } from './types.ts';
 
 export class ShareServer {
   private server: http.Server | null = null;
@@ -45,6 +45,10 @@ export class ShareServer {
 
   public getLocalShareUrl(id: string): string {
     return `http://localhost:${this.port}/share/${id}`;
+  }
+
+  public getPort(): number {
+    return this.port;
   }
 
   public start(): Promise<number> {

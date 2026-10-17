@@ -70,6 +70,9 @@ export const electronAPI = {
   getPublicUrl: async (): Promise<string | null> => {
     return await ipcRenderer.invoke('share:get-public-url');
   },
+  getServerPort: async (): Promise<number> => {
+    return await ipcRenderer.invoke('share:get-server-port');
+  },
   updateTitle: async (id: string, newTitle: string): Promise<boolean> => {
     return await ipcRenderer.invoke('recordings:update-title', id, newTitle);
   },

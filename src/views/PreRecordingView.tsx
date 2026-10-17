@@ -19,7 +19,8 @@ import {
   AlertTriangle,
   RotateCcw,
   Sparkles,
-  Info
+  Info,
+  Check
 } from 'lucide-react';
 import { CaptureSource, RecordingMode, RecordingOptions, CropArea } from '../types';
 import { LibraryView } from './LibraryView';
@@ -30,6 +31,7 @@ export const PreRecordingView: React.FC = () => {
     return (localStorage.getItem('aura_recording_mode') as RecordingMode) || 'screen-cam';
   });
   const [publicUrl, setPublicUrl] = useState<string | null>(null);
+  const [isHubCopied, setIsHubCopied] = useState(false);
   const [sources, setSources] = useState<CaptureSource[]>([]);
   const [selectedSourceId, setSelectedSourceId] = useState<string>('');
   
@@ -54,6 +56,8 @@ export const PreRecordingView: React.FC = () => {
   const [isMonitoringAudio, setIsMonitoringAudio] = useState(false);
   const [audioLevel, setAudioLevel] = useState<number>(0);
   const [isClipping, setIsClipping] = useState<boolean>(false);
+  const [micError, setMicError] = useState<string | null>(null);
+  const [camError, setCamError] = useState<string | null>(null);
   
   const [includeSystemAudio, setIncludeSystemAudio] = useState<boolean>(() => {
     const saved = localStorage.getItem('aura_include_system_audio');
@@ -381,9 +385,17 @@ export const PreRecordingView: React.FC = () => {
           animFrameRef.current = requestAnimationFrame(tick);
         };
 
+        setMicError(null);
         tick();
-      } catch (err) {
+      } catch (err: any) {
         console.warn('Microphone DSP setup error:', err);
+        if (err.name === 'NotAllowedError' || err.name === 'PermissionDeniedError') {
+          setMicError('Permissão de microfone negada no sistema');
+        } else if (err.name === 'NotFoundError' || err.name === 'DevicesNotFoundError') {
+          setMicError('Nenhum microfone físico encontrado');
+        } else {
+          setMicError('Microfone indisponível ou desconectado');
+        }
       }
     }
 
@@ -454,8 +466,16 @@ export const PreRecordingView: React.FC = () => {
         if (camVideoRef.current) {
           camVideoRef.current.srcObject = stream;
         }
-      } catch (err) {
+        setCamError(null);
+      } catch (err: any) {
         console.warn('Camera preview error:', err);
+        if (err.name === 'NotAllowedError' || err.name === 'PermissionDeniedError') {
+          setCamError('Permissão de câmera negada no sistema');
+        } else if (err.name === 'NotFoundError' || err.name === 'DevicesNotFoundError') {
+          setCamError('Nenhuma webcam detectada');
+        } else {
+          setCamError('Câmera indisponível ou em uso por outro aplicativo');
+        }
       }
     }
     initCam();
@@ -482,6 +502,17 @@ export const PreRecordingView: React.FC = () => {
     if (camStreamRef.current) {
       camStreamRef.current.getTracks().forEach((t) => t.stop());
       camStreamRef.current = null;
+    }
+
+    // Release launcher microphone preview and AudioContext to free hardware audio for recorder
+    if (animFrameRef.current) cancelAnimationFrame(animFrameRef.current);
+    if (micStreamRef.current) {
+      micStreamRef.current.getTracks().forEach((t) => t.stop());
+      micStreamRef.current = null;
+    }
+    if (audioContextRef.current) {
+      audioContextRef.current.close().catch(() => {});
+      audioContextRef.current = null;
     }
 
     const options: RecordingOptions = {
@@ -794,19 +825,29 @@ export const PreRecordingView: React.FC = () => {
 
               {/* Live Webcam Framing Box */}
               {showLiveCamPreview && (
-                <div className="relative w-full h-28 bg-black rounded-xl overflow-hidden border border-[#242b3d]">
-                  <video
-                    ref={camVideoRef}
-                    autoPlay
-                    playsInline
-                    muted
-                    className="w-full h-full object-cover -scale-x-100"
-                  />
-                  <div className="absolute inset-0 border border-dashed border-white/20 rounded-xl pointer-events-none" />
-                  <div className="absolute top-2 left-2 px-2 py-0.5 rounded bg-black/70 backdrop-blur-sm text-[10px] text-slate-300 font-medium flex items-center space-x-1.5 border border-white/10">
-                    <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 inline-block" />
-                    <span>Enquadramento ao Vivo</span>
-                  </div>
+                <div className="relative w-full h-28 bg-[#090b10] rounded-xl overflow-hidden border border-[#242b3d] flex items-center justify-center">
+                  {camError ? (
+                    <div className="flex flex-col items-center justify-center p-3 text-center space-y-1">
+                      <Camera className="w-5 h-5 text-amber-400 opacity-60" />
+                      <span className="text-[11px] text-amber-300 font-medium">{camError}</span>
+                      <span className="text-[10px] text-slate-500">Selecione outro dispositivo ou verifique permissões</span>
+                    </div>
+                  ) : (
+                    <>
+                      <video
+                        ref={camVideoRef}
+                        autoPlay
+                        playsInline
+                        muted
+                        className="w-full h-full object-cover -scale-x-100"
+                      />
+                      <div className="absolute inset-0 border border-dashed border-white/20 rounded-xl pointer-events-none" />
+                      <div className="absolute top-2 left-2 px-2 py-0.5 rounded bg-black/70 backdrop-blur-sm text-[10px] text-slate-300 font-medium flex items-center space-x-1.5 border border-white/10">
+                        <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 inline-block" />
+                        <span>Enquadramento ao Vivo</span>
+                      </div>
+                    </>
+                  )}
                 </div>
               )}
             </div>
@@ -834,6 +875,13 @@ export const PreRecordingView: React.FC = () => {
             </div>
 
             <div className="bg-[#131620] border border-[#222838] rounded-xl p-3 space-y-3">
+              {micError && (
+                <div className="flex items-center space-x-2 p-2 bg-amber-500/10 border border-amber-500/30 rounded-lg text-amber-300 text-xs">
+                  <AlertTriangle className="w-4 h-4 shrink-0 text-amber-400" />
+                  <span className="text-[11px]">{micError}</span>
+                </div>
+              )}
+
               {/* Microphone Device Dropdown */}
               <div className="flex items-center space-x-2">
                 <Mic className="w-4 h-4 text-indigo-400 shrink-0" />
@@ -1103,15 +1151,23 @@ export const PreRecordingView: React.FC = () => {
               )}
             </div>
             {publicUrl && (
-              <button
-                onClick={() => {
-                  navigator.clipboard.writeText(publicUrl);
-                  alert('Link do Hub Público copiado!\n' + publicUrl);
-                }}
-                className="text-[11px] text-indigo-400 hover:text-indigo-300 font-semibold shrink-0 ml-2"
-              >
-                Copiar Hub
-              </button>
+              isHubCopied ? (
+                <span className="text-[11px] text-emerald-400 font-semibold shrink-0 ml-2 flex items-center space-x-1">
+                  <Check className="w-3 h-3 text-emerald-400" />
+                  <span>Copiado!</span>
+                </span>
+              ) : (
+                <button
+                  onClick={() => {
+                    navigator.clipboard.writeText(publicUrl);
+                    setIsHubCopied(true);
+                    setTimeout(() => setIsHubCopied(false), 2500);
+                  }}
+                  className="text-[11px] text-indigo-400 hover:text-indigo-300 font-semibold shrink-0 ml-2"
+                >
+                  Copiar Hub
+                </button>
+              )
             )}
           </div>
 

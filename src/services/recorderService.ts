@@ -504,6 +504,8 @@ export class RecorderService {
 
       if (this.mediaRecorder.state !== 'inactive') {
         this.mediaRecorder.stop();
+      } else if (this.mediaRecorder.onstop) {
+        (this.mediaRecorder.onstop as any)(new Event('stop'));
       }
     });
   }

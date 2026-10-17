@@ -55,6 +55,16 @@ export const PreviewView: React.FC = () => {
   const [isLoadingWaveform, setIsLoadingWaveform] = useState(false);
   const [newChapterTitle, setNewChapterTitle] = useState('');
 
+  // Server port & feedback state
+  const [serverPort, setServerPort] = useState<number>(4545);
+  const [toast, setToast] = useState<{ message: string; type: 'success' | 'error' | 'info' } | null>(null);
+  const [isConfirmingDelete, setIsConfirmingDelete] = useState(false);
+
+  const showToast = (message: string, type: 'success' | 'error' | 'info' = 'success') => {
+    setToast({ message, type });
+    setTimeout(() => setToast(null), 3000);
+  };
+
   const videoRef = useRef<HTMLVideoElement>(null);
 
   const extractWaveform = async (url: string) => {
@@ -102,8 +112,16 @@ export const PreviewView: React.FC = () => {
         setPublicUrl(pub);
       } catch (e) {}
 
+      let port = 4545;
+      try {
+        if (window.electronAPI?.getServerPort) {
+          port = await window.electronAPI.getServerPort();
+          setServerPort(port);
+        }
+      } catch (e) {}
+
       const videoSrc = receivedMeta.id
-        ? `http://localhost:4545/video/${receivedMeta.id}`
+        ? `http://localhost:${port}/video/${receivedMeta.id}`
         : `file://${receivedMeta.filePath}`;
       extractWaveform(videoSrc);
     });
@@ -212,10 +230,12 @@ export const PreviewView: React.FC = () => {
 
   const handleDelete = async () => {
     if (!meta) return;
-    if (confirm('Deseja realmente excluir esta gravação?')) {
+    try {
       await window.electronAPI.deleteRecording(meta.id);
       window.electronAPI.openPreRecording();
       window.electronAPI.closeCurrentWindow();
+    } catch (err) {
+      showToast('Erro ao excluir gravação.', 'error');
     }
   };
 
@@ -292,7 +312,7 @@ export const PreviewView: React.FC = () => {
 
       const stream = (vid as any).captureStream ? (vid as any).captureStream() : null;
       if (!stream) {
-        alert('Corte direto não suportado pelo navegador.');
+        showToast('Corte direto não suportado pelo navegador.', 'error');
         setIsTrimmingSaving(false);
         return;
       }
@@ -328,11 +348,11 @@ export const PreviewView: React.FC = () => {
       if (updated) {
         setMeta(updated);
         setIsTrimming(false);
-        alert('Vídeo cortado e salvo com sucesso!');
+        showToast('Vídeo cortado e salvo com sucesso!', 'success');
       }
     } catch (e) {
       console.error('Error saving trim:', e);
-      alert('Erro ao salvar corte.');
+      showToast('Erro ao salvar corte.', 'error');
     } finally {
       setIsTrimmingSaving(false);
     }
@@ -344,10 +364,10 @@ export const PreviewView: React.FC = () => {
     try {
       await window.electronAPI.updateChapters(meta.id, chapters);
       setMeta({ ...meta, chapters });
-      alert('Capítulos atualizados com sucesso!');
+      showToast('Capítulos atualizados com sucesso!', 'success');
     } catch (e) {
       console.error('Error saving chapters:', e);
-      alert('Erro ao salvar capítulos.');
+      showToast('Erro ao salvar capítulos.', 'error');
     } finally {
       setIsSavingChapters(false);
     }
@@ -498,7 +518,7 @@ export const PreviewView: React.FC = () => {
 
           {/* Delete */}
           <button
-            onClick={handleDelete}
+            onClick={() => setIsConfirmingDelete(true)}
             className="p-2 rounded-xl bg-[#171b26] hover:bg-rose-500/20 border border-[#262c3e] text-slate-400 hover:text-rose-400 transition-all shadow-sm"
             title="Excluir gravação"
           >
@@ -533,7 +553,7 @@ export const PreviewView: React.FC = () => {
               ref={videoRef}
               src={
                 meta.id
-                  ? `http://localhost:4545/video/${meta.id}`
+                  ? `http://localhost:${serverPort}/video/${meta.id}`
                   : `file://${meta.filePath}`
               }
               onLoadedMetadata={handleLoadedMetadata}
@@ -937,6 +957,47 @@ export const PreviewView: React.FC = () => {
           </div>
         </div>
       </div>
+
+      {/* Non-blocking Delete Confirmation Modal */}
+      {isConfirmingDelete && (
+        <div className="fixed inset-0 z-50 bg-black/70 backdrop-blur-sm flex items-center justify-center p-4">
+          <div className="bg-[#121520] border border-rose-500/40 rounded-2xl p-5 max-w-sm w-full space-y-4 shadow-2xl text-center">
+            <div className="w-10 h-10 rounded-full bg-rose-500/20 border border-rose-500/40 flex items-center justify-center mx-auto text-rose-400">
+              <Trash2 className="w-5 h-5" />
+            </div>
+            <div>
+              <h3 className="text-sm font-bold text-white">Excluir Gravação?</h3>
+              <p className="text-xs text-slate-400 mt-1">
+                O arquivo de vídeo será removido permanentemente do disco. Esta ação não pode ser desfeita.
+              </p>
+            </div>
+            <div className="flex items-center space-x-2 pt-1">
+              <button
+                onClick={() => setIsConfirmingDelete(false)}
+                className="flex-1 py-2 px-3 bg-[#181c28] hover:bg-[#202536] text-slate-300 text-xs font-semibold rounded-xl border border-[#262c3e] transition-colors"
+              >
+                Cancelar
+              </button>
+              <button
+                onClick={handleDelete}
+                className="flex-1 py-2 px-3 bg-rose-600 hover:bg-rose-500 text-white text-xs font-bold rounded-xl transition-colors shadow-sm"
+              >
+                Sim, Excluir
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Non-blocking Toast Notification */}
+      {toast && (
+        <div className="fixed top-14 right-6 z-50 flex items-center space-x-2 px-4 py-2.5 rounded-xl shadow-2xl border text-xs font-medium bg-[#121520]/95 backdrop-blur-md border-indigo-500/40 text-white animate-in fade-in">
+          {toast.type === 'success' && <Check className="w-4 h-4 text-emerald-400 shrink-0" />}
+          {toast.type === 'error' && <Trash2 className="w-4 h-4 text-rose-400 shrink-0" />}
+          {toast.type === 'info' && <Sparkles className="w-4 h-4 text-indigo-400 shrink-0" />}
+          <span>{toast.message}</span>
+        </div>
+      )}
     </div>
   );
 };

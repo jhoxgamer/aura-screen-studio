@@ -20,6 +20,7 @@ export const LibraryView: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
   const [copiedId, setCopiedId] = useState<string | null>(null);
+  const [confirmDeleteId, setConfirmDeleteId] = useState<string | null>(null);
 
   useEffect(() => {
     loadList();
@@ -39,9 +40,12 @@ export const LibraryView: React.FC = () => {
   }
 
   const handleDelete = async (id: string) => {
-    if (confirm('Tem certeza que deseja excluir esta gravação?')) {
+    try {
       await window.electronAPI.deleteRecording(id);
+      setConfirmDeleteId(null);
       loadList();
+    } catch (err) {
+      console.error('Failed to delete recording:', err);
     }
   };
 
@@ -191,17 +195,36 @@ export const LibraryView: React.FC = () => {
                   <FolderOpen className="w-3.5 h-3.5" />
                 </button>
 
-                {/* Delete */}
-                <button
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    handleDelete(rec.id);
-                  }}
-                  title="Excluir Gravação"
-                  className="p-1.5 rounded-lg text-slate-400 hover:text-rose-400 hover:bg-rose-500/10 transition-colors"
-                >
-                  <Trash2 className="w-3.5 h-3.5" />
-                </button>
+                {/* Delete with inline confirmation */}
+                {confirmDeleteId === rec.id ? (
+                  <div className="flex items-center space-x-1 bg-rose-950/70 border border-rose-500/40 rounded-lg px-1.5 py-0.5" onClick={(e) => e.stopPropagation()}>
+                    <button
+                      onClick={() => handleDelete(rec.id)}
+                      title="Confirmar exclusão definitiva"
+                      className="text-[10px] text-rose-200 hover:text-white font-bold px-1.5 py-0.5 bg-rose-600 hover:bg-rose-500 rounded transition-colors"
+                    >
+                      Excluir
+                    </button>
+                    <button
+                      onClick={() => setConfirmDeleteId(null)}
+                      title="Cancelar"
+                      className="text-[10px] text-slate-400 hover:text-slate-200 px-1 py-0.5 transition-colors"
+                    >
+                      Cancelar
+                    </button>
+                  </div>
+                ) : (
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setConfirmDeleteId(rec.id);
+                    }}
+                    title="Excluir Gravação"
+                    className="p-1.5 rounded-lg text-slate-400 hover:text-rose-400 hover:bg-rose-500/10 transition-colors"
+                  >
+                    <Trash2 className="w-3.5 h-3.5" />
+                  </button>
+                )}
               </div>
             </div>
           ))

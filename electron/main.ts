@@ -733,6 +733,11 @@ function setupIpcHandlers() {
       speakerNotesWindow.close();
     }
 
+    // Synchronize recording state
+    isRecording = false;
+    isPaused = false;
+    broadcastState('stopped');
+
     // Play complete sound and open preview
     broadcastSound('complete');
     createPreviewWindow(record);
@@ -945,6 +950,10 @@ function setupIpcHandlers() {
 
   ipcMain.handle('share:get-public-url', async () => {
     return shareServer ? shareServer.getPublicUrl() : null;
+  });
+
+  ipcMain.handle('share:get-server-port', async () => {
+    return shareServer ? shareServer.getPort() : 4545;
   });
 
   ipcMain.on('window:open-pre-recording', () => {

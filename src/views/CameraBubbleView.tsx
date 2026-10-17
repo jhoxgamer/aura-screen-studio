@@ -198,6 +198,10 @@ export const CameraBubbleView: React.FC = () => {
 
         {/* Bubble Outer Frame with Clean Border */}
         <div
+          onDoubleClick={() => {
+            const nextSize = size === 'small' ? 'medium' : size === 'medium' ? 'large' : 'small';
+            handleSizeChange(nextSize);
+          }}
           className={`relative w-full h-full overflow-hidden transition-all duration-300 ring-2 ring-indigo-500/80 border border-[#232838] shadow-2xl ${
             bubbleShape === 'circle' ? 'rounded-full' : 'rounded-[38px]'
           }`}
@@ -206,7 +210,9 @@ export const CameraBubbleView: React.FC = () => {
           {isCameraActive ? (
             <div className="relative w-full h-full">
               {cameraFilter === 'blur' && (
-                <div className="absolute inset-0 bg-indigo-500/10 backdrop-blur-xl pointer-events-none rounded-full" />
+                <div className={`absolute inset-0 bg-indigo-500/10 backdrop-blur-xl pointer-events-none ${
+                  bubbleShape === 'circle' ? 'rounded-full' : 'rounded-[38px]'
+                }`} />
               )}
               <video
                 ref={videoRef}
@@ -251,7 +257,9 @@ export const CameraBubbleView: React.FC = () => {
           )}
 
           {/* Active Recording Pulsing Ring Indicator */}
-          <div className="absolute inset-0 rounded-full border border-rose-500/60 pointer-events-none" />
+          <div className={`absolute inset-0 border border-rose-500/60 pointer-events-none ${
+            bubbleShape === 'circle' ? 'rounded-full' : 'rounded-[38px]'
+          }`} />
 
           {/* Filter change toast */}
           {filterToast && (
