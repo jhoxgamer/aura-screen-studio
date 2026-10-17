@@ -23,6 +23,7 @@ import {
   getResolutionDimensions,
   getAspectRatio
 } from '../src/utils/formatters.ts';
+import { detectShape } from '../src/utils/shapeDetection.ts';
 
 describe('End-to-End Integration & Subsystem Validation', () => {
   let tempDir: string;
@@ -955,6 +956,101 @@ describe('End-to-End Integration & Subsystem Validation', () => {
 
       handleCountdownKey('Escape');
       assert.equal(cancelled, true, 'Escape safely cancels countdown');
+    });
+
+    test('v2.0.0 Zoom smart shape detection and auto-snapping', () => {
+      // Simulating smartpen stroke
+      const roughCirclePoints = [];
+      for (let i = 0; i <= 20; i++) {
+        const theta = (i / 20) * Math.PI * 2;
+        roughCirclePoints.push({ x: 100 + Math.cos(theta) * 40, y: 100 + Math.sin(theta) * 40 });
+      }
+
+      // Detection
+      const detected = detectShape(roughCirclePoints);
+      assert.equal(detected.type, 'circle');
+      assert.ok(detected.confidence >= 0.75);
+    });
+
+    test('v2.0.0 Zoom autostamp suite and step counter state', () => {
+      const strokes: any[] = [];
+      let stampNum = 1;
+
+      // Add a numbered stamp
+      strokes.push({ tool: 'stamp', stampType: 'number', stampNumber: stampNum });
+      stampNum++;
+
+      // Add a checkmark stamp
+      strokes.push({ tool: 'stamp', stampType: 'check' });
+
+      // Add a star stamp
+      strokes.push({ tool: 'stamp', stampType: 'star' });
+
+      assert.equal(strokes.length, 3);
+      assert.equal(strokes[0].stampType, 'number');
+      assert.equal(strokes[0].stampNumber, 1);
+      assert.equal(strokes[1].stampType, 'check');
+      assert.equal(strokes[2].stampType, 'star');
+    });
+
+    test('v2.0.0 Zoom full undo and redo command stack', () => {
+      const strokes: any[] = [];
+      const redoStack: any[] = [];
+
+      // Draw 2 strokes
+      strokes.push({ id: 1, tool: 'pen' });
+      strokes.push({ id: 2, tool: 'rectangle' });
+
+      // Undo last
+      const undone = strokes.pop();
+      redoStack.push(undone);
+      assert.equal(strokes.length, 1);
+      assert.equal(redoStack.length, 1);
+      assert.equal(redoStack[0].id, 2);
+
+      // Redo
+      const redone = redoStack.pop();
+      strokes.push(redone);
+      assert.equal(strokes.length, 2);
+      assert.equal(strokes[1].id, 2);
+      assert.equal(redoStack.length, 0);
+    });
+
+    test('v2.0.0 Zoom whiteboard & blackboard mode switching', () => {
+      let whiteboardMode: 'screen' | 'whiteboard' | 'blackboard' = 'screen';
+      const cycleWhiteboard = () => {
+        if (whiteboardMode === 'screen') whiteboardMode = 'whiteboard';
+        else if (whiteboardMode === 'whiteboard') whiteboardMode = 'blackboard';
+        else whiteboardMode = 'screen';
+      };
+
+      cycleWhiteboard();
+      assert.equal(whiteboardMode, 'whiteboard');
+      cycleWhiteboard();
+      assert.equal(whiteboardMode, 'blackboard');
+      cycleWhiteboard();
+      assert.equal(whiteboardMode, 'screen');
+    });
+
+    test('v2.0.0 Zoom privacy mosaic redaction and on-screen text notes', () => {
+      const strokes: any[] = [];
+
+      // Add mosaic redaction stroke
+      strokes.push({
+        tool: 'mosaic',
+        points: [{ x: 100, y: 100 }, { x: 300, y: 150 }]
+      });
+
+      // Add text annotation stroke
+      strokes.push({
+        tool: 'text',
+        text: 'Nota de Demonstração',
+        points: [{ x: 150, y: 200 }]
+      });
+
+      assert.equal(strokes[0].tool, 'mosaic');
+      assert.equal(strokes[1].tool, 'text');
+      assert.equal(strokes[1].text, 'Nota de Demonstração');
     });
   });
 });

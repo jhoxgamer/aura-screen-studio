@@ -27,8 +27,21 @@ class AudioService {
     return this.audioCtx;
   }
 
-  // Synthesize crystal-clear Aura tones via Web Audio API
-  private synthChime(type: 'start' | 'stop' | 'pause' | 'complete' | 'countdown') {
+  // Synthesize crystal-clear Aura & Zoom tones via Web Audio API
+  private synthChime(
+    type:
+      | 'start'
+      | 'stop'
+      | 'pause'
+      | 'complete'
+      | 'countdown'
+      | 'chime'
+      | 'dingdong'
+      | 'pop'
+      | 'snap'
+      | 'laser'
+      | 'whiteboard'
+  ) {
     const ctx = this.getContext();
     if (!ctx) return false;
 
@@ -136,6 +149,93 @@ class AudioService {
         });
         return true;
       }
+
+      // Zoom-inspired sound effects:
+      if (type === 'chime' || (type as string) === 'dingdong') {
+        // Zoom signature ding-dong two-tone chime
+        const osc1 = ctx.createOscillator();
+        const osc2 = ctx.createOscillator();
+        const gain = ctx.createGain();
+
+        osc1.type = 'sine';
+        osc1.frequency.setValueAtTime(587.33, now); // D5
+        osc2.type = 'sine';
+        osc2.frequency.setValueAtTime(880.0, now + 0.12); // A5
+
+        gain.gain.setValueAtTime(0.2, now);
+        gain.gain.exponentialRampToValueAtTime(0.001, now + 0.55);
+
+        osc1.connect(gain);
+        osc2.connect(gain);
+        gain.connect(ctx.destination);
+
+        osc1.start(now);
+        osc1.stop(now + 0.2);
+        osc2.start(now + 0.12);
+        osc2.stop(now + 0.55);
+        return true;
+      }
+
+      if (type === 'pop' || (type as string) === 'snap') {
+        // Crisp tactile snap / stamp pop
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(880, now);
+        osc.frequency.exponentialRampToValueAtTime(1760, now + 0.03);
+        osc.frequency.exponentialRampToValueAtTime(220, now + 0.08);
+
+        gain.gain.setValueAtTime(0.25, now);
+        gain.gain.exponentialRampToValueAtTime(0.001, now + 0.08);
+
+        osc.connect(gain);
+        gain.connect(ctx.destination);
+
+        osc.start(now);
+        osc.stop(now + 0.08);
+        return true;
+      }
+
+      if (type === 'laser') {
+        // Laser pointer subtle energy beam
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(1200, now);
+        osc.frequency.exponentialRampToValueAtTime(600, now + 0.06);
+
+        gain.gain.setValueAtTime(0.08, now);
+        gain.gain.exponentialRampToValueAtTime(0.001, now + 0.06);
+
+        osc.connect(gain);
+        gain.connect(ctx.destination);
+
+        osc.start(now);
+        osc.stop(now + 0.06);
+        return true;
+      }
+
+      if (type === 'whiteboard') {
+        // Smooth whiteboard flip tone
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+
+        osc.type = 'triangle';
+        osc.frequency.setValueAtTime(440, now);
+        osc.frequency.exponentialRampToValueAtTime(659.25, now + 0.12);
+
+        gain.gain.setValueAtTime(0.15, now);
+        gain.gain.exponentialRampToValueAtTime(0.001, now + 0.22);
+
+        osc.connect(gain);
+        gain.connect(ctx.destination);
+
+        osc.start(now);
+        osc.stop(now + 0.22);
+        return true;
+      }
     } catch (e) {
       console.warn('Synth error:', e);
     }
@@ -145,7 +245,20 @@ class AudioService {
   play(soundName: keyof typeof SOUND_MAP | string) {
     try {
       // 1. Try instant Web Audio API tone synthesis for key events
-      if (['start', 'stop', 'pause', 'complete', 'countdown'].includes(soundName)) {
+      const synthTypes = [
+        'start',
+        'stop',
+        'pause',
+        'complete',
+        'countdown',
+        'chime',
+        'dingdong',
+        'pop',
+        'snap',
+        'laser',
+        'whiteboard'
+      ];
+      if (synthTypes.includes(soundName)) {
         if (this.synthChime(soundName as any)) return;
       }
 

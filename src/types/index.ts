@@ -1,6 +1,27 @@
 export type RecordingMode = 'screen-cam' | 'screen-only' | 'cam-only' | 'custom-area';
 export type BubbleSize = 'small' | 'medium' | 'large' | 'fullscreen';
 
+export type DrawingTool =
+  | 'pen'
+  | 'smartpen'
+  | 'highlighter'
+  | 'arrow'
+  | 'darrow'
+  | 'line'
+  | 'rectangle'
+  | 'ellipse'
+  | 'diamond'
+  | 'triangle'
+  | 'stamp'
+  | 'mosaic'
+  | 'text'
+  | 'laser'
+  | 'eraser';
+
+export type FillMode = 'outline' | 'tint' | 'solid';
+export type WhiteboardMode = 'screen' | 'whiteboard' | 'blackboard';
+export type StampType = 'check' | 'cross' | 'star' | 'heart' | 'question' | 'arrow' | 'number';
+
 export interface CropArea {
   x: number;
   y: number;
