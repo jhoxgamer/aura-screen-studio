@@ -1221,10 +1221,22 @@ app.whenReady().then(() => {
     }
   };
 
-  globalShortcut.register('CommandOrControl+Shift+A', toggleRecording);
-  globalShortcut.register('CommandOrControl+Shift+L', toggleRecording);
+  const safeRegisterShortcuts = (accelerators: string[], callback: () => void) => {
+    for (const acc of accelerators) {
+      try {
+        globalShortcut.register(acc, callback);
+      } catch (err) {
+        console.warn(`Failed to register global shortcut ${acc}:`, err);
+      }
+    }
+  };
 
-  globalShortcut.register('CommandOrControl+Shift+P', () => {
+  safeRegisterShortcuts(
+    ['CommandOrControl+Shift+A', 'CommandOrControl+Shift+L', 'Alt+Shift+A', 'Alt+Shift+L'],
+    toggleRecording
+  );
+
+  safeRegisterShortcuts(['CommandOrControl+Shift+P', 'Alt+Shift+P'], () => {
     if (isRecording) {
       if (isPaused) {
         ipcMain.emit('recording:resume');
@@ -1234,23 +1246,23 @@ app.whenReady().then(() => {
     }
   });
 
-  globalShortcut.register('CommandOrControl+Shift+M', () => {
+  safeRegisterShortcuts(['CommandOrControl+Shift+M', 'Alt+Shift+M'], () => {
     if (isRecording && controlBarWindow && !controlBarWindow.isDestroyed()) {
       controlBarWindow.webContents.send('recording:toggle-mic');
     }
   });
 
-  globalShortcut.register('CommandOrControl+Shift+D', () => {
+  safeRegisterShortcuts(['CommandOrControl+Shift+D', 'Alt+Shift+D'], () => {
     if (isRecording) {
       broadcastDrawingState(!isDrawingActive);
     }
   });
 
-  globalShortcut.register('CommandOrControl+Shift+T', () => {
+  safeRegisterShortcuts(['CommandOrControl+Shift+T', 'Alt+Shift+T'], () => {
     toggleSpeakerNotesWindow();
   });
 
-  globalShortcut.register('CommandOrControl+Shift+S', () => {
+  safeRegisterShortcuts(['CommandOrControl+Shift+S', 'Alt+Shift+S'], () => {
     captureAndOpenScreenshotStudio();
   });
 

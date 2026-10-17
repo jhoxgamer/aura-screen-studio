@@ -26,6 +26,7 @@ import {
   Sliders,
   Type
 } from 'lucide-react';
+import { getShortcutLabel } from '../utils/shortcuts';
 
 interface BulletNote {
   id: string;
@@ -71,7 +72,7 @@ export const SpeakerNotesView: React.FC = () => {
     return [
       { id: '1', text: 'Boas-vindas e introdução ao tema', done: false },
       { id: '2', text: 'Mostrar a tela principal e novidades', done: false },
-      { id: '3', text: 'Demonstrar atalhos rápidos (Alt+Shift+A)', done: false },
+      { id: '3', text: `Demonstrar atalhos rápidos (${getShortcutLabel('a')})`, done: false },
       { id: '4', text: 'Conclusão e chamada para ação (Call to Action)', done: false }
     ];
   });

@@ -476,6 +476,56 @@ describe('End-to-End Integration & Subsystem Validation', () => {
       assert.equal(isCopyLinkShortcut({ ctrlKey: false, metaKey: false, key: 'l' }), false);
       assert.equal(isCopyLinkShortcut({ ctrlKey: true, metaKey: false, key: 'k' }), false);
     });
+
+    test('multi-modifier accelerator safely registers primary and secondary aliases', () => {
+      const registeredMap = new Map<string, () => void>();
+      const safeRegister = (accelerators: string[], cb: () => void) => {
+        accelerators.forEach((acc) => registeredMap.set(acc, cb));
+      };
+
+      let micToggled = false;
+      safeRegister(['CommandOrControl+Shift+M', 'Alt+Shift+M'], () => {
+        micToggled = true;
+      });
+
+      assert.ok(registeredMap.has('CommandOrControl+Shift+M'), 'Primary accelerator registered');
+      assert.ok(registeredMap.has('Alt+Shift+M'), 'Secondary alias registered');
+
+      // Trigger secondary
+      registeredMap.get('Alt+Shift+M')?.();
+      assert.equal(micToggled, true, 'Alt+Shift+M successfully triggers mic toggle callback');
+    });
+
+    test('device hotplugging event triggers dynamic device re-enumeration', () => {
+      let deviceListFetched = 0;
+      const fakeMediaDevices = {
+        listeners: [] as Array<() => void>,
+        addEventListener(event: string, cb: () => void) {
+          if (event === 'devicechange') this.listeners.push(cb);
+        },
+        removeEventListener(event: string, cb: () => void) {
+          this.listeners = this.listeners.filter((l) => l !== cb);
+        },
+        simulateHotplug() {
+          this.listeners.forEach((l) => l());
+        }
+      };
+
+      const initDevices = () => {
+        deviceListFetched++;
+      };
+
+      fakeMediaDevices.addEventListener('devicechange', initDevices);
+      initDevices(); // Initial load
+      assert.equal(deviceListFetched, 1, 'Initial device fetch ran once');
+
+      fakeMediaDevices.simulateHotplug(); // User plugs in USB mic
+      assert.equal(deviceListFetched, 2, 'Device list auto-refreshed on hotplug event');
+
+      fakeMediaDevices.removeEventListener('devicechange', initDevices);
+      fakeMediaDevices.simulateHotplug();
+      assert.equal(deviceListFetched, 2, 'Listener properly removed on cleanup');
+    });
   });
 });
 

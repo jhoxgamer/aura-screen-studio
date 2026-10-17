@@ -27,6 +27,7 @@ import {
 } from 'lucide-react';
 import { RecordingMeta, ChapterItem } from '../types';
 import confetti from 'canvas-confetti';
+import { getShortcutLabel } from '../utils/shortcuts';
 
 export const PreviewView: React.FC = () => {
   const [meta, setMeta] = useState<RecordingMeta | null>(null);
@@ -502,6 +503,7 @@ export const PreviewView: React.FC = () => {
           {/* Share Link Button */}
           <button
             onClick={handleShareLink}
+            title={`Copiar Link Público (${getShortcutLabel('l')})`}
             className="flex items-center space-x-1.5 bg-indigo-600 hover:bg-indigo-500 active:scale-95 text-white px-3.5 py-1.5 rounded-xl text-xs font-semibold transition-all shadow-sm"
           >
             {isLinkCopied ? <Check className="w-3.5 h-3.5" /> : <Share2 className="w-3.5 h-3.5" />}
@@ -569,6 +571,7 @@ export const PreviewView: React.FC = () => {
         </div>
         <button
           onClick={handleShareLink}
+          title={`Copiar Link (${getShortcutLabel('l')})`}
           className="text-xs text-indigo-400 hover:text-indigo-300 hover:underline font-semibold shrink-0 ml-4"
         >
           {isLinkCopied ? 'Copiado!' : 'Copiar'}
@@ -603,6 +606,7 @@ export const PreviewView: React.FC = () => {
           {!isPlaying && meta?.filePath && (
             <button
               onClick={togglePlay}
+              title="Reproduzir (Espaço)"
               className="absolute w-16 h-16 rounded-full bg-loom-primary/90 text-white flex items-center justify-center shadow-2xl hover:scale-110 active:scale-95 transition-all"
             >
               <Play className="w-8 h-8 fill-current ml-1" />
@@ -620,6 +624,7 @@ export const PreviewView: React.FC = () => {
                 step={0.1}
                 value={currentTime}
                 onChange={handleSeek}
+                title="Barra de Navegação (Setas Esquerda / Direita)"
                 className="w-full h-1.5 bg-white/20 accent-loom-coral rounded-lg cursor-pointer appearance-none"
               />
             </div>
@@ -629,6 +634,7 @@ export const PreviewView: React.FC = () => {
               <div className="flex items-center space-x-3">
                 <button
                   onClick={togglePlay}
+                  title="Reproduzir / Pausar (Espaço)"
                   className="p-1.5 rounded-lg hover:bg-white/10 text-white transition-colors"
                 >
                   {isPlaying ? <Pause className="w-5 h-5" /> : <Play className="w-5 h-5 fill-current" />}
@@ -644,6 +650,7 @@ export const PreviewView: React.FC = () => {
                 {/* Speed Multiplier */}
                 <button
                   onClick={handleSpeedChange}
+                  title="Alternar Velocidade (1x, 1.5x, 2x) ou Teclas 1, 2, 3"
                   className="text-xs font-bold bg-white/10 hover:bg-white/20 px-2 py-1 rounded-lg text-white transition-colors"
                 >
                   {playbackRate}x
@@ -652,6 +659,7 @@ export const PreviewView: React.FC = () => {
                 {/* Mute Button */}
                 <button
                   onClick={toggleMute}
+                  title={isMuted ? 'Ativar Áudio (M)' : 'Silenciar Áudio (M)'}
                   className="p-1.5 rounded-lg hover:bg-white/10 text-white transition-colors"
                 >
                   {isMuted ? <VolumeX className="w-4 h-4 text-loom-coral" /> : <Volume2 className="w-4 h-4" />}
@@ -664,6 +672,7 @@ export const PreviewView: React.FC = () => {
                       videoRef.current.requestFullscreen();
                     }
                   }}
+                  title="Tela Cheia (F)"
                   className="p-1.5 rounded-lg hover:bg-white/10 text-white transition-colors"
                 >
                   <Maximize className="w-4 h-4" />

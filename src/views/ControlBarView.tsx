@@ -17,6 +17,7 @@ import {
 import { RecordingOptions } from '../types';
 import { recorderService } from '../services/recorderService';
 import { transcriptionService } from '../services/transcriptionService';
+import { getShortcutLabel } from '../utils/shortcuts';
 
 export const ControlBarView: React.FC = () => {
   const [seconds, setSeconds] = useState(0);
@@ -166,7 +167,8 @@ export const ControlBarView: React.FC = () => {
     const nextMuted = !isMicMuted;
     recorderService.setMicMuted(nextMuted);
     setIsMicMuted(nextMuted);
-    setRetakeNotice(nextMuted ? 'Microfone Silenciado (Alt+Shift+M)' : 'Microfone Ativado (Alt+Shift+M)');
+    const micShortcut = getShortcutLabel('m');
+    setRetakeNotice(nextMuted ? `Microfone Silenciado (${micShortcut})` : `Microfone Ativado (${micShortcut})`);
     setTimeout(() => setRetakeNotice(null), 2000);
   };
 
@@ -203,7 +205,7 @@ export const ControlBarView: React.FC = () => {
           <button
             onClick={handleStopRecording}
             disabled={isStopping}
-            title="Concluir e Salvar Gravação"
+            title={`Concluir e Salvar Gravação (${getShortcutLabel('a')})`}
             className="flex items-center space-x-2 bg-rose-600 hover:bg-rose-500 active:scale-95 text-white px-3 py-1.5 rounded-xl font-medium text-xs transition-all shadow-sm group"
           >
             <div className="w-2.5 h-2.5 rounded-sm bg-white group-hover:scale-105 transition-transform" />
@@ -257,7 +259,7 @@ export const ControlBarView: React.FC = () => {
         <div style={{ WebkitAppRegion: 'no-drag' } as any}>
           <button
             onClick={handleTogglePause}
-            title={isPaused ? 'Retomar Gravação (Alt+Shift+P)' : 'Pausar Gravação (Alt+Shift+P)'}
+            title={isPaused ? `Retomar Gravação (${getShortcutLabel('p')})` : `Pausar Gravação (${getShortcutLabel('p')})`}
             className={`p-2 rounded-xl transition-all ${
               isPaused
                 ? 'bg-amber-400 text-slate-950 font-bold shadow-sm'
@@ -272,7 +274,7 @@ export const ControlBarView: React.FC = () => {
         <div style={{ WebkitAppRegion: 'no-drag' } as any}>
           <button
             onClick={handleToggleMic}
-            title={isMicMuted ? 'Ativar Microfone (Alt+Shift+M)' : `Microfone Ativo (${Math.round(micLevel * 100)}%) • Silenciar (Alt+Shift+M)`}
+            title={isMicMuted ? `Ativar Microfone (${getShortcutLabel('m')})` : `Microfone Ativo (${Math.round(micLevel * 100)}%) • Silenciar (${getShortcutLabel('m')})`}
             className={`px-2 py-1.5 rounded-xl transition-all flex items-center space-x-1.5 ${
               isMicMuted
                 ? 'bg-rose-500/20 text-rose-400 border border-rose-500/40 shadow-sm'
@@ -332,7 +334,7 @@ export const ControlBarView: React.FC = () => {
         <div style={{ WebkitAppRegion: 'no-drag' } as any}>
           <button
             onClick={handleToggleDrawing}
-            title="Anotações na Tela (Alt+Shift+D)"
+            title={`Anotações na Tela (${getShortcutLabel('d')})`}
             className={`p-2 rounded-xl transition-all ${
               isDrawing
                 ? 'bg-indigo-600 text-white font-medium shadow-sm'
@@ -347,7 +349,7 @@ export const ControlBarView: React.FC = () => {
         <div style={{ WebkitAppRegion: 'no-drag' } as any}>
           <button
             onClick={() => window.electronAPI.toggleSpeakerNotes()}
-            title="Teleprompter / Roteiro (Alt+Shift+T)"
+            title={`Teleprompter / Roteiro (${getShortcutLabel('t')})`}
             className={`p-2 rounded-xl transition-all ${
               isSpeakerNotesOpen
                 ? 'bg-indigo-600 text-white font-medium shadow-sm'

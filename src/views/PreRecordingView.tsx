@@ -24,6 +24,7 @@ import {
 } from 'lucide-react';
 import { CaptureSource, RecordingMode, RecordingOptions, CropArea } from '../types';
 import { LibraryView } from './LibraryView';
+import { getShortcutLabel } from '../utils/shortcuts';
 
 export const PreRecordingView: React.FC = () => {
   const [activeTab, setActiveTab] = useState<'record' | 'library'>('record');
@@ -82,6 +83,7 @@ export const PreRecordingView: React.FC = () => {
   });
   const [cropArea, setCropArea] = useState<CropArea | null>(null);
   const [showLiveCamPreview, setShowLiveCamPreview] = useState(true);
+  const [isRefreshingSources, setIsRefreshingSources] = useState(false);
 
   // Auto-Updater in-app state
   const [updaterStatus, setUpdaterStatus] = useState<{ state: string; version?: string; percent?: number }>({ state: 'idle' });
@@ -174,6 +176,23 @@ export const PreRecordingView: React.FC = () => {
     if (selectedVideoId) localStorage.setItem('aura_video_device_id', selectedVideoId);
   }, [selectedVideoId]);
 
+  const refreshSources = async () => {
+    setIsRefreshingSources(true);
+    try {
+      if (window.electronAPI?.getSources) {
+        const srcList = await window.electronAPI.getSources();
+        setSources(srcList);
+        if (srcList.length > 0 && !srcList.some((s) => s.id === selectedSourceId)) {
+          setSelectedSourceId(srcList[0].id);
+        }
+      }
+    } catch (err) {
+      console.error('Error refreshing sources:', err);
+    } finally {
+      setTimeout(() => setIsRefreshingSources(false), 500);
+    }
+  };
+
   // Load capture sources & media devices
   useEffect(() => {
     async function initDevices() {
@@ -181,7 +200,7 @@ export const PreRecordingView: React.FC = () => {
         if (window.electronAPI?.getSources) {
           const srcList = await window.electronAPI.getSources();
           setSources(srcList);
-          if (srcList.length > 0) {
+          if (srcList.length > 0 && !selectedSourceId) {
             setSelectedSourceId(srcList[0].id);
           }
         }
@@ -213,6 +232,11 @@ export const PreRecordingView: React.FC = () => {
     }
     initDevices();
 
+    const onDeviceChange = () => {
+      initDevices();
+    };
+    navigator.mediaDevices?.addEventListener?.('devicechange', onDeviceChange);
+
     const interval = setInterval(async () => {
       try {
         const pub = await window.electronAPI.getPublicUrl();
@@ -223,7 +247,10 @@ export const PreRecordingView: React.FC = () => {
       } catch (e) {}
     }, 1500);
 
-    return () => clearInterval(interval);
+    return () => {
+      navigator.mediaDevices?.removeEventListener?.('devicechange', onDeviceChange);
+      clearInterval(interval);
+    };
   }, []);
 
   // Real Web Audio DSP Pipeline & Live Microphone Monitoring
@@ -609,7 +636,7 @@ export const PreRecordingView: React.FC = () => {
           <div className="flex items-center space-x-2">
             <span className="font-semibold text-sm tracking-tight text-white">Aura Screen Studio</span>
             <span className="text-[10px] text-slate-400 bg-[#181c28] border border-[#262c3e] px-1.5 py-0.5 rounded font-mono">
-              v{appVersion || '1.7.2'}
+              v{appVersion || '1.7.3'}
             </span>
           </div>
         </div>
@@ -617,7 +644,7 @@ export const PreRecordingView: React.FC = () => {
         <div className="flex items-center space-x-1" style={{ WebkitAppRegion: 'no-drag' } as any}>
           <button
             onClick={() => window.electronAPI.takeScreenshot()}
-            title="Capturar Screenshot com Anotações (Alt+Shift+S)"
+            title={`Capturar Screenshot com Anotações (${getShortcutLabel('s')})`}
             className="flex items-center space-x-1 px-2.5 py-1 rounded-md bg-[#1a1f2e] hover:bg-[#232a3d] text-slate-300 hover:text-indigo-300 text-[11px] font-medium transition-colors border border-[#2b334a]"
           >
             <Camera className="w-3.5 h-3.5 text-indigo-400" />
@@ -808,9 +835,20 @@ export const PreRecordingView: React.FC = () => {
           {/* Screen / Window Source Picker */}
           {mode !== 'cam-only' && (
             <div>
-              <label className="text-[11px] font-semibold text-slate-400 uppercase tracking-wider block mb-2">
-                Fonte de Vídeo
-              </label>
+              <div className="flex items-center justify-between mb-2">
+                <label className="text-[11px] font-semibold text-slate-400 uppercase tracking-wider block">
+                  Fonte de Vídeo
+                </label>
+                <button
+                  type="button"
+                  onClick={refreshSources}
+                  title="Atualizar lista de janelas e telas"
+                  className="text-[10px] text-indigo-400 hover:text-indigo-300 font-medium flex items-center space-x-1"
+                >
+                  <RefreshCw className={`w-3 h-3 ${isRefreshingSources ? 'animate-spin' : ''}`} />
+                  <span>Atualizar Janelas</span>
+                </button>
+              </div>
               <div className="bg-[#131620] border border-[#222838] rounded-xl p-2.5 flex items-center space-x-3">
                 {selectedSource?.thumbnail ? (
                   <img
@@ -828,13 +866,17 @@ export const PreRecordingView: React.FC = () => {
                   <select
                     value={selectedSourceId}
                     onChange={(e) => setSelectedSourceId(e.target.value)}
-                    className="w-full bg-[#0c0e14] border border-[#262c3e] rounded-lg text-xs text-white p-2 font-medium focus:outline-none focus:border-indigo-500"
+                    className="w-full bg-[#0c0e14] border border-[#262c3e] rounded-lg text-xs text-white p-2 font-medium focus:outline-none focus:border-indigo-500 truncate"
                   >
-                    {sources.map((s) => (
-                      <option key={s.id} value={s.id} className="bg-[#121520]">
-                        {s.name}
-                      </option>
-                    ))}
+                    {sources.length === 0 ? (
+                      <option value="" className="bg-[#121520]">Nenhuma tela ou janela encontrada</option>
+                    ) : (
+                      sources.map((s) => (
+                        <option key={s.id} value={s.id} className="bg-[#121520]">
+                          {s.name}
+                        </option>
+                      ))
+                    )}
                   </select>
                 </div>
               </div>
@@ -864,11 +906,15 @@ export const PreRecordingView: React.FC = () => {
                   onChange={(e) => setSelectedVideoId(e.target.value)}
                   className="w-full bg-transparent text-xs text-white focus:outline-none font-medium truncate"
                 >
-                  {videoDevices.map((d) => (
-                    <option key={d.deviceId} value={d.deviceId} className="bg-[#121520]">
-                      {d.label || `Câmera (${d.deviceId.slice(0, 5)}...)`}
-                    </option>
-                  ))}
+                  {videoDevices.length === 0 ? (
+                    <option value="" className="bg-[#121520]">Nenhuma câmera conectada</option>
+                  ) : (
+                    videoDevices.map((d) => (
+                      <option key={d.deviceId} value={d.deviceId} className="bg-[#121520]">
+                        {d.label || `Câmera (${d.deviceId.slice(0, 5)}...)`}
+                      </option>
+                    ))
+                  )}
                 </select>
               </div>
 
@@ -939,11 +985,15 @@ export const PreRecordingView: React.FC = () => {
                   onChange={(e) => setSelectedAudioId(e.target.value)}
                   className="w-full bg-[#0c0e14] border border-[#262c3e] rounded-lg text-xs text-white p-2 font-medium focus:outline-none focus:border-indigo-500 truncate"
                 >
-                  {audioDevices.map((d) => (
-                    <option key={d.deviceId} value={d.deviceId} className="bg-[#121520]">
-                      {d.label || `Microfone (${d.deviceId.slice(0, 5)}...)`}
-                    </option>
-                  ))}
+                  {audioDevices.length === 0 ? (
+                    <option value="" className="bg-[#121520]">Nenhum microfone detectado</option>
+                  ) : (
+                    audioDevices.map((d) => (
+                      <option key={d.deviceId} value={d.deviceId} className="bg-[#121520]">
+                        {d.label || `Microfone (${d.deviceId.slice(0, 5)}...)`}
+                      </option>
+                    ))
+                  )}
                 </select>
               </div>
 
@@ -1236,7 +1286,7 @@ export const PreRecordingView: React.FC = () => {
               <span>•</span>
               <span title="Pressione Enter para iniciar gravação">[Enter] Gravar</span>
               <span>•</span>
-              <span title="Atalho global do sistema" className="text-slate-500">Alt+Shift+A</span>
+              <span title="Atalho global do sistema" className="text-slate-400 font-semibold">{getShortcutLabel('a')}</span>
             </div>
 
             {/* App Version & Manual Update Check */}
