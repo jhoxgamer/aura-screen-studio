@@ -32,7 +32,19 @@ app.commandLine.appendSwitch('high-dpi-support', '1');
 
 let isRecording = false;
 let isPaused = false;
+let isDrawingActive = false;
 let currentOptions: RecordingOptions | null = null;
+
+function broadcastDrawingState(active: boolean) {
+  isDrawingActive = active;
+  if (drawingOverlayWindow && !drawingOverlayWindow.isDestroyed()) {
+    drawingOverlayWindow.setIgnoreMouseEvents(!active, { forward: true });
+    drawingOverlayWindow.webContents.send('drawing:toggled', active);
+  }
+  if (controlBarWindow && !controlBarWindow.isDestroyed()) {
+    controlBarWindow.webContents.send('drawing:toggled', active);
+  }
+}
 
 const isDev = process.env.NODE_ENV === 'development' || !app.isPackaged;
 const VITE_DEV_SERVER_URL = 'http://localhost:5174';
@@ -604,17 +616,6 @@ function setupIpcHandlers() {
   });
 
   // Drawing mode toggle with synchronized multi-window broadcast
-  let isDrawingActive = false;
-  const broadcastDrawingState = (active: boolean) => {
-    isDrawingActive = active;
-    if (drawingOverlayWindow && !drawingOverlayWindow.isDestroyed()) {
-      drawingOverlayWindow.setIgnoreMouseEvents(!active, { forward: true });
-      drawingOverlayWindow.webContents.send('drawing:toggled', active);
-    }
-    if (controlBarWindow && !controlBarWindow.isDestroyed()) {
-      controlBarWindow.webContents.send('drawing:toggled', active);
-    }
-  };
 
   ipcMain.on('drawing:toggle', () => {
     broadcastDrawingState(!isDrawingActive);
@@ -1098,6 +1099,16 @@ app.whenReady().then(() => {
         ipcMain.emit('recording:pause');
       }
     }
+  });
+
+  globalShortcut.register('CommandOrControl+Shift+D', () => {
+    if (isRecording) {
+      broadcastDrawingState(!isDrawingActive);
+    }
+  });
+
+  globalShortcut.register('CommandOrControl+Shift+T', () => {
+    toggleSpeakerNotesWindow();
   });
 
   createPreRecordingWindow();

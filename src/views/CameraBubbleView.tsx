@@ -8,7 +8,9 @@ import {
   User,
   Sparkles,
   Circle,
-  Square
+  Square,
+  Volume2,
+  Sliders
 } from 'lucide-react';
 import { BubbleSize, RecordingOptions } from '../types';
 
@@ -20,9 +22,14 @@ export const CameraBubbleView: React.FC = () => {
   const [cameraFilter, setCameraFilter] = useState<'none' | 'blur' | 'studio' | 'vibrant'>('none');
   const [bubbleShape, setBubbleShape] = useState<'circle' | 'squircle'>('circle');
   const [filterToast, setFilterToast] = useState<string | null>(null);
+  const [audioLevel, setAudioLevel] = useState<number>(0);
 
   const videoRef = useRef<HTMLVideoElement>(null);
   const streamRef = useRef<MediaStream | null>(null);
+  const audioContextRef = useRef<AudioContext | null>(null);
+  const analyserRef = useRef<AnalyserNode | null>(null);
+  const micStreamRef = useRef<MediaStream | null>(null);
+  const animFrameRef = useRef<number | null>(null);
 
   useEffect(() => {
     // Listen for size updates from main process
@@ -32,15 +39,20 @@ export const CameraBubbleView: React.FC = () => {
 
     const cleanupOptions = window.electronAPI.onRecordingOptions((options: RecordingOptions) => {
       startCamera(options.videoDeviceId);
+      startMicListener(options.audioDeviceId);
     });
 
-    // Start with default camera initially
+    // Start with default camera & mic initially
     startCamera();
+    startMicListener();
 
     return () => {
       cleanupSize();
       cleanupOptions();
       streamRef.current?.getTracks().forEach((t) => t.stop());
+      micStreamRef.current?.getTracks().forEach((t) => t.stop());
+      if (animFrameRef.current) cancelAnimationFrame(animFrameRef.current);
+      audioContextRef.current?.close().catch(() => {});
     };
   }, []);
 
@@ -63,6 +75,52 @@ export const CameraBubbleView: React.FC = () => {
       }
     } catch (err) {
       console.warn('Camera bubble failed to access video:', err);
+    }
+  }
+
+  // Real-time audio reactivity to pulse the glowing ring when speaking
+  async function startMicListener(audioDeviceId?: string) {
+    try {
+      if (micStreamRef.current) {
+        micStreamRef.current.getTracks().forEach(t => t.stop());
+      }
+
+      const micStream = await navigator.mediaDevices.getUserMedia({
+        audio: audioDeviceId ? { deviceId: { exact: audioDeviceId } } : true,
+        video: false
+      });
+
+      micStreamRef.current = micStream;
+      const audioCtx = new (window.AudioContext || (window as any).webkitAudioContext)();
+      const analyser = audioCtx.createAnalyser();
+      analyser.fftSize = 64;
+      analyser.smoothingTimeConstant = 0.8;
+
+      const source = audioCtx.createMediaStreamSource(micStream);
+      source.connect(analyser);
+
+      audioContextRef.current = audioCtx;
+      analyserRef.current = analyser;
+
+      const dataArray = new Uint8Array(analyser.frequencyBinCount);
+
+      const checkVolume = () => {
+        analyser.getByteFrequencyData(dataArray);
+        let sum = 0;
+        for (let i = 0; i < dataArray.length; i++) {
+          sum += dataArray[i];
+        }
+        const avg = sum / dataArray.length;
+        const normalized = Math.min(1, avg / 110);
+        setAudioLevel(normalized);
+
+        animFrameRef.current = requestAnimationFrame(checkVolume);
+      };
+
+      checkVolume();
+    } catch (e) {
+      // Audio reactivity is optional enhancement
+      console.warn('Bubble mic reactivity unavailable:', e);
     }
   }
 
@@ -90,6 +148,12 @@ export const CameraBubbleView: React.FC = () => {
     setTimeout(() => setFilterToast(null), 1800);
   };
 
+  // Dynamic audio-reactive ring glow scale
+  const ringScale = 1 + (audioLevel > 0.05 ? audioLevel * 0.12 : 0);
+  const ringGlow = audioLevel > 0.08
+    ? `0 0 ${16 + audioLevel * 28}px rgba(6, 182, 212, ${0.5 + audioLevel * 0.5})`
+    : '0 0 20px rgba(6, 182, 212, 0.35)';
+
   return (
     <div
       className="w-screen h-screen flex items-center justify-center p-3 select-none"
@@ -101,10 +165,22 @@ export const CameraBubbleView: React.FC = () => {
         className="relative w-full h-full flex items-center justify-center group cursor-grab active:cursor-grabbing"
         style={{ WebkitAppRegion: 'drag' } as any}
       >
-        {/* Bubble Outer Frame with Glowing Aura Border */}
+        {/* Audio Reactive Expanding Aura Ring */}
         <div
-          className={`relative w-full h-full overflow-hidden transition-all duration-300 ring-4 ring-cyan-500/70 shadow-2xl shadow-cyan-500/30 ${
-            bubbleShape === 'circle' ? 'rounded-full' : 'rounded-3xl'
+          className={`absolute inset-0 transition-transform duration-100 pointer-events-none ${
+            bubbleShape === 'circle' ? 'rounded-full' : 'rounded-[38px]'
+          }`}
+          style={{
+            transform: `scale(${ringScale})`,
+            boxShadow: ringGlow,
+            border: `2px solid rgba(6, 182, 212, ${0.4 + audioLevel * 0.6})`
+          }}
+        />
+
+        {/* Bubble Outer Frame with Glowing Border */}
+        <div
+          className={`relative w-full h-full overflow-hidden transition-all duration-300 ring-4 ring-cyan-500/80 shadow-2xl ${
+            bubbleShape === 'circle' ? 'rounded-full' : 'rounded-[38px]'
           }`}
         >
           {/* Active Camera Stream */}
@@ -124,29 +200,43 @@ export const CameraBubbleView: React.FC = () => {
                   filter: cameraFilter === 'blur'
                     ? 'contrast(1.1) brightness(1.05) saturate(1.15)'
                     : cameraFilter === 'studio'
-                    ? 'brightness(1.15) contrast(1.12) saturate(1.05)'
+                    ? 'brightness(1.18) contrast(1.14) saturate(1.08)'
                     : cameraFilter === 'vibrant'
-                    ? 'saturate(1.4) contrast(1.1)'
+                    ? 'saturate(1.4) contrast(1.12)'
                     : 'none'
                 }}
                 className="w-full h-full object-cover transition-all duration-200"
               />
             </div>
           ) : (
-            <div className="w-full h-full bg-[#0a0d15] flex flex-col items-center justify-center text-slate-400">
-              <div className="w-20 h-20 rounded-full bg-slate-900 border border-slate-800 flex items-center justify-center shadow-inner">
+            /* Avatar mode with audio voice pulse */
+            <div className="w-full h-full bg-[#0a0d15] flex flex-col items-center justify-center text-slate-400 relative overflow-hidden">
+              {/* Voice pulse ring behind avatar */}
+              <div
+                className="absolute rounded-full bg-cyan-500/20 transition-transform duration-100 pointer-events-none"
+                style={{
+                  width: '90px',
+                  height: '90px',
+                  transform: `scale(${1 + audioLevel * 0.6})`,
+                  opacity: 0.3 + audioLevel * 0.7
+                }}
+              />
+              <div className="w-20 h-20 rounded-full bg-slate-900 border border-cyan-500/40 flex items-center justify-center shadow-inner z-10">
                 <User className="w-10 h-10 text-cyan-400" />
               </div>
-              <span className="text-[11px] font-bold text-slate-300 mt-2">Câmera Pausada</span>
+              <span className="text-[11px] font-bold text-slate-300 mt-2 z-10 flex items-center gap-1">
+                {audioLevel > 0.08 && <Volume2 className="w-3 h-3 text-cyan-400 animate-pulse" />}
+                {audioLevel > 0.08 ? 'Falando...' : 'Câmera Pausada'}
+              </span>
             </div>
           )}
 
           {/* Active Recording Pulsing Ring Indicator */}
-          <div className="absolute inset-0 rounded-full border-2 border-rose-500/60 pointer-events-none animate-pulse" />
+          <div className="absolute inset-0 rounded-full border border-rose-500/60 pointer-events-none animate-pulse" />
 
           {/* Filter change toast */}
           {filterToast && (
-            <div className="absolute top-4 left-1/2 -translate-x-1/2 bg-black/80 backdrop-blur-md px-3 py-1 rounded-full border border-cyan-500/40 text-[10px] font-bold text-cyan-300 tracking-wide uppercase shadow-lg">
+            <div className="absolute top-4 left-1/2 -translate-x-1/2 bg-black/85 backdrop-blur-md px-3 py-1 rounded-full border border-cyan-500/40 text-[10px] font-bold text-cyan-300 tracking-wide uppercase shadow-lg z-20">
               {filterToast}
             </div>
           )}
@@ -154,7 +244,7 @@ export const CameraBubbleView: React.FC = () => {
 
         {/* Hover Action Overlay & Controls */}
         <div
-          className={`absolute bottom-2 left-1/2 -translate-x-1/2 flex items-center space-x-1 px-3 py-1.5 rounded-full bg-[#0a0d15]/95 backdrop-blur-xl border border-cyan-500/30 shadow-2xl transition-all duration-200 ${
+          className={`absolute bottom-2 left-1/2 -translate-x-1/2 flex items-center space-x-1 px-3 py-1.5 rounded-full bg-[#0a0d15]/95 backdrop-blur-xl border border-cyan-500/30 shadow-2xl transition-all duration-200 z-30 ${
             showControls ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-2 pointer-events-none'
           }`}
           style={{ WebkitAppRegion: 'no-drag' } as any}
@@ -221,7 +311,7 @@ export const CameraBubbleView: React.FC = () => {
             {bubbleShape === 'circle' ? <Square className="w-3.5 h-3.5" /> : <Circle className="w-3.5 h-3.5" />}
           </button>
 
-          {/* Camera Filter / Blur toggle */}
+          {/* Camera Filter / Studio Lighting toggle */}
           <button
             onClick={cycleFilter}
             title={`Filtro: ${cameraFilter.toUpperCase()}`}

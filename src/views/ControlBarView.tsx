@@ -207,7 +207,7 @@ export const ControlBarView: React.FC = () => {
         <div style={{ WebkitAppRegion: 'no-drag' } as any}>
           <button
             onClick={handleToggleDrawing}
-            title="Anotações na Tela (Caneta & Formas)"
+            title="Anotações na Tela (Alt+Shift+D)"
             className={`p-2 rounded-xl transition-all ${
               isDrawing
                 ? 'bg-cyan-500 text-slate-950 font-bold shadow-md shadow-cyan-500/30 scale-105'
@@ -222,7 +222,7 @@ export const ControlBarView: React.FC = () => {
         <div style={{ WebkitAppRegion: 'no-drag' } as any}>
           <button
             onClick={() => window.electronAPI.toggleSpeakerNotes()}
-            title="Teleprompter / Roteiro do Apresentador"
+            title="Teleprompter / Roteiro (Alt+Shift+T)"
             className={`p-2 rounded-xl transition-all ${
               isSpeakerNotesOpen
                 ? 'bg-cyan-500 text-slate-950 font-bold shadow-md shadow-cyan-500/30 scale-105'

@@ -89,6 +89,57 @@ export const PreviewView: React.FC = () => {
     };
   }, [meta?.id]);
 
+  // Video Player Keyboard Navigation
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (isEditingTitle) return;
+      const target = e.target as HTMLElement;
+      if (target && (target.tagName === 'INPUT' || target.tagName === 'TEXTAREA')) return;
+
+      if (e.code === 'Space') {
+        e.preventDefault();
+        togglePlay();
+      } else if (e.code === 'KeyM') {
+        e.preventDefault();
+        toggleMute();
+      } else if (e.code === 'ArrowLeft') {
+        e.preventDefault();
+        if (videoRef.current) {
+          videoRef.current.currentTime = Math.max(0, videoRef.current.currentTime - 5);
+        }
+      } else if (e.code === 'ArrowRight') {
+        e.preventDefault();
+        if (videoRef.current) {
+          videoRef.current.currentTime = Math.min(duration, videoRef.current.currentTime + 5);
+        }
+      } else if (e.code === 'KeyF') {
+        e.preventDefault();
+        if (videoRef.current) {
+          if (document.fullscreenElement) {
+            document.exitFullscreen().catch(() => {});
+          } else {
+            videoRef.current.requestFullscreen().catch(() => {});
+          }
+        }
+      } else if (e.code === 'Digit1') {
+        e.preventDefault();
+        setPlaybackRate(1);
+        if (videoRef.current) videoRef.current.playbackRate = 1;
+      } else if (e.code === 'Digit2') {
+        e.preventDefault();
+        setPlaybackRate(1.5);
+        if (videoRef.current) videoRef.current.playbackRate = 1.5;
+      } else if (e.code === 'Digit3') {
+        e.preventDefault();
+        setPlaybackRate(2);
+        if (videoRef.current) videoRef.current.playbackRate = 2;
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [isPlaying, isMuted, duration, isEditingTitle]);
+
   const handleShareLink = async () => {
     if (!meta) return;
     const url = shareUrl || await window.electronAPI.getShareUrl(meta.id);
