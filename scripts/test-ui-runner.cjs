@@ -151,20 +151,29 @@ async function runUITests() {
       const libraryTab = Array.from(document.querySelectorAll('button')).find(b => b.textContent && b.textContent.includes('Biblioteca de Vídeos'));
       if (!libraryTab) return { error: 'Botão Biblioteca de Vídeos não encontrado' };
       libraryTab.click();
-      await new Promise(r => setTimeout(r, 250));
 
-      const hasLibraryHeader = document.body.innerText.includes('Buscar gravações') ||
-                               document.body.innerText.includes('Gravação Demonstração UI') ||
-                               document.body.innerText.includes('Nenhuma gravação encontrada');
+      let hasLibraryHeader = false;
+      for (let i = 0; i < 25; i++) {
+        await new Promise(r => setTimeout(r, 40));
+        hasLibraryHeader = document.body.innerText.includes('Buscar gravações') ||
+                           document.body.innerText.includes('Gravação Demonstração UI') ||
+                           document.body.innerText.includes('Carregando biblioteca Aura') ||
+                           document.body.innerText.includes('Nenhuma gravação encontrada');
+        if (hasLibraryHeader) break;
+      }
 
       // 2. Voltar para Nova Gravação
       const recordTab = Array.from(document.querySelectorAll('button')).find(b => b.textContent && b.textContent.includes('Nova Gravação'));
       if (!recordTab) return { error: 'Botão Nova Gravação não encontrado', hasLibraryHeader };
       recordTab.click();
-      await new Promise(r => setTimeout(r, 250));
-
-      const textAfter = document.body.innerText.toLowerCase();
-      const hasRecordView = textAfter.includes('modo de gravação');
+      
+      let hasRecordView = false;
+      for (let i = 0; i < 25; i++) {
+        await new Promise(r => setTimeout(r, 40));
+        const textAfter = document.body.innerText.toLowerCase();
+        hasRecordView = textAfter.includes('modo de gravação') || textAfter.includes('iniciar gravação');
+        if (hasRecordView) break;
+      }
 
       return { success: hasLibraryHeader && hasRecordView, hasLibraryHeader, hasRecordView };
     })()

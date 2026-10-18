@@ -1,0 +1,263 @@
+{
+  "timestamp": "2026-10-18T06:00:53.230Z",
+  "environment": {
+    "electron": "34.5.8",
+    "chrome": "132.0.6834.210",
+    "node": "20.19.1",
+    "platform": "win32",
+    "arch": "x64"
+  },
+  "config": {
+    "measurementWindowMs": 30000,
+    "targetFps": 30,
+    "sourceResolution": "320x240",
+    "audioTrack": "Opus 440Hz Sine Wave"
+  },
+  "stages": {
+    "host": {
+      "started": true,
+      "mime": "video/webm;codecs=vp8,opus",
+      "videoTracks": 1,
+      "audioTracks": 1
+    },
+    "continuous30sPlayback": {
+      "success": true,
+      "windowMsConfigured": 30000,
+      "exactDurationSec": 30.026,
+      "timeToFirstFrameMs": 165.6,
+      "totalPresentedFrames": 896,
+      "effectiveFps": 29.84,
+      "intervals": {
+        "minMs": 6.1,
+        "maxMs": 151.5,
+        "meanMs": 33.52,
+        "p50Ms": 30.4,
+        "p95Ms": 42.3,
+        "p99Ms": 42.5,
+        "jitterStdDevMs": 5.94,
+        "stallsExceeding100ms": 1,
+        "stallEvents": [
+          {
+            "frameIndex": 27,
+            "nowMs": 1653.9,
+            "durationMs": 151.5,
+            "mediaTimeSec": 1.05,
+            "currentTimeSec": 1.046,
+            "liveEdgeDistanceSec": 1.021
+          }
+        ],
+        "totalIntervalsMeasured": 895
+      },
+      "liveEdge": {
+        "minDistanceSec": 0.994,
+        "maxDistanceSec": 1.135,
+        "meanDistanceSec": 1.059
+      },
+      "temporalBuffer": {
+        "calculationMethod": "bufferAhead = activeRange.end - currentTime (calculado estritamente via TimeRanges e currentTime, sem derivação a partir de contadores de quadros)",
+        "minBufferAheadSec": 0.994,
+        "maxBufferAheadSec": 1.135,
+        "meanBufferAheadSec": 1.059,
+        "startBufferedRanges": [
+          {
+            "start": 0,
+            "end": 0.834
+          }
+        ],
+        "endBufferedRanges": [
+          {
+            "start": 20.3,
+            "end": 31.101
+          }
+        ]
+      },
+      "playerState": {
+        "paused": false,
+        "readyState": 4,
+        "currentTimeStart": 0.015,
+        "currentTimeEnd": 29.999,
+        "currentTimeAdvancementSec": 29.984,
+        "bufferedRanges": [
+          {
+            "start": 20.3,
+            "end": 31.101
+          }
+        ]
+      },
+      "snapshots": {
+        "initial": {
+          "perfTimeMs": 582.4,
+          "currentTimeSec": 0.015,
+          "totalVideoFrames": 4,
+          "droppedVideoFrames": 0,
+          "corruptedVideoFrames": 0,
+          "webkitDecodedFrameCount": 4,
+          "webkitVideoDecodedByteCount": 9859,
+          "webkitAudioDecodedByteCount": 5134,
+          "bytesReceived": 75439,
+          "segmentsReceived": 4,
+          "bufferedRanges": [
+            {
+              "start": 0,
+              "end": 0.834
+            }
+          ]
+        },
+        "final": {
+          "perfTimeMs": 30608.1,
+          "currentTimeSec": 29.999,
+          "totalVideoFrames": 900,
+          "droppedVideoFrames": 0,
+          "corruptedVideoFrames": 0,
+          "webkitDecodedFrameCount": 900,
+          "webkitVideoDecodedByteCount": 2015670,
+          "webkitAudioDecodedByteCount": 486134,
+          "bytesReceived": 2646478,
+          "segmentsReceived": 255,
+          "bufferedRanges": [
+            {
+              "start": 20.3,
+              "end": 31.101
+            }
+          ]
+        }
+      },
+      "windowDeltas": {
+        "totalVideoFramesDelta": 896,
+        "droppedVideoFramesDelta": 0,
+        "corruptedVideoFramesDelta": 0,
+        "decodedFramesDelta": 896,
+        "decodedVideoBytesDelta": 2005811,
+        "decodedAudioBytesDelta": 481000,
+        "bytesReceivedDelta": 2571039,
+        "segmentsReceivedDelta": 251,
+        "rVfcCallbacksCount": 896,
+        "firstPresentedFrame": 2,
+        "lastPresentedFrame": 897,
+        "presentedFramesSpan": 896,
+        "totalPresentedGaps": 0,
+        "gapEvents": []
+      },
+      "metricsConciliation": {
+        "formulaUsed": "totalVideoFrames = displayedFrames + droppedVideoFrames (W3C Video Playback Quality) => displayedFramesExpected = totalVideoFramesDelta - droppedVideoFramesDelta",
+        "totalVideoFramesDelta": 896,
+        "droppedVideoFramesDelta": 0,
+        "corruptedVideoFramesDelta": 0,
+        "displayedFramesExpected": 896,
+        "rVfcCallbacksReceived": 896,
+        "decodedFramesDelta": 896,
+        "discrepancyDecodedVsTotal": 0,
+        "discrepancyDisplayedVsRvfc": 0,
+        "discrepancyPresentedVsRvfc": 0,
+        "gapEventsCount": 0,
+        "status": "CONCILIADO_E_COERENTE",
+        "limitations": [
+          "requestVideoFrameCallback confirma o envio/apresentação do quadro ao compositor gráfico do Chromium, NÃO constituindo medição óptica/física de fótons ou pixels no painel do monitor.",
+          "totalVideoFrames representa quadros que concluíram descompressão e foram exibidos ou descartados; não representa fila de lookahead.",
+          "Duração de buffer é calculada exclusivamente via TimeRanges (video.buffered) e video.currentTime."
+        ]
+      },
+      "firstFrameSample": {
+        "index": 1,
+        "now": 605.5,
+        "presentationTime": 605.7,
+        "expectedDisplayTime": 611.5,
+        "mediaTime": 0.002,
+        "currentTime": 0.018,
+        "bufferedEnd": 1.113,
+        "liveEdgeDistance": 1.095,
+        "bufferAheadSec": 1.095,
+        "presentedFrames": 2,
+        "width": 320,
+        "height": 240
+      },
+      "lastFrameSample": {
+        "index": 896,
+        "now": 30607.3,
+        "presentationTime": 30607.4,
+        "expectedDisplayTime": 30613.4,
+        "mediaTime": 30,
+        "currentTime": 29.999,
+        "bufferedEnd": 31.101,
+        "liveEdgeDistance": 1.102,
+        "bufferAheadSec": 1.102,
+        "presentedFrames": 897,
+        "width": 320,
+        "height": 240
+      }
+    },
+    "lateJoiner": {
+      "initMetaReceived": true,
+      "bytesReceived": 814159,
+      "segmentsReceived": 69,
+      "readyState": 4,
+      "paused": false,
+      "currentTimeStart": 1.950545,
+      "currentTimeEnd": 7.961381,
+      "currentTimeDelta": 6.010836,
+      "decodedFrames": 235,
+      "decodedAudioBytes": 132756,
+      "framesCaptured": 175,
+      "effectiveFps": 29.12,
+      "buffered": [
+        {
+          "start": 0,
+          "end": 9.232
+        }
+      ]
+    }
+  },
+  "epistemologicalClassification": {
+    "bytesReceived": {
+      "verified": true,
+      "method": "WebSocket onmessage byte counter"
+    },
+    "segmentsAcceptedBySourceBuffer": {
+      "verified": true,
+      "method": "video.buffered TimeRanges inspection"
+    },
+    "mediaDecodedVideo": {
+      "verified": true,
+      "method": "video.webkitDecodedFrameCount & webkitVideoDecodedByteCount"
+    },
+    "mediaDecodedAudioOpus": {
+      "verified": true,
+      "method": "video.webkitAudioDecodedByteCount"
+    },
+    "framesPresentedCompositor": {
+      "verified": true,
+      "method": "video.requestVideoFrameCallback (confirmação de envio/submissão do quadro ao compositor gráfico do Chromium; NÃO constitui medição física ou óptica dos fótons/pixels emitidos pelo monitor)"
+    },
+    "frameMetricsConciliation": {
+      "verified": true,
+      "classification": "VERIFICADO",
+      "formula": "totalVideoFrames = displayedFrames + droppedVideoFrames (W3C Video Playback Quality) => displayedFramesExpected = totalVideoFramesDelta - droppedVideoFramesDelta",
+      "discrepancies": {
+        "decodedVsTotal": 0,
+        "displayedVsRvfc": 0,
+        "presentedVsRvfc": 0
+      }
+    },
+    "physicalPixelsEmitted": {
+      "verified": false,
+      "classification": "NÃO VERIFICADO",
+      "justification": "A apresentação ao compositor foi confirmada via requestVideoFrameCallback; contudo, a emissão física de fótons/pixels na superfície do display requer instrumentação externa com sensor óptico/fotodiodo, não verificado em automação."
+    },
+    "audioPhysicallyHeard": {
+      "verified": false,
+      "classification": "NÃO VERIFICADO",
+      "justification": "Decodificação e buffer de áudio Opus comprovados empiricamente pelo navegador; emissão acústica e percepção auditiva humana requerem equipamento físico de transdução sonora, não verificado em automação."
+    },
+    "wanPublicNetwork": {
+      "verified": false,
+      "classification": "NÃO VERIFICADO",
+      "justification": "Túnel Cloudflare verificado para rotas e segurança; latência e perda de pacotes em conexões globais reais requerem telemetria de campo."
+    },
+    "longSessionsHours": {
+      "verified": false,
+      "classification": "NÃO VERIFICADO",
+      "justification": "Janela de 30 segundos contínuos comprovada; sessões de horas exigem teste de exaustão de memória prolongado."
+    }
+  },
+  "allPassed": true
+}

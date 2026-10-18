@@ -1,0 +1,120 @@
+{
+  "timestamp": "2026-10-18T02:07:40.256Z",
+  "environment": {
+    "electron": "34.5.8",
+    "chrome": "132.0.6834.210",
+    "node": "20.19.1",
+    "platform": "win32",
+    "arch": "x64"
+  },
+  "encodingProfiles": {
+    "mjpeg": {
+      "codec": "JPEG (Baseline DCT 8x8)",
+      "profile": "image/jpeg quality=0.88",
+      "keyframeInterval": "1 frame (Todo quadro é Intra-frame autônomo)",
+      "configuredBitrate": "Dinâmico (~8-26 Mbps sob 1080p30)",
+      "segmentDuration": "Inaplicável (fluxo contínuo multipart HTTP)",
+      "audioSupport": "Ausente (0 kbps / Silencioso)"
+    },
+    "mseWebSocket": {
+      "codec": "VP8 / Opus",
+      "profile": "WebM Clusters com fatiamento a cada 1000ms",
+      "keyframeInterval": "1.0s a 2.0s",
+      "configuredBitrate": "1.0 Mbps vídeo + 128 kbps áudio (~1.13 Mbps)",
+      "segmentDuration": "1000 ms por segmento WebM",
+      "audioSupport": "Sintética (Opus 48kHz Stereo Muxed)"
+    },
+    "webrtcP2p": {
+      "codec": "VP8 / Opus RTP",
+      "profile": "RFC 7741 VP8 payload type 96 + Opus 48kHz stereo payload type 111",
+      "keyframeInterval": "Sob demanda (PLI/FIR) e periódico",
+      "configuredBitrate": "Adaptativo (BWE GCC ~500-1500 kbps)",
+      "segmentDuration": "Inaplicável (Pacotes RTP MTU ~1200 bytes)",
+      "audioSupport": "Sintética (Opus 48kHz Stereo Track)"
+    }
+  },
+  "phases": {
+    "phase1_ide": {
+      "name": "Fase 1: IDE Estática (Texto & Código)",
+      "mjpeg": {
+        "mse": 1.95,
+        "psnr": 45.23,
+        "ssim": 0.9998
+      },
+      "mseVp8": {
+        "mse": 3.61,
+        "psnr": 42.55,
+        "ssim": 0.9996
+      },
+      "webrtcVp8": {
+        "mse": 5.21,
+        "psnr": 40.97,
+        "ssim": 0.9988
+      },
+      "textLegibility": {
+        "mjpeg": "Excelente (Sem blur ou artefatos em fontes pequenas de código)",
+        "mseVp8": "Boa a Excelente (Texto perfeitamente legível com leve compressão)",
+        "webrtcVp8": "Boa (Legível, com leve redução de contraste em fontes sub-12px)"
+      }
+    },
+    "phase2_scroll": {
+      "name": "Fase 2: Rolagem Contínua de Texto",
+      "mjpeg": {
+        "mse": 4.44,
+        "psnr": 41.65,
+        "ssim": 0.9999
+      },
+      "mseVp8": {
+        "mse": 7.39,
+        "psnr": 39.44,
+        "ssim": 0.9997
+      },
+      "webrtcVp8": {
+        "mse": 9.31,
+        "psnr": 38.44,
+        "ssim": 0.9989
+      }
+    },
+    "phase3_rgb": {
+      "name": "Fase 3: Formas Geométricas RGB e Alta Entropia",
+      "mjpeg": {
+        "mse": 5.5,
+        "psnr": 40.73,
+        "ssim": 0.9991
+      },
+      "mseVp8": {
+        "mse": 7.34,
+        "psnr": 39.47,
+        "ssim": 0.9997
+      },
+      "webrtcVp8": {
+        "mse": 7.45,
+        "psnr": 39.41,
+        "ssim": 0.9989
+      }
+    },
+    "phase4_ui": {
+      "name": "Fase 4: Elementos de UI e Cronômetro Digital",
+      "mjpeg": {
+        "mse": 2.12,
+        "psnr": 44.87,
+        "ssim": 0.9998
+      },
+      "mseVp8": {
+        "mse": 3.41,
+        "psnr": 42.8,
+        "ssim": 0.999
+      },
+      "webrtcVp8": {
+        "mse": 5.29,
+        "psnr": 40.89,
+        "ssim": 0.9988
+      }
+    }
+  },
+  "comparativeAnalysis": {
+    "videoOnly": "Em vídeo puro (sem áudio), o MJPEG entrega a mais alta fidelidade visual por quadro estático (PSNR de 40,73 a 45,23 dB, SSIM > 0,999), mas ao custo de 8,66 Mbps para 1 espectador e 26,04 Mbps para 3 espectadores. O MSE em vídeo puro consome ~1,00 Mbps entregando PSNR de 39,44 a 42,80 dB e SSIM > 0,999 (~88,5% de redução de egresso sobre MJPEG), mantendo excelente legibilidade de código em IDE. A diferença de PSNR entre MJPEG e MSE/WebRTC em todas as 4 fases situa-se estritamente entre 1,26 dB e 4,26 dB.",
+    "fullAudioVideo": "Na comparação completa com áudio (Opus 48 kHz estéreo): o Opus adiciona uma sobrecarga isolada de ~128 kbps (~11,3% da banda total de ~1,13 Mbps no MSE). O MJPEG não suporta faixa de áudio no padrão multipart/x-mixed-replace. Entre MSE e WebRTC, o MSE garante integridade de fluxo contínuo via TCP ao custo de latência de buffer (~620 ms), enquanto o WebRTC opera em ~140 ms sob UDP com adaptação dinâmica de bitrate (BWE).",
+    "hardwareLimitation": "Testes realizados com tela e áudio sintéticos calibrados. Captura de microfone físico analógico/USB e loopback estéreo do Windows dependem de transdutores físicos e permanecem NÃO VERIFICADOS."
+  }
+}

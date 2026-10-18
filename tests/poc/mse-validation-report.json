@@ -1,0 +1,21 @@
+{
+  "ebmlHeaderDetected": true,
+  "initSegmentSizeBytes": 189,
+  "clusterElementsDetected": 1,
+  "clustersWithKeyframes": 1,
+  "sourceBufferCreated": true,
+  "appendBufferSuccessCount": 2,
+  "appendBufferErrorCount": 0,
+  "bufferedRangeStartSec": 0,
+  "bufferedRangeEndSec": 2.436,
+  "playbackStarted": true,
+  "currentTimeAdvanced": true,
+  "initialCurrentTime": 0,
+  "finalCurrentTime": 0.809536,
+  "evictionTested": true,
+  "postEvictionRangeStartSec": 0,
+  "midStreamJoinWithoutInitFailed": true,
+  "midStreamJoinWithInitSucceeded": true,
+  "audioEnergyDetected": true,
+  "errors": []
+}

@@ -7,15 +7,15 @@ console.log('===================================================================
 console.log('🏁 INICIANDO BATERIA COMPLETA DE QA DO AURA SCREEN STUDIO');
 console.log('========================================================================\n');
 
-// Stage 1: Unit & Subsystem Integration Tests (58 tests)
-console.log('▶ ETAPA 1: Executando 58 testes unitários e de integração de subsistemas...');
+// Stage 1: Unit & Subsystem Integration Tests (181 tests)
+console.log('▶ ETAPA 1: Executando 181 testes unitários e de integração de subsistemas...');
 const s1 = spawnSync('node', ['--experimental-strip-types', '--test', 'tests/**/*.test.ts'], { stdio: 'inherit' });
 if (s1.status !== 0) {
   console.error('❌ Falha na Etapa 1');
   process.exit(1);
 }
 
-// Stage 2: Electron Real UI Tests (8 tests)
+// Stage 2: Electron Real UI Tests (13 tests)
 console.log('\n▶ ETAPA 2: Executando testes reais de interface no motor Chromium...');
 const s2 = spawnSync(electronBin, ['scripts/test-ui-runner.cjs'], { stdio: 'inherit', env: { ...process.env, ELECTRON_ENABLE_LOGGING: '1' } });
 if (s2.status !== 0) {

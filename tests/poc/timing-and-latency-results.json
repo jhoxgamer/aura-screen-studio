@@ -1,0 +1,26 @@
+{
+  "wallClockDurationSeconds": 15.001,
+  "initialCurrentTime": 3.80314,
+  "finalCurrentTime": 18.803641,
+  "deltaCurrentTime": 15.000501,
+  "playbackRateMultiplier": 0.9999667355509633,
+  "stalls": {
+    "waitingEvents": 0,
+    "stalledEvents": 0
+  },
+  "liveEdgeDistanceSeconds": {
+    "min": 1.5430379999999992,
+    "max": 1.7272630000000007,
+    "avg": 1.6602425499999995,
+    "p50": 1.6571840000000009,
+    "p95": 1.7153889999999983,
+    "p99": 1.7272630000000007
+  },
+  "serverToClientTransitMs": {
+    "samplesCount": 124,
+    "min": 128,
+    "max": 152,
+    "avg": 135.20967741935485
+  },
+  "sampleCount": 60
+}

@@ -1,0 +1,275 @@
+{
+  "timestamp": "2026-10-18T06:29:37.495Z",
+  "environment": {
+    "electron": "34.5.8",
+    "chrome": "132.0.6834.210",
+    "node": "20.19.1",
+    "platform": "win32",
+    "arch": "x64"
+  },
+  "tunnel": {
+    "publicUrl": "https://premiere-lectures-importantly-animated.trycloudflare.com",
+    "domain": "premiere-lectures-importantly-animated.trycloudflare.com",
+    "edgeIp": "104.16.231.132",
+    "tunnelAcquiredMs": 6047,
+    "dnsDurationMs": 5103,
+    "status": "ONLINE"
+  },
+  "security": {
+    "statusEndpoint": 200,
+    "liveHtmlEndpoint": 200,
+    "privateRecordingsBlocked": true,
+    "privateShareBlocked": true,
+    "isolationVerified": true
+  },
+  "devices": {
+    "desktopChrome": {
+      "passed": true,
+      "stats": {
+        "currentTime": 10.752252,
+        "paused": false,
+        "readyState": 4,
+        "videoWidth": 640,
+        "videoHeight": 360,
+        "buffered": [
+          0,
+          13.7
+        ],
+        "mseStats": {
+          "connected": true,
+          "initMetaReceived": true,
+          "segmentsReceived": 94,
+          "bytesReceived": 1316337,
+          "framesPresented": 314,
+          "lastPresentationTime": 137581.4,
+          "closed": false
+        },
+        "audioMuted": true
+      }
+    },
+    "mobileSafari": {
+      "passed": true,
+      "stats": {
+        "currentTime": 10.79808,
+        "paused": false,
+        "readyState": 4,
+        "videoWidth": 640,
+        "videoHeight": 360,
+        "buffered": [
+          0,
+          11.377
+        ],
+        "mseStats": {
+          "connected": true,
+          "initMetaReceived": true,
+          "segmentsReceived": 94,
+          "bytesReceived": 1087148,
+          "framesPresented": 316,
+          "lastPresentationTime": 138119.9,
+          "closed": false
+        },
+        "audioMuted": true
+      }
+    },
+    "mobileAndroid": {
+      "passed": true,
+      "stats": {
+        "currentTime": 10.631387,
+        "paused": false,
+        "readyState": 4,
+        "videoWidth": 640,
+        "videoHeight": 360,
+        "buffered": [
+          0,
+          11.859
+        ],
+        "mseStats": {
+          "connected": true,
+          "initMetaReceived": true,
+          "segmentsReceived": 93,
+          "bytesReceived": 1191252,
+          "framesPresented": 316,
+          "lastPresentationTime": 137707.8,
+          "closed": false
+        },
+        "audioMuted": true
+      }
+    }
+  },
+  "audio": {
+    "instrumentallyDecoded": true,
+    "codec": "Opus (48kHz, WebM)",
+    "autoplayPolicyMutedFirst": true,
+    "unmuteInteractionSucceeded": true,
+    "physicalAcousticSound": "NÃO VERIFICADO (Exige microfone/sensor acústico físico no ambiente)"
+  },
+  "reconnection": {
+    "cyclesTested": 3,
+    "allPassed": true,
+    "cycles": [
+      {
+        "cycle": 1,
+        "passed": true,
+        "stats": {
+          "connected": true,
+          "initMetaReceived": true,
+          "segmentsReceived": 2421,
+          "framesPresented": 61,
+          "currentTime": 2.084312,
+          "readyState": 4
+        }
+      },
+      {
+        "cycle": 2,
+        "passed": true,
+        "stats": {
+          "connected": true,
+          "initMetaReceived": true,
+          "segmentsReceived": 2443,
+          "framesPresented": 67,
+          "currentTime": 2.284119,
+          "readyState": 4
+        }
+      },
+      {
+        "cycle": 3,
+        "passed": true,
+        "stats": {
+          "connected": true,
+          "initMetaReceived": true,
+          "segmentsReceived": 2465,
+          "framesPresented": 63,
+          "currentTime": 2.120996,
+          "readyState": 4
+        }
+      }
+    ]
+  },
+  "degradedNetwork": {
+    "jitterRangeMs": "50ms - 130ms (FIFO Preserving)",
+    "delayedChunks": 99,
+    "deltaFrames": 354,
+    "deltaCurrentTime": 12.001196,
+    "playbackMaintained": true,
+    "status": "RECUPEROU_CONTINUAMENTE"
+  },
+  "endurance": {
+    "telemetrySnapshots": [
+      {
+        "elapsedSeconds": 6,
+        "heapUsedMb": "5.52",
+        "rssMb": "127.86",
+        "buffer": {
+          "start": 0,
+          "end": 5.679,
+          "duration": 5.679,
+          "currentTime": 4.714018
+        }
+      },
+      {
+        "elapsedSeconds": 12,
+        "heapUsedMb": "5.50",
+        "rssMb": "125.24",
+        "buffer": {
+          "start": 0,
+          "end": 11.693,
+          "duration": 11.693,
+          "currentTime": 10.729259
+        }
+      },
+      {
+        "elapsedSeconds": 18,
+        "heapUsedMb": "5.47",
+        "rssMb": "122.47",
+        "buffer": {
+          "start": 6.934,
+          "end": 17.699,
+          "duration": 10.765,
+          "currentTime": 16.733606
+        }
+      },
+      {
+        "elapsedSeconds": 24,
+        "heapUsedMb": "5.64",
+        "rssMb": "134.82",
+        "buffer": {
+          "start": 10.4,
+          "end": 23.792,
+          "duration": 13.392000000000001,
+          "currentTime": 22.747146
+        }
+      },
+      {
+        "elapsedSeconds": 30,
+        "heapUsedMb": "5.60",
+        "rssMb": "118.64",
+        "buffer": {
+          "start": 20.758,
+          "end": 29.806,
+          "duration": 9.048000000000002,
+          "currentTime": 28.761024
+        }
+      },
+      {
+        "elapsedSeconds": 36,
+        "heapUsedMb": "5.57",
+        "rssMb": "115.09",
+        "buffer": {
+          "start": 24.23,
+          "end": 35.806,
+          "duration": 11.575999999999997,
+          "currentTime": 34.83509
+        }
+      },
+      {
+        "elapsedSeconds": 42,
+        "heapUsedMb": "5.55",
+        "rssMb": "111.43",
+        "buffer": {
+          "start": 31.16,
+          "end": 41.817,
+          "duration": 10.657,
+          "currentTime": 40.849015
+        }
+      }
+    ],
+    "heapDriftMb": 0.03000000000000025,
+    "bufferEvictionVerified": true,
+    "activeBufferSpanSeconds": 10.657,
+    "projected15m": "ESTÁVEL (Evicção cíclica a cada 5s limita buffer a ~10-12s, sem fuga de heap)",
+    "projected30m": "ESTÁVEL (Deriva nula no estado estacionário após preenchimento da janela deslizante)",
+    "projected60m": "ESTÁVEL (Consumo assintótico limitado pelo teto de evicção do SourceBuffer)",
+    "bench15mRealTime": "NÃO VERIFICADO DIRETAMENTE (Requer bancada de soak test contínuo de 15 minutos)",
+    "bench30mRealTime": "NÃO VERIFICADO DIRETAMENTE (Requer bancada de soak test contínuo de 30 minutos)",
+    "bench60mRealTime": "NÃO VERIFICADO DIRETAMENTE (Requer bancada de soak test contínuo de 60 minutos)"
+  },
+  "epistemologicalBoundaries": {
+    "verifiedInstrumentally": [
+      "Conexão pública via Cloudflare Quick Tunnel (cloudflared.exe) com resolução DNS global",
+      "Handshake RFC 6455 over TLS (WSS) com chave SHA-1 e framing nativo",
+      "Isolamento e bloqueio de rotas privadas (/api/recordings, /share/*) com HTTP 403 via túnel público",
+      "Decodificação contínua de fluxo WebM VP8 no espectador via MediaSource Extensions",
+      "Apresentação de quadros confirmada por requestVideoFrameCallback (rVFC)",
+      "Decodificação de áudio instrumental Opus (48 kHz) no pipeline de mídia",
+      "Política de autoplay: início mudo e ativação de som após interação do espectador",
+      "Recuperação imediata em ciclos de desconexão/reconexão com Init Segment + Keyframe Cluster",
+      "Resiliência a degradação de rede com jitter FIFO (50ms a 130ms) mantendo reprodução contínua",
+      "Evicção contínua de SourceBuffer mantendo janela ativa de ~10-12s sem acúmulo de memória"
+    ],
+    "notVerified": [
+      {
+        "item": "Dispositivos físicos externos (iPhone / iPad / Android em redes celulares 4G/5G externas)",
+        "missingPrerequisites": "Aparelhos físicos iOS e Android desvinculados da rede local, com chips SIM de operadoras comerciais (Vivo/Claro/TIM) e testadores humanos remotos."
+      },
+      {
+        "item": "Som audível fisicamente no ambiente",
+        "missingPrerequisites": "Alto-falante físico em operação e sensor acústico / decibelímetro / microfone calibrado para aferir ondas de pressão sonoras físicas."
+      },
+      {
+        "item": "Sessão contínua ininterrupta de 15, 30 e 60 minutos de relógio de parede",
+        "missingPrerequisites": "Bancada dedicada de homologação contínua de longa duração (soak test) executando sem pausas por 3600 segundos ininterruptos."
+      }
+    ]
+  },
+  "overallStatus": "HOMOLOGADO_COM_RESSALVAS_DE_CAMPO"
+}

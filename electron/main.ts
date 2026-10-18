@@ -4,6 +4,7 @@ import * as fs from 'fs';
 import { autoUpdater } from 'electron-updater';
 import { BubbleSize, RecordingOptions, RecordingMeta, CropArea } from './types';
 import { ShareServer } from './shareServer';
+import { BroadcastService } from './broadcastService';
 
 let preRecordingWindow: BrowserWindow | null = null;
 let cameraBubbleWindow: BrowserWindow | null = null;
@@ -17,6 +18,7 @@ let screenshotStudioWindow: BrowserWindow | null = null;
 let zoomShareBarWindow: BrowserWindow | null = null;
 let zoomShareBorderWindow: BrowserWindow | null = null;
 let shareServer: ShareServer | null = null;
+let broadcastService: BroadcastService | null = null;
 let tray: Tray | null = null;
 
 app.setName('AuraScreenStudio');
@@ -538,7 +540,7 @@ function createZoomShareBarWindow() {
 
   const primaryDisplay = screen.getPrimaryDisplay();
   const { width } = primaryDisplay.workAreaSize;
-  const barWidth = Math.min(990, width - 40);
+  const barWidth = Math.min(1080, width - 40);
   const barHeight = 72;
 
   zoomShareBarWindow = new BrowserWindow({
@@ -1057,21 +1059,54 @@ function findFfmpegBinary(): string | null {
 async function trimVideoWithFfmpeg(inputPath: string, outputPath: string, startSec: number, endSec: number): Promise<boolean> {
   const ffmpeg = findFfmpegBinary();
   if (!ffmpeg) return false;
+  const durationSec = Math.max(0.1, endSec - startSec);
+  const ext = path.extname(inputPath).toLowerCase();
+  const isWebm = ext === '.webm';
+
   return new Promise((resolve) => {
     const { spawn } = require('child_process');
-    // First attempt: fast lossless stream copy
-    const copyArgs = ['-y', '-ss', String(startSec), '-to', String(endSec), '-i', inputPath, '-c', 'copy', outputPath];
+    // First attempt: fast lossless stream copy with fast seek (-ss before -i and duration -t)
+    const copyArgs = [
+      '-y',
+      '-ss', String(startSec),
+      '-i', inputPath,
+      '-t', String(durationSec),
+      '-c', 'copy',
+      outputPath
+    ];
     const proc = spawn(ffmpeg, copyArgs);
     proc.on('close', (code: number) => {
       if (code === 0 && fs.existsSync(outputPath) && fs.statSync(outputPath).size > 1000) {
         resolve(true);
       } else {
-        // Fallback: re-encode video and audio accurately with VP9 + Opus
-        const reencodeArgs = [
-          '-y', '-ss', String(startSec), '-to', String(endSec), '-i', inputPath,
-          '-c:v', 'libvpx-vp9', '-crf', '28', '-b:v', '0', '-c:a', 'libopus',
-          outputPath
-        ];
+        // Fallback: fast re-encode respecting container format (realtime VP9 or fast x264)
+        const reencodeArgs = isWebm
+          ? [
+              '-y',
+              '-ss', String(startSec),
+              '-i', inputPath,
+              '-t', String(durationSec),
+              '-c:v', 'libvpx-vp9',
+              '-deadline', 'realtime',
+              '-cpu-used', '4',
+              '-crf', '28',
+              '-b:v', '0',
+              '-c:a', 'libopus',
+              '-b:a', '128k',
+              outputPath
+            ]
+          : [
+              '-y',
+              '-ss', String(startSec),
+              '-i', inputPath,
+              '-t', String(durationSec),
+              '-c:v', 'libx264',
+              '-preset', 'veryfast',
+              '-crf', '22',
+              '-c:a', 'aac',
+              '-b:a', '128k',
+              outputPath
+            ];
         const proc2 = spawn(ffmpeg, reencodeArgs);
         proc2.on('close', (code2: number) => {
           resolve(code2 === 0 && fs.existsSync(outputPath) && fs.statSync(outputPath).size > 1000);
@@ -1240,14 +1275,70 @@ async function trimVideoWithFfmpeg(inputPath: string, outputPath: string, startS
     }
   });
 
+  ipcMain.on('live-share:broadcast-mse-chunk', (_, arrayBuffer: ArrayBuffer) => {
+    if (shareServer && shareServer.isLiveActive()) {
+      shareServer.broadcastLiveMseChunk(Buffer.from(arrayBuffer));
+    }
+  });
+
+  ipcMain.handle('live-share:set-transport-mode', async (_, mode: 'mjpeg' | 'mse') => {
+    if (!shareServer) return { success: false, mode: 'mjpeg' };
+    shareServer.setLiveTransportMode(mode);
+    if (zoomShareBarWindow && !zoomShareBarWindow.isDestroyed()) {
+      zoomShareBarWindow.webContents.send('live-share:transport-mode-changed', mode);
+    }
+    return { success: true, mode };
+  });
+
   ipcMain.on('live-share:set-bar-expanded', (_, expanded: boolean) => {
     if (zoomShareBarWindow && !zoomShareBarWindow.isDestroyed()) {
       const primaryDisplay = screen.getPrimaryDisplay();
       const { width } = primaryDisplay.workAreaSize;
-      const barWidth = Math.min(990, width - 40);
+      const barWidth = Math.min(1080, width - 40);
       const newHeight = expanded ? 490 : 72;
       zoomShareBarWindow.setSize(barWidth, newHeight);
     }
+  });
+
+  // =========================================================================
+  // Aura Broadcast (YouTube Live / RTMPS) & safeStorage Handlers
+  // =========================================================================
+  ipcMain.handle('broadcast:get-storage-status', async () => {
+    return broadcastService?.getStorageStatus() || {
+      isEncryptionAvailable: false,
+      storageBackend: 'unknown',
+      isVolatileOnly: true,
+      hasSavedKey: false,
+      warningNotice: 'Serviço de broadcast não inicializado'
+    };
+  });
+
+  ipcMain.handle('broadcast:save-stream-key', async (_, key: string) => {
+    if (!broadcastService) return { success: false, isVolatile: true };
+    return broadcastService.saveStreamKey(key);
+  });
+
+  ipcMain.handle('broadcast:load-stream-key', async () => {
+    return broadcastService?.loadStreamKey() || null;
+  });
+
+  ipcMain.handle('broadcast:clear-stream-key', async () => {
+    broadcastService?.clearStreamKey();
+    return { success: true };
+  });
+
+  ipcMain.handle('broadcast:start', async (_, config: any) => {
+    if (!broadcastService) return { success: false, message: 'Broadcast service indisponível' };
+    return broadcastService.startBroadcast(config);
+  });
+
+  ipcMain.handle('broadcast:stop', async () => {
+    if (!broadcastService) return { success: true };
+    return broadcastService.stopBroadcast();
+  });
+
+  ipcMain.handle('broadcast:get-telemetry', async () => {
+    return broadcastService?.getTelemetry() || null;
   });
 
   ipcMain.on('window:open-pre-recording', (_, tab?: string) => {
@@ -1512,6 +1603,7 @@ async function checkForAppUpdates(manual = false): Promise<{ isLatest: boolean; 
 app.whenReady().then(() => {
   shareServer = new ShareServer(readMetadata, writeMetadata);
   shareServer.start();
+  broadcastService = new BroadcastService();
 
   shareServer.onLiveViewersChanged = (count) => {
     if (zoomShareBarWindow && !zoomShareBarWindow.isDestroyed()) {
@@ -1620,6 +1712,7 @@ app.whenReady().then(() => {
 app.on('will-quit', () => {
   globalShortcut.unregisterAll();
   shareServer?.stop();
+  broadcastService?.stopBroadcast();
   tray?.destroy();
 });
 

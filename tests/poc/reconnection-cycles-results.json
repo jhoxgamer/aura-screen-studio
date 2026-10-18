@@ -1,0 +1,119 @@
+{
+  "timestamp": "2026-10-18T03:47:22.483Z",
+  "environment": {
+    "electron": "34.5.8",
+    "chrome": "132.0.6834.210",
+    "node": "20.19.1",
+    "platform": "win32",
+    "arch": "x64"
+  },
+  "cycles": [
+    {
+      "cycle": 1,
+      "metrics": {
+        "initMetaReceived": true,
+        "bytesReceived": 185230,
+        "readyState": 4,
+        "currentTimeStart": 1.000054,
+        "currentTimeEnd": 2.543805,
+        "currentTimeDelta": 1.5437509999999999,
+        "decodedFrames": 75,
+        "decodedAudioBytes": 49386,
+        "presentedFrames": 42
+      },
+      "viewersWhileActive": 1,
+      "viewersAfterClose": 0,
+      "mseClientsAfterClose": 0,
+      "passed": true
+    },
+    {
+      "cycle": 2,
+      "metrics": {
+        "initMetaReceived": true,
+        "bytesReceived": 231958,
+        "readyState": 4,
+        "currentTimeStart": 2.156083,
+        "currentTimeEnd": 3.988891,
+        "currentTimeDelta": 1.832808,
+        "decodedFrames": 120,
+        "decodedAudioBytes": 67664,
+        "presentedFrames": 55
+      },
+      "viewersWhileActive": 1,
+      "viewersAfterClose": 0,
+      "mseClientsAfterClose": 0,
+      "passed": true
+    },
+    {
+      "cycle": 3,
+      "metrics": {
+        "initMetaReceived": true,
+        "bytesReceived": 336116,
+        "readyState": 4,
+        "currentTimeStart": 2.150758,
+        "currentTimeEnd": 3.95332,
+        "currentTimeDelta": 1.802562,
+        "decodedFrames": 122,
+        "decodedAudioBytes": 69264,
+        "presentedFrames": 54
+      },
+      "viewersWhileActive": 1,
+      "viewersAfterClose": 0,
+      "mseClientsAfterClose": 0,
+      "passed": true
+    },
+    {
+      "cycle": 4,
+      "metrics": {
+        "initMetaReceived": true,
+        "bytesReceived": 321056,
+        "readyState": 4,
+        "currentTimeStart": 2.147377,
+        "currentTimeEnd": 3.957664,
+        "currentTimeDelta": 1.8102869999999998,
+        "decodedFrames": 122,
+        "decodedAudioBytes": 68302,
+        "presentedFrames": 52
+      },
+      "viewersWhileActive": 1,
+      "viewersAfterClose": 0,
+      "mseClientsAfterClose": 0,
+      "passed": true
+    },
+    {
+      "cycle": 5,
+      "metrics": {
+        "initMetaReceived": true,
+        "bytesReceived": 503485,
+        "readyState": 4,
+        "currentTimeStart": 2.159338,
+        "currentTimeEnd": 3.969878,
+        "currentTimeDelta": 1.81054,
+        "decodedFrames": 121,
+        "decodedAudioBytes": 69264,
+        "presentedFrames": 53
+      },
+      "viewersWhileActive": 1,
+      "viewersAfterClose": 0,
+      "mseClientsAfterClose": 0,
+      "passed": true
+    }
+  ],
+  "backpressure": {
+    "clientsBeforeBloat": 1,
+    "clientsAfterBackpressure": 0,
+    "viewersAfterBackpressure": 0,
+    "passed": true
+  },
+  "allPassed": true,
+  "recoveryAfterBackpressure": {
+    "metrics": {
+      "initMetaReceived": true,
+      "bytesReceived": 165047,
+      "readyState": 2,
+      "currentTime": 1.28006,
+      "decodedFrames": 40
+    },
+    "passed": true
+  }
+}

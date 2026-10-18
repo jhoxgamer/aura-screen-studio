@@ -254,6 +254,17 @@ export const electronAPI = {
   sendLiveFrame: (buffer: ArrayBuffer) => {
     ipcRenderer.send('live-share:broadcast-frame', buffer);
   },
+  sendLiveMseChunk: (buffer: ArrayBuffer) => {
+    ipcRenderer.send('live-share:broadcast-mse-chunk', buffer);
+  },
+  setLiveTransportMode: async (mode: 'mjpeg' | 'mse') => {
+    return await ipcRenderer.invoke('live-share:set-transport-mode', mode);
+  },
+  onLiveTransportModeChanged: (callback: (mode: 'mjpeg' | 'mse') => void) => {
+    const handler = (_: any, mode: 'mjpeg' | 'mse') => callback(mode);
+    ipcRenderer.on('live-share:transport-mode-changed', handler);
+    return () => ipcRenderer.removeListener('live-share:transport-mode-changed', handler);
+  },
   onLiveViewersChanged: (callback: (count: number) => void) => {
     const handler = (_: any, count: number) => callback(count);
     ipcRenderer.on('live-share:viewers-changed', handler);
@@ -276,6 +287,29 @@ export const electronAPI = {
   },
   setLiveShareBarExpanded: (expanded: boolean) => {
     ipcRenderer.send('live-share:set-bar-expanded', expanded);
+  },
+
+  // Aura Broadcast (YouTube Live / RTMPS) & safeStorage
+  getBroadcastStorageStatus: async () => {
+    return await ipcRenderer.invoke('broadcast:get-storage-status');
+  },
+  saveBroadcastStreamKey: async (key: string) => {
+    return await ipcRenderer.invoke('broadcast:save-stream-key', key);
+  },
+  loadBroadcastStreamKey: async () => {
+    return await ipcRenderer.invoke('broadcast:load-stream-key');
+  },
+  clearBroadcastStreamKey: async () => {
+    return await ipcRenderer.invoke('broadcast:clear-stream-key');
+  },
+  startBroadcast: async (config?: any) => {
+    return await ipcRenderer.invoke('broadcast:start', config);
+  },
+  stopBroadcast: async () => {
+    return await ipcRenderer.invoke('broadcast:stop');
+  },
+  getBroadcastTelemetry: async () => {
+    return await ipcRenderer.invoke('broadcast:get-telemetry');
   }
 };
 

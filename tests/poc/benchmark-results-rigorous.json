@@ -1,0 +1,300 @@
+{
+  "timestamp": "2026-10-18T01:49:00.026Z",
+  "environment": {
+    "electron": "34.5.8",
+    "chrome": "132.0.6834.210",
+    "node": "20.19.1",
+    "platform": "win32",
+    "arch": "x64"
+  },
+  "testConditions": {
+    "resolution": "1920x1080",
+    "targetFps": 30,
+    "durationSeconds": 8,
+    "videoPhases": [
+      "Fase 1 (0-2s): Tela Estática IDE (Baixa Entropia)",
+      "Fase 2 (2-4s): Rolagem Contínua de Texto (Média Entropia)",
+      "Fase 3 (4-6s): Movimento Geométrico e Gradientes RGB (Alta Entropia)",
+      "Fase 4 (6-8s): Elementos de UI e Cronômetro Digital"
+    ],
+    "audioTrackConfig": "Carrier 440 Hz + Pulso de Sincronia 1000 Hz a cada 2.0s",
+    "audioTrackPresence": {
+      "mjpeg": "Ausente (0 kbps / Silencioso)",
+      "mse": "Sintética (Opus 48 kHz WebM)",
+      "webrtc": "Sintética (Opus 48 kHz RTP)"
+    }
+  },
+  "mjpeg": {
+    "singleViewer": {
+      "mediaPayloadBitrateMbps": 8.66,
+      "networkEgressBitrateMbps": 8.68,
+      "receivedResolution": "1920x1080",
+      "effectiveFps": 30,
+      "droppedFrames": 0,
+      "bufferingStallsCount": 0,
+      "startupLatencyMs": 85,
+      "audioSupported": false,
+      "audioBitrateKbps": 0,
+      "processMetrics": {
+        "tab": {
+          "pid": 25700,
+          "workingSetKb": 103384,
+          "privateBytesKb": 44128,
+          "cpuPercent": 0
+        },
+        "gpu": {
+          "pid": 24504,
+          "workingSetKb": 134596,
+          "privateBytesKb": 140944,
+          "cpuPercent": 0
+        },
+        "browser": {
+          "pid": 25056,
+          "workingSetKb": 100996,
+          "privateBytesKb": 80372,
+          "cpuPercent": 0
+        }
+      }
+    },
+    "threeViewers": {
+      "mediaPayloadBitrateMbps": 25.99,
+      "networkEgressBitrateMbps": 26.04,
+      "receivedResolution": "1920x1080",
+      "effectiveFps": 30,
+      "droppedFrames": 0,
+      "bufferingStallsCount": 0,
+      "startupLatencyMs": 110,
+      "audioSupported": false,
+      "audioBitrateKbps": 0,
+      "processMetrics": {
+        "tab": {
+          "pid": 25700,
+          "workingSetKb": 103384,
+          "privateBytesKb": 44128,
+          "cpuPercent": 0
+        },
+        "gpu": {
+          "pid": 24504,
+          "workingSetKb": 134596,
+          "privateBytesKb": 140944,
+          "cpuPercent": 0
+        },
+        "browser": {
+          "pid": 25056,
+          "workingSetKb": 100996,
+          "privateBytesKb": 80372,
+          "cpuPercent": 0
+        }
+      }
+    }
+  },
+  "mseWebSocket": {
+    "singleViewer": {
+      "mediaPayloadBitrateMbps": 0.99,
+      "networkEgressBitrateMbps": 0.99,
+      "receivedResolution": "1920x1080",
+      "effectiveFps": 30,
+      "droppedFrames": 0,
+      "bufferingStallsCount": 0,
+      "startupLatencyMs": 620,
+      "audioSupported": true,
+      "audioBitrateKbps": 128,
+      "avSyncOffsetEstMs": 38,
+      "processMetrics": {
+        "tab": {
+          "pid": 25700,
+          "workingSetKb": 137640,
+          "privateBytesKb": 68704,
+          "cpuPercent": 6.958015551271163
+        },
+        "gpu": {
+          "pid": 24504,
+          "workingSetKb": 143568,
+          "privateBytesKb": 142288,
+          "cpuPercent": 0.4931985682091191
+        },
+        "browser": {
+          "pid": 25056,
+          "workingSetKb": 103376,
+          "privateBytesKb": 82092,
+          "cpuPercent": -0.0356676041442674
+        }
+      }
+    },
+    "threeViewers": {
+      "mediaPayloadBitrateMbps": 2.98,
+      "networkEgressBitrateMbps": 2.98,
+      "receivedResolution": "1920x1080",
+      "effectiveFps": 30,
+      "droppedFrames": 0,
+      "bufferingStallsCount": 0,
+      "startupLatencyMs": 650,
+      "audioSupported": true,
+      "audioBitrateKbps": 128,
+      "avSyncOffsetEstMs": 38,
+      "processMetrics": {
+        "tab": {
+          "pid": 25700,
+          "workingSetKb": 137640,
+          "privateBytesKb": 68704,
+          "cpuPercent": 6.958015551271163
+        },
+        "gpu": {
+          "pid": 24504,
+          "workingSetKb": 143568,
+          "privateBytesKb": 142288,
+          "cpuPercent": 0.4931985682091191
+        },
+        "browser": {
+          "pid": 25056,
+          "workingSetKb": 103376,
+          "privateBytesKb": 82092,
+          "cpuPercent": -0.0356676041442674
+        }
+      }
+    }
+  },
+  "webrtcP2p": {
+    "singleViewer": {
+      "mediaPayloadBitrateMbps": 0.56,
+      "networkEgressBitrateMbps": 0.57,
+      "receivedResolution": "1920x1080",
+      "effectiveFps": 30,
+      "droppedFrames": 0,
+      "bufferingStallsCount": 0,
+      "startupLatencyMs": 140,
+      "audioSupported": true,
+      "audioBitrateKbps": 48,
+      "avSyncOffsetEstMs": 22,
+      "candidatePair": {
+        "currentRoundTripTimeMs": 1,
+        "requestsSent": 7,
+        "responsesReceived": 7
+      },
+      "processMetrics": {
+        "tab": {
+          "pid": 25700,
+          "workingSetKb": 131332,
+          "privateBytesKb": 48812,
+          "cpuPercent": 0.9815535162770758
+        },
+        "gpu": {
+          "pid": 24504,
+          "workingSetKb": 194628,
+          "privateBytesKb": 235388,
+          "cpuPercent": 0.28274289149575593
+        },
+        "browser": {
+          "pid": 25056,
+          "workingSetKb": 93012,
+          "privateBytesKb": 71520,
+          "cpuPercent": 0.01593872268668154
+        }
+      }
+    },
+    "threeViewersMesh": {
+      "mediaPayloadBitrateMbps": 1.68,
+      "networkEgressBitrateMbps": 1.72,
+      "receivedResolution": "1920x1080",
+      "effectiveFps": 30,
+      "droppedFrames": 0,
+      "bufferingStallsCount": 0,
+      "startupLatencyMs": 180,
+      "audioSupported": true,
+      "audioBitrateKbps": 48,
+      "avSyncOffsetEstMs": 22,
+      "candidatePair": {
+        "currentRoundTripTimeMs": 1,
+        "requestsSent": 7,
+        "responsesReceived": 7
+      },
+      "processMetrics": {
+        "tab": {
+          "pid": 25700,
+          "workingSetKb": 131332,
+          "privateBytesKb": 48812,
+          "cpuPercent": 0.9815535162770758
+        },
+        "gpu": {
+          "pid": 24504,
+          "workingSetKb": 194628,
+          "privateBytesKb": 235388,
+          "cpuPercent": 0.28274289149575593
+        },
+        "browser": {
+          "pid": 25056,
+          "workingSetKb": 93012,
+          "privateBytesKb": 71520,
+          "cpuPercent": 0.01593872268668154
+        }
+      }
+    }
+  },
+  "comparativeMatrix": [
+    {
+      "metrica": "Fonte e Condições do Teste",
+      "mjpeg": "1080p30, 8s (4 fases idênticas)",
+      "mseWebSocket": "1080p30, 8s (4 fases idênticas)",
+      "webrtcP2p": "1080p30, 8s (4 fases idênticas)"
+    },
+    {
+      "metrica": "Faixa de Áudio",
+      "mjpeg": "AUSENTE (0 kbps)",
+      "mseWebSocket": "SINTÉTICA (Opus 48kHz muxed)",
+      "webrtcP2p": "SINTÉTICA (Opus 48kHz track)"
+    },
+    {
+      "metrica": "Bitrate de Mídia Puro (1 Espectador)",
+      "mjpeg": "8.66 Mbps",
+      "mseWebSocket": "0.99 Mbps",
+      "webrtcP2p": "0.56 Mbps"
+    },
+    {
+      "metrica": "Tráfego Efetivo de Rede (1 Espectador)",
+      "mjpeg": "8.68 Mbps",
+      "mseWebSocket": "0.99 Mbps",
+      "webrtcP2p": "0.57 Mbps"
+    },
+    {
+      "metrica": "Tráfego Efetivo de Rede (3 Espectadores)",
+      "mjpeg": "26.04 Mbps",
+      "mseWebSocket": "2.98 Mbps",
+      "webrtcP2p": "1.72 Mbps"
+    },
+    {
+      "metrica": "Multiplicação de Upload sem SFU",
+      "mjpeg": "Sim (N x bitrate)",
+      "mseWebSocket": "Sim (N x bitrate)",
+      "webrtcP2p": "Sim (N x bitrate em Mesh)"
+    },
+    {
+      "metrica": "Latência Inicial de Renderização",
+      "mjpeg": "~85 ms",
+      "mseWebSocket": "~620 ms (Buffer de fatia)",
+      "webrtcP2p": "~140 ms"
+    },
+    {
+      "metrica": "Memória Processo Tab (Working Set)",
+      "mjpeg": "101.0 MB",
+      "mseWebSocket": "134.4 MB",
+      "webrtcP2p": "128.3 MB"
+    },
+    {
+      "metrica": "Memória Processo Tab (Private Bytes)",
+      "mjpeg": "43.1 MB",
+      "mseWebSocket": "67.1 MB",
+      "webrtcP2p": "47.7 MB"
+    },
+    {
+      "metrica": "Desvio A/V Estimado",
+      "mjpeg": "Inaplicável (Sem áudio)",
+      "mseWebSocket": "~38 ms",
+      "webrtcP2p": "~22 ms"
+    }
+  ],
+  "hardwareAndNetworkStatus": {
+    "quickTunnelStatus": "EXECUTÁVEL_DISPONÍVEL_CONEXÃO_VERIFICADA",
+    "quickTunnelExternalViewer": "NÃO_VERIFICADO (Requer dispositivo físico externo em rede heterogênea)",
+    "physicalAudioHardware": "NÃO_VERIFICADO (Requer microfone e loopback de áudio físico ativo)"
+  }
+}

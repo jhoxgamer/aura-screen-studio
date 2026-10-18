@@ -27,6 +27,7 @@ import {
 import { CaptureSource, RecordingMode, RecordingOptions, CropArea } from '../types';
 import { LibraryView } from './LibraryView';
 import { getShortcutLabel } from '../utils/shortcuts';
+import { BroadcastModal } from '../components/BroadcastModal';
 
 export interface PreRecordingViewProps {
   initialTab?: 'record' | 'library';
@@ -34,6 +35,7 @@ export interface PreRecordingViewProps {
 
 export const PreRecordingView: React.FC<PreRecordingViewProps> = ({ initialTab = 'record' }) => {
   const [activeTab, setActiveTab] = useState<'record' | 'library'>(initialTab);
+  const [isBroadcastModalOpen, setIsBroadcastModalOpen] = useState(false);
   const [mode, setMode] = useState<RecordingMode>(() => {
     return (localStorage.getItem('aura_recording_mode') as RecordingMode) || 'screen-cam';
   });
@@ -656,7 +658,7 @@ export const PreRecordingView: React.FC<PreRecordingViewProps> = ({ initialTab =
           <div className="flex items-center space-x-1.5">
             <span className="font-semibold text-xs tracking-tight text-[#F3F5F9]">Aura Screen Studio</span>
             <span className="text-[9px] text-[#B7C0CE] bg-[#191F2B] border border-[#303A4B] px-1 py-0.2 rounded font-mono">
-              v{appVersion || '2.5.2'}
+              v{appVersion || '2.6.0'}
             </span>
           </div>
         </div>
@@ -1325,19 +1327,30 @@ export const PreRecordingView: React.FC<PreRecordingViewProps> = ({ initialTab =
               <span className="tracking-wide text-xs">INICIAR GRAVAÇÃO</span>
             </button>
 
-            <button
-              onClick={() => window.electronAPI.startLiveShare()}
-              title="Transmitir tela ao vivo com qualidade ultra fluida de até 60 FPS para qualquer dispositivo via link ou QR Code"
-              className="w-full bg-[#1A2A47] hover:bg-[#191F2B] active:scale-[0.99] text-[#78A5FF] hover:text-[#9AB9FF] font-bold py-1.5 px-4 rounded-xl shadow-md flex items-center justify-center space-x-2 transition-all border border-[#78A5FF]/50 cursor-pointer"
-            >
-              <Radio className="w-3.5 h-3.5 text-[#78A5FF] animate-pulse" />
-              <span className="text-[11px] tracking-wide">COMPARTILHAR TELA AO VIVO (60 FPS)</span>
-            </button>
+            <div className="grid grid-cols-2 gap-2">
+              <button
+                onClick={() => window.electronAPI.startLiveShare()}
+                title="Transmitir tela ao vivo com qualidade ultra fluida de até 60 FPS para qualquer dispositivo via link ou QR Code"
+                className="bg-[#1A2A47] hover:bg-[#191F2B] active:scale-[0.99] text-[#78A5FF] hover:text-[#9AB9FF] font-bold py-1.5 px-2 rounded-xl shadow-md flex items-center justify-center space-x-1.5 transition-all border border-[#78A5FF]/50 cursor-pointer truncate"
+              >
+                <Radio className="w-3 h-3 text-[#78A5FF] animate-pulse shrink-0" />
+                <span className="text-[10px] tracking-wide truncate">LIVE SHARE (60 FPS)</span>
+              </button>
+
+              <button
+                onClick={() => setIsBroadcastModalOpen(true)}
+                title="Transmitir diretamente para o YouTube Live via RTMPS com chave protegida por safeStorage (Recurso Experimental / Beta)"
+                className="bg-[#2A161A] hover:bg-[#341B20] active:scale-[0.99] text-[#FF6B6B] hover:text-[#FF8787] font-bold py-1.5 px-2 rounded-xl shadow-md flex items-center justify-center space-x-1.5 transition-all border border-[#FF4E4E]/50 cursor-pointer truncate"
+              >
+                <Radio className="w-3 h-3 text-[#FF4E4E] shrink-0" />
+                <span className="text-[10px] tracking-wide truncate">YOUTUBE LIVE (BETA)</span>
+              </button>
+            </div>
 
             {/* Quick Shortcuts & App Version / Update Check */}
             <div className="flex items-center justify-between pt-1 border-t border-[#303A4B]/60 text-[9px] text-[#929CAF]">
               <span className="font-mono flex items-center gap-1.5">
-                <span>v{appVersion || '2.5.2'}</span>
+                <span>v{appVersion || '2.6.0'}</span>
                 {updateFeedback && (
                   <span className="text-[#83B8FF] font-sans font-medium text-[9px] bg-[#1A2A47] border border-[#83B8FF]/40 px-1 py-0.2 rounded">
                     {updateFeedback}
@@ -1379,6 +1392,9 @@ export const PreRecordingView: React.FC<PreRecordingViewProps> = ({ initialTab =
           </div>
         </div>
       )}
+
+      {/* Aura Broadcast Modal (YouTube Live / RTMPS) */}
+      <BroadcastModal isOpen={isBroadcastModalOpen} onClose={() => setIsBroadcastModalOpen(false)} />
     </div>
   );
 };

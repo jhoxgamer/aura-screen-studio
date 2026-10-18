@@ -10,9 +10,13 @@ import {
   Square,
   Sparkles,
   ExternalLink,
-  Zap
+  Zap,
+  Radio,
+  Mic,
+  MicOff,
+  AlertCircle
 } from 'lucide-react';
-import { liveShareService } from '../services/liveShareService';
+import { liveShareService, LiveAudioStatus } from '../services/liveShareService';
 import { audioService } from '../services/audioService';
 
 interface FloatingReaction {
@@ -33,6 +37,12 @@ export const ZoomShareBarView: React.FC = () => {
   const [showQrModal, setShowQrModal] = useState(false);
   const [targetFps, setTargetFps] = useState<number>(60);
   const [currentFps, setCurrentFps] = useState<number>(60);
+  const [transportMode, setTransportMode] = useState<'mjpeg' | 'mse'>('mjpeg');
+  const [audioStatus, setAudioStatus] = useState<LiveAudioStatus>({
+    micAvailable: false,
+    systemAudioAvailable: false
+  });
+  const [transportNotice, setTransportNotice] = useState<string | null>(null);
   const [liveUrls, setLiveUrls] = useState<{ networkUrl: string; localUrl: string; publicUrl: string | null }>({
     networkUrl: '',
     localUrl: '',
@@ -54,6 +64,9 @@ export const ZoomShareBarView: React.FC = () => {
       if (status) {
         setIsPaused(!!status.isPaused);
         setViewersCount(status.viewers || 0);
+        if (status.transportMode) {
+          setTransportMode(status.transportMode);
+        }
       }
     });
 
@@ -65,7 +78,25 @@ export const ZoomShareBarView: React.FC = () => {
     const cleanupStatus = window.electronAPI?.onLiveStatusChanged?.((status) => {
       setIsPaused(!!status?.isPaused);
       liveShareService.setPaused(!!status?.isPaused);
+      if (status?.transportMode) {
+        setTransportMode(status.transportMode);
+      }
     });
+
+    const cleanupTransport = window.electronAPI?.onLiveTransportModeChanged?.((mode) => {
+      setTransportMode(mode);
+    });
+
+    liveShareService.onAudioStatusChanged = (status) => {
+      setAudioStatus(status);
+    };
+
+    liveShareService.onTransportError = (err) => {
+      setTransportNotice(`Erro no transporte MSE: ${err.message}. Retornando ao MJPEG.`);
+      setTransportMode('mjpeg');
+      audioService.play('pause');
+      setTimeout(() => setTransportNotice(null), 5000);
+    };
 
     const cleanupReactions = window.electronAPI?.onLiveReactionReceived?.((r) => {
       const item: FloatingReaction = {
@@ -102,6 +133,7 @@ export const ZoomShareBarView: React.FC = () => {
       liveShareService.stopCapture();
       cleanupViewers?.();
       cleanupStatus?.();
+      cleanupTransport?.();
       cleanupReactions?.();
       cleanupQuestions?.();
       window.electronAPI?.setLiveShareBarExpanded?.(false);
@@ -109,9 +141,9 @@ export const ZoomShareBarView: React.FC = () => {
   }, []);
 
   useEffect(() => {
-    const isExpanded = showQrModal || !!activeQuestion;
+    const isExpanded = showQrModal || !!activeQuestion || !!transportNotice;
     window.electronAPI?.setLiveShareBarExpanded?.(isExpanded);
-  }, [showQrModal, activeQuestion]);
+  }, [showQrModal, activeQuestion, transportNotice]);
 
   const handleCopyLink = () => {
     const targetUrl = liveUrls.publicUrl || liveUrls.networkUrl || 'http://localhost:4545/live';
@@ -137,6 +169,13 @@ export const ZoomShareBarView: React.FC = () => {
     const nextFps = targetFps === 60 ? 30 : 60;
     setTargetFps(nextFps);
     liveShareService.setTargetFps(nextFps);
+    audioService.play('pop');
+  };
+
+  const handleToggleTransport = async () => {
+    const nextMode = transportMode === 'mjpeg' ? 'mse' : 'mjpeg';
+    setTransportMode(nextMode);
+    await liveShareService.setTransportMode(nextMode);
     audioService.play('pop');
   };
 
@@ -167,6 +206,37 @@ export const ZoomShareBarView: React.FC = () => {
           />
           <span className="shrink-0">{isPaused ? 'Transmissão Pausada' : 'Você está transmitindo a tela'}</span>
         </div>
+
+        {/* Experimental Transport Mode Toggle Pill */}
+        <button
+          onClick={handleToggleTransport}
+          title={
+            transportMode === 'mjpeg'
+              ? 'Transporte Padrão MJPEG (Vídeo). Clique para alternar para MSE Experimental (com Áudio Opus).'
+              : `Transporte Experimental MSE (WebM + Áudio). ${
+                  audioStatus.micAvailable
+                    ? 'Microfone físico ativo.'
+                    : `Microfone: ${audioStatus.micError || 'Indisponível no sistema'}.`
+                } Clique para retornar ao MJPEG.`
+          }
+          className={`flex items-center space-x-1.5 px-2.5 py-1 rounded-xl font-mono text-[11px] transition-all active:scale-95 shrink-0 whitespace-nowrap border ${
+            transportMode === 'mse'
+              ? 'bg-[#1A2A47] border-[#78A5FF]/60 text-[#78A5FF] shadow-sm'
+              : 'bg-[#191F2B] hover:bg-[#222B39] border-[#303A4B] text-[#B7C0CE] hover:text-[#F3F5F9]'
+          }`}
+        >
+          <Radio className={`w-3.5 h-3.5 shrink-0 ${transportMode === 'mse' ? 'text-[#78A5FF] animate-pulse' : 'text-[#929CAF]'}`} />
+          <span className="font-bold shrink-0">{transportMode === 'mse' ? 'MSE (Beta)' : 'MJPEG'}</span>
+          {transportMode === 'mse' && (
+            <span className="flex items-center space-x-1 ml-0.5 shrink-0">
+              {audioStatus.micAvailable ? (
+                <span title="Microfone ativo"><Mic className="w-3 h-3 text-emerald-400" /></span>
+              ) : (
+                <span title={audioStatus.micError || 'Microfone físico indisponível'}><MicOff className="w-3 h-3 text-rose-400" /></span>
+              )}
+            </span>
+          )}
+        </button>
 
         {/* 60 FPS Ultra-Smooth Mode Badge */}
         <button
@@ -246,6 +316,14 @@ export const ZoomShareBarView: React.FC = () => {
           <span className="shrink-0">Parar Transmissão</span>
         </button>
       </div>
+
+      {/* Transport Notice / Error Banner */}
+      {transportNotice && (
+        <div className="mt-2 bg-amber-500/20 border border-amber-500/50 text-amber-200 text-xs px-3.5 py-1.5 rounded-xl flex items-center space-x-2 shadow-lg backdrop-blur-md animate-in fade-in shrink-0">
+          <AlertCircle className="w-4 h-4 text-amber-400 shrink-0" />
+          <span>{transportNotice}</span>
+        </div>
+      )}
 
       {/* Floating Reactions Banner */}
       <div className="relative w-full max-w-md h-12 pointer-events-none overflow-visible flex items-center justify-center">

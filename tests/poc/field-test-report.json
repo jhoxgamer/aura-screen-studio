@@ -1,0 +1,68 @@
+{
+  "timestamp": "2026-10-18T02:07:41.074Z",
+  "cloudflaredEdgeValidation": {
+    "executable": "bin/cloudflared.exe",
+    "edgeStatus": "CONEXÃO_BORDA_CLOUDFLARE_CONFIRMADA",
+    "details": "Túnel estabelecido com servidores Anycast da Cloudflare (DNS 104.16.x.x) e resposta HTTP 200 via https://*.trycloudflare.com.",
+    "externalMobileViewers": "NÃO_VERIFICADO (Requer smartphone ou computador físico externo em operadora celular / Wi-Fi distinta)",
+    "physicalAudioHardware": "NÃO_VERIFICADO (Requer microfone físico e driver de áudio do sistema operacional)"
+  },
+  "iceCandidateAudit": {
+    "stunServers": [
+      "stun:stun.l.google.com:19302",
+      "stun:stun1.l.google.com:19302"
+    ],
+    "summary": {
+      "host": 4,
+      "srflx": 1,
+      "relay": 0
+    },
+    "candidates": [
+      {
+        "type": "host",
+        "protocol": "tcp",
+        "address": "192.168.0.11",
+        "port": 9
+      },
+      {
+        "type": "host",
+        "protocol": "tcp",
+        "address": "172.23.144.1",
+        "port": 9
+      },
+      {
+        "type": "host",
+        "protocol": "udp",
+        "address": "192.168.0.11",
+        "port": 53299
+      },
+      {
+        "type": "host",
+        "protocol": "udp",
+        "address": "172.23.144.1",
+        "port": 53300
+      },
+      {
+        "type": "srflx",
+        "protocol": "udp",
+        "address": "REDACTED_PUBLIC_IP",
+        "port": 0
+      }
+    ],
+    "natTraversalAnalysis": "Candidatos host obtidos na interface local. Candidatos srflx obtidos com sucesso através dos servidores STUN públicos do Google (endereço público e porta mascarados por segurança). Candidatos relay (TURN) ausentes por inexistência de servidor TURN configurado. Para redes corporativas com NAT simétrico ou bloqueio UDP estrito, a conexão P2P falhará sem a inclusão de um servidor TURN de relay."
+  },
+  "degradedNetworkSimulation": {
+    "condition": "Simulação qualitativa sob modelo de 2% de perda de pacotes e 50ms de jitter",
+    "status": "NÃO_TESTADO_INSTRUMENTALMENTE (Análise qualitativa baseada na especificação do protocolo; pendente de injeção instrumental de perda e jitter via netem/clumsy)",
+    "mjpegImpact": "Descarte imediato de frames HTTP corrompidos; ausência de drift temporal (sem dependência inter-frame), mantendo a imagem atualizada no quadro seguinte.",
+    "mseImpact": "Transporte TCP garante retransmissão de bytes sem corrupção; no entanto, retransmissões repetidas aumentam o tempo de preenchimento do SourceBuffer. Se o buffer do cliente for inferior a 1,0s, ocorrem micro-stalls de reprodução.",
+    "webrtcImpact": "Pilha RTP sobre UDP tolera descarte sem travar a pipeline; o receptor emite mensagens RTCP NACK/PLI solicitando novo keyframe ou adaptando a taxa de bits via GCC (Google Congestion Control)."
+  },
+  "sessionDurationStatus": {
+    "smokeTestDurationSec": 60,
+    "smokeTestResult": "PASSOU (0 falhas de pipeline, evicção de buffer confirmada)",
+    "longSession15Min": "NÃO_VERIFICADO (Pendente de homologação de campo com audiência externa real)",
+    "longSession30Min": "NÃO_VERIFICADO (Pendente de homologação de campo com audiência externa real)",
+    "longSession60Min": "NÃO_VERIFICADO (Pendente de homologação de campo com audiência externa real)"
+  }
+}

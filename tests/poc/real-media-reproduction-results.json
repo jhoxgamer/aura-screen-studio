@@ -1,0 +1,90 @@
+{
+  "timestamp": "2026-10-18T03:49:02.380Z",
+  "environment": {
+    "electron": "34.5.8",
+    "chrome": "132.0.6834.210",
+    "node": "20.19.1",
+    "platform": "win32",
+    "arch": "x64"
+  },
+  "stages": {
+    "host": {
+      "started": true,
+      "mime": "video/webm;codecs=vp8,opus",
+      "videoTracks": 1,
+      "audioTracks": 1
+    },
+    "spectator1": {
+      "bytesReceived": 272470,
+      "segmentsReceived": 2,
+      "paused": false,
+      "currentTime": 1.367534,
+      "readyState": 4,
+      "buffered": [
+        {
+          "start": 0,
+          "end": 3.416
+        }
+      ],
+      "videoWidth": 320,
+      "videoHeight": 240,
+      "decodedFrames": 40,
+      "decodedVideoBytes": 90363,
+      "decodedAudioBytes": 27260,
+      "framesCaptured": 2,
+      "sampleFrames": [
+        {
+          "presentationTime": 3295.2,
+          "expectedDisplayTime": 3301.1,
+          "width": 320,
+          "height": 240
+        },
+        {
+          "presentationTime": 4356,
+          "expectedDisplayTime": 4361.9,
+          "width": 320,
+          "height": 240
+        }
+      ],
+      "muted": true
+    },
+    "lateSpectator": {
+      "initMetaReceived": true,
+      "bytesReceived": 527027,
+      "paused": false,
+      "currentTime": 3.920506,
+      "readyState": 4,
+      "buffered": [
+        {
+          "start": 0,
+          "end": 6.843
+        }
+      ],
+      "decodedFrames": 116,
+      "decodedVideoBytes": 259053,
+      "decodedAudioBytes": 67664,
+      "framesCaptured": 3,
+      "sampleFrames": [
+        {
+          "presentationTime": 2324.2,
+          "expectedDisplayTime": 2330.1,
+          "width": 320,
+          "height": 240
+        },
+        {
+          "presentationTime": 3312.1,
+          "expectedDisplayTime": 3318,
+          "width": 320,
+          "height": 240
+        },
+        {
+          "presentationTime": 4300,
+          "expectedDisplayTime": 4305.9,
+          "width": 320,
+          "height": 240
+        }
+      ]
+    }
+  },
+  "allPassed": true
+}

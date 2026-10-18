@@ -1,0 +1,3115 @@
+{
+  "timestamp": "2026-10-18T20:04:34.133Z",
+  "config": {
+    "targetDurationSec": 1800,
+    "targetDurationMs": 1800000,
+    "port": 4598,
+    "fps": 30,
+    "codecs": "video/webm; codecs=vp8,opus"
+  },
+  "system": {
+    "platform": "win32",
+    "arch": "x64",
+    "electron": "34.5.8",
+    "chrome": "132.0.6834.210",
+    "node": "20.19.1"
+  },
+  "memorySamples": [
+    {
+      "elapsedSec": 30,
+      "nodeHeapUsedMB": "5.32",
+      "nodeHeapTotalMB": "8.27",
+      "nodeRssMB": "105.77",
+      "processes": [
+        {
+          "pid": 9212,
+          "type": "Browser",
+          "workingSetMB": "105.76",
+          "privateBytesMB": "85.02",
+          "cpuPercent": "0.0"
+        },
+        {
+          "pid": 17676,
+          "type": "GPU",
+          "workingSetMB": "113.02",
+          "privateBytesMB": "100.71",
+          "cpuPercent": "0.0"
+        },
+        {
+          "pid": 18448,
+          "type": "Utility",
+          "workingSetMB": "54.05",
+          "privateBytesMB": "13.61",
+          "cpuPercent": "0.0"
+        },
+        {
+          "pid": 19288,
+          "type": "Tab",
+          "workingSetMB": "92.11",
+          "privateBytesMB": "47.80",
+          "cpuPercent": "0.0"
+        },
+        {
+          "pid": 17068,
+          "type": "Utility",
+          "workingSetMB": "64.48",
+          "privateBytesMB": "11.68",
+          "cpuPercent": "0.0"
+        },
+        {
+          "pid": 5892,
+          "type": "Tab",
+          "workingSetMB": "111.17",
+          "privateBytesMB": "47.45",
+          "cpuPercent": "0.0"
+        }
+      ]
+    },
+    {
+      "elapsedSec": 60,
+      "nodeHeapUsedMB": "5.58",
+      "nodeHeapTotalMB": "7.52",
+      "nodeRssMB": "112.04",
+      "processes": [
+        {
+          "pid": 9212,
+          "type": "Browser",
+          "workingSetMB": "112.04",
+          "privateBytesMB": "91.32",
+          "cpuPercent": "0.1"
+        },
+        {
+          "pid": 17676,
+          "type": "GPU",
+          "workingSetMB": "112.62",
+          "privateBytesMB": "101.33",
+          "cpuPercent": "2.3"
+        },
+        {
+          "pid": 18448,
+          "type": "Utility",
+          "workingSetMB": "53.89",
+          "privateBytesMB": "13.39",
+          "cpuPercent": "0.0"
+        },
+        {
+          "pid": 19288,
+          "type": "Tab",
+          "workingSetMB": "94.06",
+          "privateBytesMB": "48.38",
+          "cpuPercent": "0.8"
+        },
+        {
+          "pid": 17068,
+          "type": "Utility",
+          "workingSetMB": "64.48",
+          "privateBytesMB": "11.68",
+          "cpuPercent": "0.1"
+        },
+        {
+          "pid": 5892,
+          "type": "Tab",
+          "workingSetMB": "115.41",
+          "privateBytesMB": "51.33",
+          "cpuPercent": "1.1"
+        }
+      ]
+    },
+    {
+      "elapsedSec": 90,
+      "nodeHeapUsedMB": "5.46",
+      "nodeHeapTotalMB": "7.52",
+      "nodeRssMB": "105.66",
+      "processes": [
+        {
+          "pid": 9212,
+          "type": "Browser",
+          "workingSetMB": "105.66",
+          "privateBytesMB": "82.34",
+          "cpuPercent": "0.1"
+        },
+        {
+          "pid": 17676,
+          "type": "GPU",
+          "workingSetMB": "114.01",
+          "privateBytesMB": "102.45",
+          "cpuPercent": "2.3"
+        },
+        {
+          "pid": 18448,
+          "type": "Utility",
+          "workingSetMB": "53.89",
+          "privateBytesMB": "13.39",
+          "cpuPercent": "0.0"
+        },
+        {
+          "pid": 19288,
+          "type": "Tab",
+          "workingSetMB": "98.63",
+          "privateBytesMB": "52.30",
+          "cpuPercent": "0.7"
+        },
+        {
+          "pid": 17068,
+          "type": "Utility",
+          "workingSetMB": "64.48",
+          "privateBytesMB": "11.68",
+          "cpuPercent": "0.1"
+        },
+        {
+          "pid": 5892,
+          "type": "Tab",
+          "workingSetMB": "120.26",
+          "privateBytesMB": "55.58",
+          "cpuPercent": "1.0"
+        }
+      ]
+    },
+    {
+      "elapsedSec": 120,
+      "nodeHeapUsedMB": "5.67",
+      "nodeHeapTotalMB": "7.52",
+      "nodeRssMB": "113.55",
+      "processes": [
+        {
+          "pid": 9212,
+          "type": "Browser",
+          "workingSetMB": "113.55",
+          "privateBytesMB": "89.81",
+          "cpuPercent": "0.1"
+        },
+        {
+          "pid": 17676,
+          "type": "GPU",
+          "workingSetMB": "113.59",
+          "privateBytesMB": "101.72",
+          "cpuPercent": "2.3"
+        },
+        {
+          "pid": 18448,
+          "type": "Utility",
+          "workingSetMB": "53.90",
+          "privateBytesMB": "13.36",
+          "cpuPercent": "0.0"
+        },
+        {
+          "pid": 19288,
+          "type": "Tab",
+          "workingSetMB": "103.10",
+          "privateBytesMB": "56.37",
+          "cpuPercent": "0.8"
+        },
+        {
+          "pid": 17068,
+          "type": "Utility",
+          "workingSetMB": "64.48",
+          "privateBytesMB": "11.68",
+          "cpuPercent": "0.1"
+        },
+        {
+          "pid": 5892,
+          "type": "Tab",
+          "workingSetMB": "126.15",
+          "privateBytesMB": "61.23",
+          "cpuPercent": "1.1"
+        }
+      ]
+    },
+    {
+      "elapsedSec": 150,
+      "nodeHeapUsedMB": "5.88",
+      "nodeHeapTotalMB": "8.02",
+      "nodeRssMB": "122.54",
+      "processes": [
+        {
+          "pid": 9212,
+          "type": "Browser",
+          "workingSetMB": "122.54",
+          "privateBytesMB": "97.98",
+          "cpuPercent": "0.1"
+        },
+        {
+          "pid": 17676,
+          "type": "GPU",
+          "workingSetMB": "113.54",
+          "privateBytesMB": "101.71",
+          "cpuPercent": "2.5"
+        },
+        {
+          "pid": 18448,
+          "type": "Utility",
+          "workingSetMB": "53.89",
+          "privateBytesMB": "13.33",
+          "cpuPercent": "0.0"
+        },
+        {
+          "pid": 19288,
+          "type": "Tab",
+          "workingSetMB": "107.79",
+          "privateBytesMB": "62.04",
+          "cpuPercent": "0.8"
+        },
+        {
+          "pid": 17068,
+          "type": "Utility",
+          "workingSetMB": "64.48",
+          "privateBytesMB": "11.62",
+          "cpuPercent": "0.1"
+        },
+        {
+          "pid": 5892,
+          "type": "Tab",
+          "workingSetMB": "120.63",
+          "privateBytesMB": "56.81",
+          "cpuPercent": "1.1"
+        }
+      ]
+    },
+    {
+      "elapsedSec": 180,
+      "nodeHeapUsedMB": "5.83",
+      "nodeHeapTotalMB": "8.02",
+      "nodeRssMB": "116.58",
+      "processes": [
+        {
+          "pid": 9212,
+          "type": "Browser",
+          "workingSetMB": "116.58",
+          "privateBytesMB": "91.55",
+          "cpuPercent": "0.1"
+        },
+        {
+          "pid": 17676,
+          "type": "GPU",
+          "workingSetMB": "113.43",
+          "privateBytesMB": "101.57",
+          "cpuPercent": "2.4"
+        },
+        {
+          "pid": 18448,
+          "type": "Utility",
+          "workingSetMB": "53.89",
+          "privateBytesMB": "13.33",
+          "cpuPercent": "0.0"
+        },
+        {
+          "pid": 19288,
+          "type": "Tab",
+          "workingSetMB": "112.35",
+          "privateBytesMB": "66.29",
+          "cpuPercent": "0.8"
+        },
+        {
+          "pid": 17068,
+          "type": "Utility",
+          "workingSetMB": "64.48",
+          "privateBytesMB": "11.62",
+          "cpuPercent": "0.1"
+        },
+        {
+          "pid": 5892,
+          "type": "Tab",
+          "workingSetMB": "123.33",
+          "privateBytesMB": "59.32",
+          "cpuPercent": "1.1"
+        }
+      ]
+    },
+    {
+      "elapsedSec": 210,
+      "nodeHeapUsedMB": "6.04",
+      "nodeHeapTotalMB": "8.02",
+      "nodeRssMB": "107.62",
+      "processes": [
+        {
+          "pid": 9212,
+          "type": "Browser",
+          "workingSetMB": "107.62",
+          "privateBytesMB": "82.50",
+          "cpuPercent": "0.1"
+        },
+        {
+          "pid": 17676,
+          "type": "GPU",
+          "workingSetMB": "113.56",
+          "privateBytesMB": "101.73",
+          "cpuPercent": "2.4"
+        },
+        {
+          "pid": 18448,
+          "type": "Utility",
+          "workingSetMB": "53.88",
+          "privateBytesMB": "13.29",
+          "cpuPercent": "0.0"
+        },
+        {
+          "pid": 19288,
+          "type": "Tab",
+          "workingSetMB": "102.63",
+          "privateBytesMB": "55.96",
+          "cpuPercent": "0.8"
+        },
+        {
+          "pid": 17068,
+          "type": "Utility",
+          "workingSetMB": "64.48",
+          "privateBytesMB": "11.62",
+          "cpuPercent": "0.1"
+        },
+        {
+          "pid": 5892,
+          "type": "Tab",
+          "workingSetMB": "125.92",
+          "privateBytesMB": "61.86",
+          "cpuPercent": "1.1"
+        }
+      ]
+    },
+    {
+      "elapsedSec": 240,
+      "nodeHeapUsedMB": "6.27",
+      "nodeHeapTotalMB": "8.27",
+      "nodeRssMB": "114.53",
+      "processes": [
+        {
+          "pid": 9212,
+          "type": "Browser",
+          "workingSetMB": "114.53",
+          "privateBytesMB": "89.71",
+          "cpuPercent": "0.1"
+        },
+        {
+          "pid": 17676,
+          "type": "GPU",
+          "workingSetMB": "113.50",
+          "privateBytesMB": "101.73",
+          "cpuPercent": "2.5"
+        },
+        {
+          "pid": 18448,
+          "type": "Utility",
+          "workingSetMB": "53.88",
+          "privateBytesMB": "13.29",
+          "cpuPercent": "0.0"
+        },
+        {
+          "pid": 19288,
+          "type": "Tab",
+          "workingSetMB": "107.60",
+          "privateBytesMB": "58.19",
+          "cpuPercent": "0.8"
+        },
+        {
+          "pid": 17068,
+          "type": "Utility",
+          "workingSetMB": "64.48",
+          "privateBytesMB": "11.62",
+          "cpuPercent": "0.1"
+        },
+        {
+          "pid": 5892,
+          "type": "Tab",
+          "workingSetMB": "121.64",
+          "privateBytesMB": "57.63",
+          "cpuPercent": "1.2"
+        }
+      ]
+    },
+    {
+      "elapsedSec": 270,
+      "nodeHeapUsedMB": "6.52",
+      "nodeHeapTotalMB": "8.52",
+      "nodeRssMB": "121.99",
+      "processes": [
+        {
+          "pid": 9212,
+          "type": "Browser",
+          "workingSetMB": "121.99",
+          "privateBytesMB": "97.12",
+          "cpuPercent": "0.1"
+        },
+        {
+          "pid": 17676,
+          "type": "GPU",
+          "workingSetMB": "113.55",
+          "privateBytesMB": "101.71",
+          "cpuPercent": "2.5"
+        },
+        {
+          "pid": 18448,
+          "type": "Utility",
+          "workingSetMB": "53.88",
+          "privateBytesMB": "13.29",
+          "cpuPercent": "0.0"
+        },
+        {
+          "pid": 19288,
+          "type": "Tab",
+          "workingSetMB": "110.04",
+          "privateBytesMB": "60.60",
+          "cpuPercent": "0.9"
+        },
+        {
+          "pid": 17068,
+          "type": "Utility",
+          "workingSetMB": "64.48",
+          "privateBytesMB": "11.62",
+          "cpuPercent": "0.1"
+        },
+        {
+          "pid": 5892,
+          "type": "Tab",
+          "workingSetMB": "124.27",
+          "privateBytesMB": "60.10",
+          "cpuPercent": "1.1"
+        }
+      ]
+    },
+    {
+      "elapsedSec": 300,
+      "nodeHeapUsedMB": "6.39",
+      "nodeHeapTotalMB": "8.52",
+      "nodeRssMB": "114.27",
+      "processes": [
+        {
+          "pid": 9212,
+          "type": "Browser",
+          "workingSetMB": "114.27",
+          "privateBytesMB": "88.57",
+          "cpuPercent": "0.1"
+        },
+        {
+          "pid": 17676,
+          "type": "GPU",
+          "workingSetMB": "113.73",
+          "privateBytesMB": "101.77",
+          "cpuPercent": "2.1"
+        },
+        {
+          "pid": 18448,
+          "type": "Utility",
+          "workingSetMB": "54.01",
+          "privateBytesMB": "13.36",
+          "cpuPercent": "0.0"
+        },
+        {
+          "pid": 19288,
+          "type": "Tab",
+          "workingSetMB": "112.94",
+          "privateBytesMB": "63.23",
+          "cpuPercent": "0.7"
+        },
+        {
+          "pid": 17068,
+          "type": "Utility",
+          "workingSetMB": "64.63",
+          "privateBytesMB": "11.68",
+          "cpuPercent": "0.1"
+        },
+        {
+          "pid": 5892,
+          "type": "Tab",
+          "workingSetMB": "127.31",
+          "privateBytesMB": "62.95",
+          "cpuPercent": "1.0"
+        }
+      ]
+    },
+    {
+      "elapsedSec": 330,
+      "nodeHeapUsedMB": "6.62",
+      "nodeHeapTotalMB": "8.52",
+      "nodeRssMB": "122.50",
+      "processes": [
+        {
+          "pid": 9212,
+          "type": "Browser",
+          "workingSetMB": "122.50",
+          "privateBytesMB": "96.83",
+          "cpuPercent": "0.1"
+        },
+        {
+          "pid": 17676,
+          "type": "GPU",
+          "workingSetMB": "113.77",
+          "privateBytesMB": "101.77",
+          "cpuPercent": "2.2"
+        },
+        {
+          "pid": 18448,
+          "type": "Utility",
+          "workingSetMB": "54.01",
+          "privateBytesMB": "13.36",
+          "cpuPercent": "0.0"
+        },
+        {
+          "pid": 19288,
+          "type": "Tab",
+          "workingSetMB": "115.51",
+          "privateBytesMB": "65.89",
+          "cpuPercent": "0.7"
+        },
+        {
+          "pid": 17068,
+          "type": "Utility",
+          "workingSetMB": "64.63",
+          "privateBytesMB": "11.68",
+          "cpuPercent": "0.1"
+        },
+        {
+          "pid": 5892,
+          "type": "Tab",
+          "workingSetMB": "121.94",
+          "privateBytesMB": "58.32",
+          "cpuPercent": "1.0"
+        }
+      ]
+    },
+    {
+      "elapsedSec": 360,
+      "nodeHeapUsedMB": "6.85",
+      "nodeHeapTotalMB": "8.77",
+      "nodeRssMB": "114.97",
+      "processes": [
+        {
+          "pid": 9212,
+          "type": "Browser",
+          "workingSetMB": "114.97",
+          "privateBytesMB": "89.46",
+          "cpuPercent": "0.1"
+        },
+        {
+          "pid": 17676,
+          "type": "GPU",
+          "workingSetMB": "113.82",
+          "privateBytesMB": "101.77",
+          "cpuPercent": "2.2"
+        },
+        {
+          "pid": 18448,
+          "type": "Utility",
+          "workingSetMB": "54.02",
+          "privateBytesMB": "13.36",
+          "cpuPercent": "0.0"
+        },
+        {
+          "pid": 19288,
+          "type": "Tab",
+          "workingSetMB": "104.87",
+          "privateBytesMB": "55.19",
+          "cpuPercent": "0.7"
+        },
+        {
+          "pid": 17068,
+          "type": "Utility",
+          "workingSetMB": "64.63",
+          "privateBytesMB": "11.68",
+          "cpuPercent": "0.1"
+        },
+        {
+          "pid": 5892,
+          "type": "Tab",
+          "workingSetMB": "124.47",
+          "privateBytesMB": "60.88",
+          "cpuPercent": "1.0"
+        }
+      ]
+    },
+    {
+      "elapsedSec": 390,
+      "nodeHeapUsedMB": "6.78",
+      "nodeHeapTotalMB": "9.02",
+      "nodeRssMB": "107.40",
+      "processes": [
+        {
+          "pid": 9212,
+          "type": "Browser",
+          "workingSetMB": "107.40",
+          "privateBytesMB": "80.85",
+          "cpuPercent": "0.1"
+        },
+        {
+          "pid": 17676,
+          "type": "GPU",
+          "workingSetMB": "113.84",
+          "privateBytesMB": "101.75",
+          "cpuPercent": "2.2"
+        },
+        {
+          "pid": 18448,
+          "type": "Utility",
+          "workingSetMB": "54.02",
+          "privateBytesMB": "13.36",
+          "cpuPercent": "0.0"
+        },
+        {
+          "pid": 19288,
+          "type": "Tab",
+          "workingSetMB": "106.98",
+          "privateBytesMB": "57.32",
+          "cpuPercent": "0.8"
+        },
+        {
+          "pid": 17068,
+          "type": "Utility",
+          "workingSetMB": "64.63",
+          "privateBytesMB": "11.68",
+          "cpuPercent": "0.1"
+        },
+        {
+          "pid": 5892,
+          "type": "Tab",
+          "workingSetMB": "126.94",
+          "privateBytesMB": "63.36",
+          "cpuPercent": "1.0"
+        }
+      ]
+    },
+    {
+      "elapsedSec": 420,
+      "nodeHeapUsedMB": "7.01",
+      "nodeHeapTotalMB": "9.02",
+      "nodeRssMB": "114.18",
+      "processes": [
+        {
+          "pid": 9212,
+          "type": "Browser",
+          "workingSetMB": "114.18",
+          "privateBytesMB": "87.84",
+          "cpuPercent": "0.1"
+        },
+        {
+          "pid": 17676,
+          "type": "GPU",
+          "workingSetMB": "113.77",
+          "privateBytesMB": "101.70",
+          "cpuPercent": "2.2"
+        },
+        {
+          "pid": 18448,
+          "type": "Utility",
+          "workingSetMB": "53.99",
+          "privateBytesMB": "13.30",
+          "cpuPercent": "0.0"
+        },
+        {
+          "pid": 19288,
+          "type": "Tab",
+          "workingSetMB": "109.38",
+          "privateBytesMB": "59.68",
+          "cpuPercent": "0.7"
+        },
+        {
+          "pid": 17068,
+          "type": "Utility",
+          "workingSetMB": "64.60",
+          "privateBytesMB": "11.62",
+          "cpuPercent": "0.1"
+        },
+        {
+          "pid": 5892,
+          "type": "Tab",
+          "workingSetMB": "122.68",
+          "privateBytesMB": "59.15",
+          "cpuPercent": "1.0"
+        }
+      ]
+    },
+    {
+      "elapsedSec": 450,
+      "nodeHeapUsedMB": "7.24",
+      "nodeHeapTotalMB": "9.02",
+      "nodeRssMB": "122.65",
+      "processes": [
+        {
+          "pid": 9212,
+          "type": "Browser",
+          "workingSetMB": "122.65",
+          "privateBytesMB": "96.40",
+          "cpuPercent": "0.1"
+        },
+        {
+          "pid": 17676,
+          "type": "GPU",
+          "workingSetMB": "113.81",
+          "privateBytesMB": "101.71",
+          "cpuPercent": "2.3"
+        },
+        {
+          "pid": 18448,
+          "type": "Utility",
+          "workingSetMB": "53.99",
+          "privateBytesMB": "13.30",
+          "cpuPercent": "0.0"
+        },
+        {
+          "pid": 19288,
+          "type": "Tab",
+          "workingSetMB": "111.88",
+          "privateBytesMB": "62.18",
+          "cpuPercent": "0.8"
+        },
+        {
+          "pid": 17068,
+          "type": "Utility",
+          "workingSetMB": "64.60",
+          "privateBytesMB": "11.62",
+          "cpuPercent": "0.1"
+        },
+        {
+          "pid": 5892,
+          "type": "Tab",
+          "workingSetMB": "124.93",
+          "privateBytesMB": "61.40",
+          "cpuPercent": "1.1"
+        }
+      ]
+    },
+    {
+      "elapsedSec": 480,
+      "nodeHeapUsedMB": "7.20",
+      "nodeHeapTotalMB": "9.27",
+      "nodeRssMB": "115.60",
+      "processes": [
+        {
+          "pid": 9212,
+          "type": "Browser",
+          "workingSetMB": "115.60",
+          "privateBytesMB": "88.55",
+          "cpuPercent": "0.1"
+        },
+        {
+          "pid": 17676,
+          "type": "GPU",
+          "workingSetMB": "113.74",
+          "privateBytesMB": "101.66",
+          "cpuPercent": "2.2"
+        },
+        {
+          "pid": 18448,
+          "type": "Utility",
+          "workingSetMB": "53.97",
+          "privateBytesMB": "13.26",
+          "cpuPercent": "0.0"
+        },
+        {
+          "pid": 19288,
+          "type": "Tab",
+          "workingSetMB": "114.49",
+          "privateBytesMB": "64.80",
+          "cpuPercent": "0.7"
+        },
+        {
+          "pid": 17068,
+          "type": "Utility",
+          "workingSetMB": "64.60",
+          "privateBytesMB": "11.62",
+          "cpuPercent": "0.1"
+        },
+        {
+          "pid": 5892,
+          "type": "Tab",
+          "workingSetMB": "127.72",
+          "privateBytesMB": "63.90",
+          "cpuPercent": "1.0"
+        }
+      ]
+    },
+    {
+      "elapsedSec": 510,
+      "nodeHeapUsedMB": "7.37",
+      "nodeHeapTotalMB": "9.52",
+      "nodeRssMB": "122.77",
+      "processes": [
+        {
+          "pid": 9212,
+          "type": "Browser",
+          "workingSetMB": "122.77",
+          "privateBytesMB": "96.08",
+          "cpuPercent": "0.1"
+        },
+        {
+          "pid": 17676,
+          "type": "GPU",
+          "workingSetMB": "113.80",
+          "privateBytesMB": "101.68",
+          "cpuPercent": "2.2"
+        },
+        {
+          "pid": 18448,
+          "type": "Utility",
+          "workingSetMB": "53.96",
+          "privateBytesMB": "13.25",
+          "cpuPercent": "0.0"
+        },
+        {
+          "pid": 19288,
+          "type": "Tab",
+          "workingSetMB": "117.10",
+          "privateBytesMB": "67.40",
+          "cpuPercent": "0.7"
+        },
+        {
+          "pid": 17068,
+          "type": "Utility",
+          "workingSetMB": "64.60",
+          "privateBytesMB": "11.62",
+          "cpuPercent": "0.1"
+        },
+        {
+          "pid": 5892,
+          "type": "Tab",
+          "workingSetMB": "123.08",
+          "privateBytesMB": "59.32",
+          "cpuPercent": "1.0"
+        }
+      ]
+    },
+    {
+      "elapsedSec": 540,
+      "nodeHeapUsedMB": "7.58",
+      "nodeHeapTotalMB": "10.52",
+      "nodeRssMB": "114.18",
+      "processes": [
+        {
+          "pid": 9212,
+          "type": "Browser",
+          "workingSetMB": "114.18",
+          "privateBytesMB": "87.55",
+          "cpuPercent": "0.1"
+        },
+        {
+          "pid": 17676,
+          "type": "GPU",
+          "workingSetMB": "114.04",
+          "privateBytesMB": "101.96",
+          "cpuPercent": "2.5"
+        },
+        {
+          "pid": 18448,
+          "type": "Utility",
+          "workingSetMB": "53.96",
+          "privateBytesMB": "13.25",
+          "cpuPercent": "0.0"
+        },
+        {
+          "pid": 19288,
+          "type": "Tab",
+          "workingSetMB": "106.27",
+          "privateBytesMB": "56.56",
+          "cpuPercent": "0.9"
+        },
+        {
+          "pid": 17068,
+          "type": "Utility",
+          "workingSetMB": "64.60",
+          "privateBytesMB": "11.62",
+          "cpuPercent": "0.1"
+        },
+        {
+          "pid": 5892,
+          "type": "Tab",
+          "workingSetMB": "125.77",
+          "privateBytesMB": "62.04",
+          "cpuPercent": "1.2"
+        }
+      ]
+    },
+    {
+      "elapsedSec": 570,
+      "nodeHeapUsedMB": "7.77",
+      "nodeHeapTotalMB": "9.52",
+      "nodeRssMB": "121.63",
+      "processes": [
+        {
+          "pid": 9212,
+          "type": "Browser",
+          "workingSetMB": "121.63",
+          "privateBytesMB": "95.13",
+          "cpuPercent": "0.1"
+        },
+        {
+          "pid": 17676,
+          "type": "GPU",
+          "workingSetMB": "113.79",
+          "privateBytesMB": "101.68",
+          "cpuPercent": "2.6"
+        },
+        {
+          "pid": 18448,
+          "type": "Utility",
+          "workingSetMB": "53.96",
+          "privateBytesMB": "13.25",
+          "cpuPercent": "0.0"
+        },
+        {
+          "pid": 19288,
+          "type": "Tab",
+          "workingSetMB": "108.42",
+          "privateBytesMB": "58.65",
+          "cpuPercent": "0.9"
+        },
+        {
+          "pid": 17068,
+          "type": "Utility",
+          "workingSetMB": "64.60",
+          "privateBytesMB": "11.62",
+          "cpuPercent": "0.1"
+        },
+        {
+          "pid": 5892,
+          "type": "Tab",
+          "workingSetMB": "128.39",
+          "privateBytesMB": "64.68",
+          "cpuPercent": "1.2"
+        }
+      ]
+    },
+    {
+      "elapsedSec": 600,
+      "nodeHeapUsedMB": "7.65",
+      "nodeHeapTotalMB": "9.52",
+      "nodeRssMB": "112.97",
+      "processes": [
+        {
+          "pid": 9212,
+          "type": "Browser",
+          "workingSetMB": "112.97",
+          "privateBytesMB": "85.75",
+          "cpuPercent": "0.1"
+        },
+        {
+          "pid": 17676,
+          "type": "GPU",
+          "workingSetMB": "113.79",
+          "privateBytesMB": "101.70",
+          "cpuPercent": "2.5"
+        },
+        {
+          "pid": 18448,
+          "type": "Utility",
+          "workingSetMB": "53.99",
+          "privateBytesMB": "13.31",
+          "cpuPercent": "0.0"
+        },
+        {
+          "pid": 19288,
+          "type": "Tab",
+          "workingSetMB": "111.07",
+          "privateBytesMB": "61.35",
+          "cpuPercent": "0.9"
+        },
+        {
+          "pid": 17068,
+          "type": "Utility",
+          "workingSetMB": "64.63",
+          "privateBytesMB": "11.68",
+          "cpuPercent": "0.1"
+        },
+        {
+          "pid": 5892,
+          "type": "Tab",
+          "workingSetMB": "123.96",
+          "privateBytesMB": "60.25",
+          "cpuPercent": "1.3"
+        }
+      ]
+    },
+    {
+      "elapsedSec": 630,
+      "nodeHeapUsedMB": "7.84",
+      "nodeHeapTotalMB": "10.02",
+      "nodeRssMB": "121.78",
+      "processes": [
+        {
+          "pid": 9212,
+          "type": "Browser",
+          "workingSetMB": "121.78",
+          "privateBytesMB": "95.41",
+          "cpuPercent": "0.1"
+        },
+        {
+          "pid": 17676,
+          "type": "GPU",
+          "workingSetMB": "113.82",
+          "privateBytesMB": "101.71",
+          "cpuPercent": "2.5"
+        },
+        {
+          "pid": 18448,
+          "type": "Utility",
+          "workingSetMB": "53.99",
+          "privateBytesMB": "13.31",
+          "cpuPercent": "0.0"
+        },
+        {
+          "pid": 19288,
+          "type": "Tab",
+          "workingSetMB": "113.66",
+          "privateBytesMB": "63.93",
+          "cpuPercent": "0.8"
+        },
+        {
+          "pid": 17068,
+          "type": "Utility",
+          "workingSetMB": "64.63",
+          "privateBytesMB": "11.68",
+          "cpuPercent": "0.1"
+        },
+        {
+          "pid": 5892,
+          "type": "Tab",
+          "workingSetMB": "126.02",
+          "privateBytesMB": "62.68",
+          "cpuPercent": "1.2"
+        }
+      ]
+    },
+    {
+      "elapsedSec": 660,
+      "nodeHeapUsedMB": "8.05",
+      "nodeHeapTotalMB": "10.02",
+      "nodeRssMB": "130.33",
+      "processes": [
+        {
+          "pid": 9212,
+          "type": "Browser",
+          "workingSetMB": "130.33",
+          "privateBytesMB": "103.84",
+          "cpuPercent": "0.1"
+        },
+        {
+          "pid": 17676,
+          "type": "GPU",
+          "workingSetMB": "113.78",
+          "privateBytesMB": "101.70",
+          "cpuPercent": "2.5"
+        },
+        {
+          "pid": 18448,
+          "type": "Utility",
+          "workingSetMB": "53.99",
+          "privateBytesMB": "13.31",
+          "cpuPercent": "0.0"
+        },
+        {
+          "pid": 19288,
+          "type": "Tab",
+          "workingSetMB": "116.10",
+          "privateBytesMB": "66.62",
+          "cpuPercent": "0.8"
+        },
+        {
+          "pid": 17068,
+          "type": "Utility",
+          "workingSetMB": "64.63",
+          "privateBytesMB": "11.68",
+          "cpuPercent": "0.1"
+        },
+        {
+          "pid": 5892,
+          "type": "Tab",
+          "workingSetMB": "128.51",
+          "privateBytesMB": "65.18",
+          "cpuPercent": "1.2"
+        }
+      ]
+    },
+    {
+      "elapsedSec": 690,
+      "nodeHeapUsedMB": "7.94",
+      "nodeHeapTotalMB": "10.02",
+      "nodeRssMB": "107.02",
+      "processes": [
+        {
+          "pid": 9212,
+          "type": "Browser",
+          "workingSetMB": "107.00",
+          "privateBytesMB": "80.01",
+          "cpuPercent": "0.1"
+        },
+        {
+          "pid": 17676,
+          "type": "GPU",
+          "workingSetMB": "113.81",
+          "privateBytesMB": "101.68",
+          "cpuPercent": "2.6"
+        },
+        {
+          "pid": 18448,
+          "type": "Utility",
+          "workingSetMB": "53.96",
+          "privateBytesMB": "13.25",
+          "cpuPercent": "0.0"
+        },
+        {
+          "pid": 19288,
+          "type": "Tab",
+          "workingSetMB": "105.60",
+          "privateBytesMB": "55.97",
+          "cpuPercent": "1.2"
+        },
+        {
+          "pid": 17068,
+          "type": "Utility",
+          "workingSetMB": "64.60",
+          "privateBytesMB": "11.62",
+          "cpuPercent": "0.1"
+        },
+        {
+          "pid": 5892,
+          "type": "Tab",
+          "workingSetMB": "123.89",
+          "privateBytesMB": "60.76",
+          "cpuPercent": "1.3"
+        }
+      ]
+    },
+    {
+      "elapsedSec": 720,
+      "nodeHeapUsedMB": "8.15",
+      "nodeHeapTotalMB": "10.02",
+      "nodeRssMB": "114.92",
+      "processes": [
+        {
+          "pid": 9212,
+          "type": "Browser",
+          "workingSetMB": "114.92",
+          "privateBytesMB": "88.17",
+          "cpuPercent": "0.1"
+        },
+        {
+          "pid": 17676,
+          "type": "GPU",
+          "workingSetMB": "113.78",
+          "privateBytesMB": "101.66",
+          "cpuPercent": "2.6"
+        },
+        {
+          "pid": 18448,
+          "type": "Utility",
+          "workingSetMB": "53.96",
+          "privateBytesMB": "13.25",
+          "cpuPercent": "0.0"
+        },
+        {
+          "pid": 19288,
+          "type": "Tab",
+          "workingSetMB": "107.59",
+          "privateBytesMB": "58.04",
+          "cpuPercent": "0.9"
+        },
+        {
+          "pid": 17068,
+          "type": "Utility",
+          "workingSetMB": "64.60",
+          "privateBytesMB": "11.62",
+          "cpuPercent": "0.1"
+        },
+        {
+          "pid": 5892,
+          "type": "Tab",
+          "workingSetMB": "126.39",
+          "privateBytesMB": "63.30",
+          "cpuPercent": "1.3"
+        }
+      ]
+    },
+    {
+      "elapsedSec": 750,
+      "nodeHeapUsedMB": "4.78",
+      "nodeHeapTotalMB": "9.77",
+      "nodeRssMB": "124.90",
+      "processes": [
+        {
+          "pid": 9212,
+          "type": "Browser",
+          "workingSetMB": "124.90",
+          "privateBytesMB": "98.56",
+          "cpuPercent": "0.1"
+        },
+        {
+          "pid": 17676,
+          "type": "GPU",
+          "workingSetMB": "113.81",
+          "privateBytesMB": "101.68",
+          "cpuPercent": "2.6"
+        },
+        {
+          "pid": 18448,
+          "type": "Utility",
+          "workingSetMB": "53.96",
+          "privateBytesMB": "13.25",
+          "cpuPercent": "0.0"
+        },
+        {
+          "pid": 19288,
+          "type": "Tab",
+          "workingSetMB": "110.15",
+          "privateBytesMB": "60.65",
+          "cpuPercent": "0.9"
+        },
+        {
+          "pid": 17068,
+          "type": "Utility",
+          "workingSetMB": "64.60",
+          "privateBytesMB": "11.62",
+          "cpuPercent": "0.1"
+        },
+        {
+          "pid": 5892,
+          "type": "Tab",
+          "workingSetMB": "129.13",
+          "privateBytesMB": "65.93",
+          "cpuPercent": "1.3"
+        }
+      ]
+    },
+    {
+      "elapsedSec": 780,
+      "nodeHeapUsedMB": "4.71",
+      "nodeHeapTotalMB": "9.77",
+      "nodeRssMB": "116.35",
+      "processes": [
+        {
+          "pid": 9212,
+          "type": "Browser",
+          "workingSetMB": "116.35",
+          "privateBytesMB": "89.39",
+          "cpuPercent": "0.1"
+        },
+        {
+          "pid": 17676,
+          "type": "GPU",
+          "workingSetMB": "114.09",
+          "privateBytesMB": "101.99",
+          "cpuPercent": "2.5"
+        },
+        {
+          "pid": 18448,
+          "type": "Utility",
+          "workingSetMB": "53.96",
+          "privateBytesMB": "13.25",
+          "cpuPercent": "0.0"
+        },
+        {
+          "pid": 19288,
+          "type": "Tab",
+          "workingSetMB": "112.73",
+          "privateBytesMB": "63.23",
+          "cpuPercent": "0.9"
+        },
+        {
+          "pid": 17068,
+          "type": "Utility",
+          "workingSetMB": "64.60",
+          "privateBytesMB": "11.62",
+          "cpuPercent": "0.1"
+        },
+        {
+          "pid": 5892,
+          "type": "Tab",
+          "workingSetMB": "124.66",
+          "privateBytesMB": "61.55",
+          "cpuPercent": "1.3"
+        }
+      ]
+    },
+    {
+      "elapsedSec": 810,
+      "nodeHeapUsedMB": "4.90",
+      "nodeHeapTotalMB": "9.77",
+      "nodeRssMB": "123.96",
+      "processes": [
+        {
+          "pid": 9212,
+          "type": "Browser",
+          "workingSetMB": "123.96",
+          "privateBytesMB": "97.32",
+          "cpuPercent": "0.1"
+        },
+        {
+          "pid": 17676,
+          "type": "GPU",
+          "workingSetMB": "113.83",
+          "privateBytesMB": "101.71",
+          "cpuPercent": "2.5"
+        },
+        {
+          "pid": 18448,
+          "type": "Utility",
+          "workingSetMB": "53.96",
+          "privateBytesMB": "13.25",
+          "cpuPercent": "0.0"
+        },
+        {
+          "pid": 19288,
+          "type": "Tab",
+          "workingSetMB": "114.45",
+          "privateBytesMB": "65.00",
+          "cpuPercent": "0.8"
+        },
+        {
+          "pid": 17068,
+          "type": "Utility",
+          "workingSetMB": "64.60",
+          "privateBytesMB": "11.62",
+          "cpuPercent": "0.1"
+        },
+        {
+          "pid": 5892,
+          "type": "Tab",
+          "workingSetMB": "127.06",
+          "privateBytesMB": "63.95",
+          "cpuPercent": "1.3"
+        }
+      ]
+    },
+    {
+      "elapsedSec": 840,
+      "nodeHeapUsedMB": "5.10",
+      "nodeHeapTotalMB": "9.77",
+      "nodeRssMB": "117.60",
+      "processes": [
+        {
+          "pid": 9212,
+          "type": "Browser",
+          "workingSetMB": "117.60",
+          "privateBytesMB": "91.12",
+          "cpuPercent": "0.1"
+        },
+        {
+          "pid": 17676,
+          "type": "GPU",
+          "workingSetMB": "113.76",
+          "privateBytesMB": "101.68",
+          "cpuPercent": "2.6"
+        },
+        {
+          "pid": 18448,
+          "type": "Utility",
+          "workingSetMB": "53.96",
+          "privateBytesMB": "13.25",
+          "cpuPercent": "0.0"
+        },
+        {
+          "pid": 19288,
+          "type": "Tab",
+          "workingSetMB": "104.69",
+          "privateBytesMB": "55.63",
+          "cpuPercent": "1.0"
+        },
+        {
+          "pid": 17068,
+          "type": "Utility",
+          "workingSetMB": "64.60",
+          "privateBytesMB": "11.62",
+          "cpuPercent": "0.1"
+        },
+        {
+          "pid": 5892,
+          "type": "Tab",
+          "workingSetMB": "129.64",
+          "privateBytesMB": "66.53",
+          "cpuPercent": "1.3"
+        }
+      ]
+    },
+    {
+      "elapsedSec": 870,
+      "nodeHeapUsedMB": "4.90",
+      "nodeHeapTotalMB": "6.77",
+      "nodeRssMB": "118.27",
+      "processes": [
+        {
+          "pid": 9212,
+          "type": "Browser",
+          "workingSetMB": "118.27",
+          "privateBytesMB": "92.53",
+          "cpuPercent": "0.1"
+        },
+        {
+          "pid": 17676,
+          "type": "GPU",
+          "workingSetMB": "113.80",
+          "privateBytesMB": "101.68",
+          "cpuPercent": "2.5"
+        },
+        {
+          "pid": 18448,
+          "type": "Utility",
+          "workingSetMB": "53.96",
+          "privateBytesMB": "13.25",
+          "cpuPercent": "0.0"
+        },
+        {
+          "pid": 19288,
+          "type": "Tab",
+          "workingSetMB": "106.74",
+          "privateBytesMB": "57.51",
+          "cpuPercent": "0.8"
+        },
+        {
+          "pid": 17068,
+          "type": "Utility",
+          "workingSetMB": "64.60",
+          "privateBytesMB": "11.62",
+          "cpuPercent": "0.1"
+        },
+        {
+          "pid": 5892,
+          "type": "Tab",
+          "workingSetMB": "125.16",
+          "privateBytesMB": "62.00",
+          "cpuPercent": "1.3"
+        }
+      ]
+    },
+    {
+      "elapsedSec": 900,
+      "nodeHeapUsedMB": "4.79",
+      "nodeHeapTotalMB": "6.77",
+      "nodeRssMB": "110.23",
+      "processes": [
+        {
+          "pid": 9212,
+          "type": "Browser",
+          "workingSetMB": "110.23",
+          "privateBytesMB": "83.43",
+          "cpuPercent": "0.1"
+        },
+        {
+          "pid": 17676,
+          "type": "GPU",
+          "workingSetMB": "113.77",
+          "privateBytesMB": "101.66",
+          "cpuPercent": "2.5"
+        },
+        {
+          "pid": 18448,
+          "type": "Utility",
+          "workingSetMB": "53.96",
+          "privateBytesMB": "13.25",
+          "cpuPercent": "0.0"
+        },
+        {
+          "pid": 19288,
+          "type": "Tab",
+          "workingSetMB": "109.08",
+          "privateBytesMB": "59.87",
+          "cpuPercent": "0.8"
+        },
+        {
+          "pid": 17068,
+          "type": "Utility",
+          "workingSetMB": "64.60",
+          "privateBytesMB": "11.62",
+          "cpuPercent": "0.1"
+        },
+        {
+          "pid": 5892,
+          "type": "Tab",
+          "workingSetMB": "127.29",
+          "privateBytesMB": "64.16",
+          "cpuPercent": "1.3"
+        }
+      ]
+    },
+    {
+      "elapsedSec": 930,
+      "nodeHeapUsedMB": "5.01",
+      "nodeHeapTotalMB": "6.77",
+      "nodeRssMB": "118.90",
+      "processes": [
+        {
+          "pid": 9212,
+          "type": "Browser",
+          "workingSetMB": "118.90",
+          "privateBytesMB": "92.38",
+          "cpuPercent": "0.1"
+        },
+        {
+          "pid": 17676,
+          "type": "GPU",
+          "workingSetMB": "113.81",
+          "privateBytesMB": "101.68",
+          "cpuPercent": "2.5"
+        },
+        {
+          "pid": 18448,
+          "type": "Utility",
+          "workingSetMB": "53.96",
+          "privateBytesMB": "13.25",
+          "cpuPercent": "0.0"
+        },
+        {
+          "pid": 19288,
+          "type": "Tab",
+          "workingSetMB": "111.47",
+          "privateBytesMB": "62.26",
+          "cpuPercent": "0.9"
+        },
+        {
+          "pid": 17068,
+          "type": "Utility",
+          "workingSetMB": "64.60",
+          "privateBytesMB": "11.62",
+          "cpuPercent": "0.1"
+        },
+        {
+          "pid": 5892,
+          "type": "Tab",
+          "workingSetMB": "130.02",
+          "privateBytesMB": "66.92",
+          "cpuPercent": "1.2"
+        }
+      ]
+    },
+    {
+      "elapsedSec": 960,
+      "nodeHeapUsedMB": "4.76",
+      "nodeHeapTotalMB": "6.02",
+      "nodeRssMB": "123.37",
+      "processes": [
+        {
+          "pid": 9212,
+          "type": "Browser",
+          "workingSetMB": "123.37",
+          "privateBytesMB": "96.36",
+          "cpuPercent": "0.1"
+        },
+        {
+          "pid": 17676,
+          "type": "GPU",
+          "workingSetMB": "113.77",
+          "privateBytesMB": "101.66",
+          "cpuPercent": "2.6"
+        },
+        {
+          "pid": 18448,
+          "type": "Utility",
+          "workingSetMB": "53.96",
+          "privateBytesMB": "13.25",
+          "cpuPercent": "0.0"
+        },
+        {
+          "pid": 19288,
+          "type": "Tab",
+          "workingSetMB": "113.67",
+          "privateBytesMB": "64.82",
+          "cpuPercent": "0.9"
+        },
+        {
+          "pid": 17068,
+          "type": "Utility",
+          "workingSetMB": "64.60",
+          "privateBytesMB": "11.62",
+          "cpuPercent": "0.1"
+        },
+        {
+          "pid": 5892,
+          "type": "Tab",
+          "workingSetMB": "125.42",
+          "privateBytesMB": "62.30",
+          "cpuPercent": "1.3"
+        }
+      ]
+    },
+    {
+      "elapsedSec": 990,
+      "nodeHeapUsedMB": "4.68",
+      "nodeHeapTotalMB": "6.02",
+      "nodeRssMB": "116.27",
+      "processes": [
+        {
+          "pid": 9212,
+          "type": "Browser",
+          "workingSetMB": "116.24",
+          "privateBytesMB": "89.27",
+          "cpuPercent": "0.1"
+        },
+        {
+          "pid": 17676,
+          "type": "GPU",
+          "workingSetMB": "113.82",
+          "privateBytesMB": "101.68",
+          "cpuPercent": "2.7"
+        },
+        {
+          "pid": 18448,
+          "type": "Utility",
+          "workingSetMB": "53.96",
+          "privateBytesMB": "13.25",
+          "cpuPercent": "0.0"
+        },
+        {
+          "pid": 19288,
+          "type": "Tab",
+          "workingSetMB": "116.20",
+          "privateBytesMB": "67.33",
+          "cpuPercent": "1.1"
+        },
+        {
+          "pid": 17068,
+          "type": "Utility",
+          "workingSetMB": "64.60",
+          "privateBytesMB": "11.62",
+          "cpuPercent": "0.1"
+        },
+        {
+          "pid": 5892,
+          "type": "Tab",
+          "workingSetMB": "127.94",
+          "privateBytesMB": "64.83",
+          "cpuPercent": "1.4"
+        }
+      ]
+    },
+    {
+      "elapsedSec": 1020,
+      "nodeHeapUsedMB": "4.90",
+      "nodeHeapTotalMB": "6.52",
+      "nodeRssMB": "109.37",
+      "processes": [
+        {
+          "pid": 9212,
+          "type": "Browser",
+          "workingSetMB": "109.37",
+          "privateBytesMB": "82.82",
+          "cpuPercent": "0.1"
+        },
+        {
+          "pid": 17676,
+          "type": "GPU",
+          "workingSetMB": "114.07",
+          "privateBytesMB": "101.96",
+          "cpuPercent": "2.3"
+        },
+        {
+          "pid": 18448,
+          "type": "Utility",
+          "workingSetMB": "53.96",
+          "privateBytesMB": "13.25",
+          "cpuPercent": "0.0"
+        },
+        {
+          "pid": 19288,
+          "type": "Tab",
+          "workingSetMB": "105.81",
+          "privateBytesMB": "56.50",
+          "cpuPercent": "0.8"
+        },
+        {
+          "pid": 17068,
+          "type": "Utility",
+          "workingSetMB": "64.60",
+          "privateBytesMB": "11.62",
+          "cpuPercent": "0.1"
+        },
+        {
+          "pid": 5892,
+          "type": "Tab",
+          "workingSetMB": "130.05",
+          "privateBytesMB": "67.45",
+          "cpuPercent": "1.2"
+        }
+      ]
+    },
+    {
+      "elapsedSec": 1050,
+      "nodeHeapUsedMB": "5.04",
+      "nodeHeapTotalMB": "6.52",
+      "nodeRssMB": "114.49",
+      "processes": [
+        {
+          "pid": 9212,
+          "type": "Browser",
+          "workingSetMB": "114.49",
+          "privateBytesMB": "87.88",
+          "cpuPercent": "0.1"
+        },
+        {
+          "pid": 17676,
+          "type": "GPU",
+          "workingSetMB": "114.11",
+          "privateBytesMB": "101.97",
+          "cpuPercent": "2.4"
+        },
+        {
+          "pid": 18448,
+          "type": "Utility",
+          "workingSetMB": "53.96",
+          "privateBytesMB": "13.25",
+          "cpuPercent": "0.0"
+        },
+        {
+          "pid": 19288,
+          "type": "Tab",
+          "workingSetMB": "108.25",
+          "privateBytesMB": "59.04",
+          "cpuPercent": "0.9"
+        },
+        {
+          "pid": 17068,
+          "type": "Utility",
+          "workingSetMB": "64.60",
+          "privateBytesMB": "11.62",
+          "cpuPercent": "0.1"
+        },
+        {
+          "pid": 5892,
+          "type": "Tab",
+          "workingSetMB": "125.51",
+          "privateBytesMB": "62.96",
+          "cpuPercent": "1.2"
+        }
+      ]
+    },
+    {
+      "elapsedSec": 1080,
+      "nodeHeapUsedMB": "5.20",
+      "nodeHeapTotalMB": "6.52",
+      "nodeRssMB": "120.66",
+      "processes": [
+        {
+          "pid": 9212,
+          "type": "Browser",
+          "workingSetMB": "120.66",
+          "privateBytesMB": "94.01",
+          "cpuPercent": "0.1"
+        },
+        {
+          "pid": 17676,
+          "type": "GPU",
+          "workingSetMB": "114.07",
+          "privateBytesMB": "101.95",
+          "cpuPercent": "2.5"
+        },
+        {
+          "pid": 18448,
+          "type": "Utility",
+          "workingSetMB": "53.96",
+          "privateBytesMB": "13.25",
+          "cpuPercent": "0.0"
+        },
+        {
+          "pid": 19288,
+          "type": "Tab",
+          "workingSetMB": "110.25",
+          "privateBytesMB": "61.07",
+          "cpuPercent": "1.0"
+        },
+        {
+          "pid": 17068,
+          "type": "Utility",
+          "workingSetMB": "64.60",
+          "privateBytesMB": "11.62",
+          "cpuPercent": "0.1"
+        },
+        {
+          "pid": 5892,
+          "type": "Tab",
+          "workingSetMB": "127.99",
+          "privateBytesMB": "65.44",
+          "cpuPercent": "1.2"
+        }
+      ]
+    },
+    {
+      "elapsedSec": 1110,
+      "nodeHeapUsedMB": "5.12",
+      "nodeHeapTotalMB": "6.52",
+      "nodeRssMB": "112.72",
+      "processes": [
+        {
+          "pid": 9212,
+          "type": "Browser",
+          "workingSetMB": "112.72",
+          "privateBytesMB": "85.46",
+          "cpuPercent": "0.1"
+        },
+        {
+          "pid": 17676,
+          "type": "GPU",
+          "workingSetMB": "114.15",
+          "privateBytesMB": "101.97",
+          "cpuPercent": "2.5"
+        },
+        {
+          "pid": 18448,
+          "type": "Utility",
+          "workingSetMB": "53.96",
+          "privateBytesMB": "13.25",
+          "cpuPercent": "0.0"
+        },
+        {
+          "pid": 19288,
+          "type": "Tab",
+          "workingSetMB": "112.75",
+          "privateBytesMB": "63.54",
+          "cpuPercent": "0.9"
+        },
+        {
+          "pid": 17068,
+          "type": "Utility",
+          "workingSetMB": "64.60",
+          "privateBytesMB": "11.62",
+          "cpuPercent": "0.1"
+        },
+        {
+          "pid": 5892,
+          "type": "Tab",
+          "workingSetMB": "130.54",
+          "privateBytesMB": "68.00",
+          "cpuPercent": "1.3"
+        }
+      ]
+    },
+    {
+      "elapsedSec": 1140,
+      "nodeHeapUsedMB": "5.32",
+      "nodeHeapTotalMB": "6.77",
+      "nodeRssMB": "121.35",
+      "processes": [
+        {
+          "pid": 9212,
+          "type": "Browser",
+          "workingSetMB": "121.35",
+          "privateBytesMB": "94.38",
+          "cpuPercent": "0.1"
+        },
+        {
+          "pid": 17676,
+          "type": "GPU",
+          "workingSetMB": "113.80",
+          "privateBytesMB": "101.66",
+          "cpuPercent": "2.3"
+        },
+        {
+          "pid": 18448,
+          "type": "Utility",
+          "workingSetMB": "53.96",
+          "privateBytesMB": "13.25",
+          "cpuPercent": "0.0"
+        },
+        {
+          "pid": 19288,
+          "type": "Tab",
+          "workingSetMB": "115.37",
+          "privateBytesMB": "66.17",
+          "cpuPercent": "0.8"
+        },
+        {
+          "pid": 17068,
+          "type": "Utility",
+          "workingSetMB": "64.60",
+          "privateBytesMB": "11.62",
+          "cpuPercent": "0.1"
+        },
+        {
+          "pid": 5892,
+          "type": "Tab",
+          "workingSetMB": "126.57",
+          "privateBytesMB": "63.81",
+          "cpuPercent": "1.1"
+        }
+      ]
+    },
+    {
+      "elapsedSec": 1170,
+      "nodeHeapUsedMB": "5.52",
+      "nodeHeapTotalMB": "7.02",
+      "nodeRssMB": "114.07",
+      "processes": [
+        {
+          "pid": 9212,
+          "type": "Browser",
+          "workingSetMB": "114.07",
+          "privateBytesMB": "87.64",
+          "cpuPercent": "0.1"
+        },
+        {
+          "pid": 17676,
+          "type": "GPU",
+          "workingSetMB": "113.86",
+          "privateBytesMB": "101.68",
+          "cpuPercent": "2.2"
+        },
+        {
+          "pid": 18448,
+          "type": "Utility",
+          "workingSetMB": "53.96",
+          "privateBytesMB": "13.25",
+          "cpuPercent": "0.0"
+        },
+        {
+          "pid": 19288,
+          "type": "Tab",
+          "workingSetMB": "105.31",
+          "privateBytesMB": "56.18",
+          "cpuPercent": "0.8"
+        },
+        {
+          "pid": 17068,
+          "type": "Utility",
+          "workingSetMB": "64.60",
+          "privateBytesMB": "11.62",
+          "cpuPercent": "0.1"
+        },
+        {
+          "pid": 5892,
+          "type": "Tab",
+          "workingSetMB": "128.37",
+          "privateBytesMB": "65.67",
+          "cpuPercent": "1.1"
+        }
+      ]
+    },
+    {
+      "elapsedSec": 1200,
+      "nodeHeapUsedMB": "5.42",
+      "nodeHeapTotalMB": "7.02",
+      "nodeRssMB": "104.88",
+      "processes": [
+        {
+          "pid": 9212,
+          "type": "Browser",
+          "workingSetMB": "104.88",
+          "privateBytesMB": "77.64",
+          "cpuPercent": "0.1"
+        },
+        {
+          "pid": 17676,
+          "type": "GPU",
+          "workingSetMB": "113.80",
+          "privateBytesMB": "101.66",
+          "cpuPercent": "2.2"
+        },
+        {
+          "pid": 18448,
+          "type": "Utility",
+          "workingSetMB": "53.96",
+          "privateBytesMB": "13.25",
+          "cpuPercent": "0.0"
+        },
+        {
+          "pid": 19288,
+          "type": "Tab",
+          "workingSetMB": "107.29",
+          "privateBytesMB": "58.05",
+          "cpuPercent": "0.8"
+        },
+        {
+          "pid": 17068,
+          "type": "Utility",
+          "workingSetMB": "64.60",
+          "privateBytesMB": "11.62",
+          "cpuPercent": "0.1"
+        },
+        {
+          "pid": 5892,
+          "type": "Tab",
+          "workingSetMB": "130.97",
+          "privateBytesMB": "68.30",
+          "cpuPercent": "1.0"
+        }
+      ]
+    },
+    {
+      "elapsedSec": 1230,
+      "nodeHeapUsedMB": "5.62",
+      "nodeHeapTotalMB": "7.02",
+      "nodeRssMB": "113.01",
+      "processes": [
+        {
+          "pid": 9212,
+          "type": "Browser",
+          "workingSetMB": "113.01",
+          "privateBytesMB": "86.03",
+          "cpuPercent": "0.1"
+        },
+        {
+          "pid": 17676,
+          "type": "GPU",
+          "workingSetMB": "113.82",
+          "privateBytesMB": "101.68",
+          "cpuPercent": "2.4"
+        },
+        {
+          "pid": 18448,
+          "type": "Utility",
+          "workingSetMB": "53.95",
+          "privateBytesMB": "13.25",
+          "cpuPercent": "0.0"
+        },
+        {
+          "pid": 19288,
+          "type": "Tab",
+          "workingSetMB": "109.59",
+          "privateBytesMB": "60.31",
+          "cpuPercent": "0.8"
+        },
+        {
+          "pid": 17068,
+          "type": "Utility",
+          "workingSetMB": "64.62",
+          "privateBytesMB": "11.68",
+          "cpuPercent": "0.1"
+        },
+        {
+          "pid": 5892,
+          "type": "Tab",
+          "workingSetMB": "133.59",
+          "privateBytesMB": "70.92",
+          "cpuPercent": "1.2"
+        }
+      ]
+    },
+    {
+      "elapsedSec": 1260,
+      "nodeHeapUsedMB": "5.80",
+      "nodeHeapTotalMB": "7.27",
+      "nodeRssMB": "121.43",
+      "processes": [
+        {
+          "pid": 9212,
+          "type": "Browser",
+          "workingSetMB": "121.43",
+          "privateBytesMB": "94.77",
+          "cpuPercent": "0.1"
+        },
+        {
+          "pid": 17676,
+          "type": "GPU",
+          "workingSetMB": "113.80",
+          "privateBytesMB": "101.66",
+          "cpuPercent": "2.3"
+        },
+        {
+          "pid": 18448,
+          "type": "Utility",
+          "workingSetMB": "53.95",
+          "privateBytesMB": "13.25",
+          "cpuPercent": "0.0"
+        },
+        {
+          "pid": 19288,
+          "type": "Tab",
+          "workingSetMB": "112.02",
+          "privateBytesMB": "62.75",
+          "cpuPercent": "0.7"
+        },
+        {
+          "pid": 17068,
+          "type": "Utility",
+          "workingSetMB": "64.62",
+          "privateBytesMB": "11.68",
+          "cpuPercent": "0.1"
+        },
+        {
+          "pid": 5892,
+          "type": "Tab",
+          "workingSetMB": "129.05",
+          "privateBytesMB": "66.41",
+          "cpuPercent": "1.1"
+        }
+      ]
+    },
+    {
+      "elapsedSec": 1290,
+      "nodeHeapUsedMB": "5.72",
+      "nodeHeapTotalMB": "7.27",
+      "nodeRssMB": "113.63",
+      "processes": [
+        {
+          "pid": 9212,
+          "type": "Browser",
+          "workingSetMB": "113.63",
+          "privateBytesMB": "87.02",
+          "cpuPercent": "0.1"
+        },
+        {
+          "pid": 17676,
+          "type": "GPU",
+          "workingSetMB": "111.93",
+          "privateBytesMB": "101.68",
+          "cpuPercent": "2.1"
+        },
+        {
+          "pid": 18448,
+          "type": "Utility",
+          "workingSetMB": "53.83",
+          "privateBytesMB": "13.25",
+          "cpuPercent": "0.0"
+        },
+        {
+          "pid": 19288,
+          "type": "Tab",
+          "workingSetMB": "109.31",
+          "privateBytesMB": "65.39",
+          "cpuPercent": "0.7"
+        },
+        {
+          "pid": 17068,
+          "type": "Utility",
+          "workingSetMB": "64.50",
+          "privateBytesMB": "11.68",
+          "cpuPercent": "0.1"
+        },
+        {
+          "pid": 5892,
+          "type": "Tab",
+          "workingSetMB": "127.98",
+          "privateBytesMB": "68.86",
+          "cpuPercent": "1.0"
+        }
+      ]
+    },
+    {
+      "elapsedSec": 1320,
+      "nodeHeapUsedMB": "5.90",
+      "nodeHeapTotalMB": "7.27",
+      "nodeRssMB": "122.27",
+      "processes": [
+        {
+          "pid": 9212,
+          "type": "Browser",
+          "workingSetMB": "122.27",
+          "privateBytesMB": "95.67",
+          "cpuPercent": "0.1"
+        },
+        {
+          "pid": 17676,
+          "type": "GPU",
+          "workingSetMB": "111.89",
+          "privateBytesMB": "101.66",
+          "cpuPercent": "2.2"
+        },
+        {
+          "pid": 18448,
+          "type": "Utility",
+          "workingSetMB": "53.83",
+          "privateBytesMB": "13.25",
+          "cpuPercent": "0.0"
+        },
+        {
+          "pid": 19288,
+          "type": "Tab",
+          "workingSetMB": "112.89",
+          "privateBytesMB": "68.14",
+          "cpuPercent": "0.7"
+        },
+        {
+          "pid": 17068,
+          "type": "Utility",
+          "workingSetMB": "64.50",
+          "privateBytesMB": "11.68",
+          "cpuPercent": "0.1"
+        },
+        {
+          "pid": 5892,
+          "type": "Tab",
+          "workingSetMB": "132.81",
+          "privateBytesMB": "71.47",
+          "cpuPercent": "1.1"
+        }
+      ]
+    },
+    {
+      "elapsedSec": 1350,
+      "nodeHeapUsedMB": "6.10",
+      "nodeHeapTotalMB": "7.52",
+      "nodeRssMB": "114.48",
+      "processes": [
+        {
+          "pid": 9212,
+          "type": "Browser",
+          "workingSetMB": "114.48",
+          "privateBytesMB": "88.38",
+          "cpuPercent": "0.1"
+        },
+        {
+          "pid": 17676,
+          "type": "GPU",
+          "workingSetMB": "111.93",
+          "privateBytesMB": "101.68",
+          "cpuPercent": "2.5"
+        },
+        {
+          "pid": 18448,
+          "type": "Utility",
+          "workingSetMB": "53.83",
+          "privateBytesMB": "13.25",
+          "cpuPercent": "0.0"
+        },
+        {
+          "pid": 19288,
+          "type": "Tab",
+          "workingSetMB": "102.38",
+          "privateBytesMB": "57.22",
+          "cpuPercent": "0.8"
+        },
+        {
+          "pid": 17068,
+          "type": "Utility",
+          "workingSetMB": "64.47",
+          "privateBytesMB": "11.62",
+          "cpuPercent": "0.1"
+        },
+        {
+          "pid": 5892,
+          "type": "Tab",
+          "workingSetMB": "128.61",
+          "privateBytesMB": "66.57",
+          "cpuPercent": "1.3"
+        }
+      ]
+    },
+    {
+      "elapsedSec": 1380,
+      "nodeHeapUsedMB": "6.29",
+      "nodeHeapTotalMB": "7.52",
+      "nodeRssMB": "121.39",
+      "processes": [
+        {
+          "pid": 9212,
+          "type": "Browser",
+          "workingSetMB": "121.39",
+          "privateBytesMB": "95.42",
+          "cpuPercent": "0.1"
+        },
+        {
+          "pid": 17676,
+          "type": "GPU",
+          "workingSetMB": "111.89",
+          "privateBytesMB": "101.66",
+          "cpuPercent": "2.5"
+        },
+        {
+          "pid": 18448,
+          "type": "Utility",
+          "workingSetMB": "53.83",
+          "privateBytesMB": "13.25",
+          "cpuPercent": "0.0"
+        },
+        {
+          "pid": 19288,
+          "type": "Tab",
+          "workingSetMB": "104.73",
+          "privateBytesMB": "59.52",
+          "cpuPercent": "0.9"
+        },
+        {
+          "pid": 17068,
+          "type": "Utility",
+          "workingSetMB": "64.47",
+          "privateBytesMB": "11.62",
+          "cpuPercent": "0.1"
+        },
+        {
+          "pid": 5892,
+          "type": "Tab",
+          "workingSetMB": "131.35",
+          "privateBytesMB": "69.36",
+          "cpuPercent": "1.3"
+        }
+      ]
+    },
+    {
+      "elapsedSec": 1410,
+      "nodeHeapUsedMB": "6.18",
+      "nodeHeapTotalMB": "7.52",
+      "nodeRssMB": "113.43",
+      "processes": [
+        {
+          "pid": 9212,
+          "type": "Browser",
+          "workingSetMB": "113.43",
+          "privateBytesMB": "86.91",
+          "cpuPercent": "0.1"
+        },
+        {
+          "pid": 17676,
+          "type": "GPU",
+          "workingSetMB": "111.93",
+          "privateBytesMB": "101.67",
+          "cpuPercent": "2.2"
+        },
+        {
+          "pid": 18448,
+          "type": "Utility",
+          "workingSetMB": "53.83",
+          "privateBytesMB": "13.25",
+          "cpuPercent": "0.0"
+        },
+        {
+          "pid": 19288,
+          "type": "Tab",
+          "workingSetMB": "107.03",
+          "privateBytesMB": "61.86",
+          "cpuPercent": "0.7"
+        },
+        {
+          "pid": 17068,
+          "type": "Utility",
+          "workingSetMB": "64.47",
+          "privateBytesMB": "11.62",
+          "cpuPercent": "0.1"
+        },
+        {
+          "pid": 5892,
+          "type": "Tab",
+          "workingSetMB": "134.02",
+          "privateBytesMB": "72.01",
+          "cpuPercent": "1.2"
+        }
+      ]
+    },
+    {
+      "elapsedSec": 1440,
+      "nodeHeapUsedMB": "6.38",
+      "nodeHeapTotalMB": "7.52",
+      "nodeRssMB": "121.07",
+      "processes": [
+        {
+          "pid": 9212,
+          "type": "Browser",
+          "workingSetMB": "121.07",
+          "privateBytesMB": "94.59",
+          "cpuPercent": "0.1"
+        },
+        {
+          "pid": 17676,
+          "type": "GPU",
+          "workingSetMB": "111.89",
+          "privateBytesMB": "101.66",
+          "cpuPercent": "2.3"
+        },
+        {
+          "pid": 18448,
+          "type": "Utility",
+          "workingSetMB": "53.83",
+          "privateBytesMB": "13.25",
+          "cpuPercent": "0.0"
+        },
+        {
+          "pid": 19288,
+          "type": "Tab",
+          "workingSetMB": "109.23",
+          "privateBytesMB": "64.09",
+          "cpuPercent": "0.8"
+        },
+        {
+          "pid": 17068,
+          "type": "Utility",
+          "workingSetMB": "64.47",
+          "privateBytesMB": "11.62",
+          "cpuPercent": "0.1"
+        },
+        {
+          "pid": 5892,
+          "type": "Tab",
+          "workingSetMB": "129.33",
+          "privateBytesMB": "67.34",
+          "cpuPercent": "1.2"
+        }
+      ]
+    },
+    {
+      "elapsedSec": 1470,
+      "nodeHeapUsedMB": "4.84",
+      "nodeHeapTotalMB": "7.52",
+      "nodeRssMB": "129.21",
+      "processes": [
+        {
+          "pid": 9212,
+          "type": "Browser",
+          "workingSetMB": "129.21",
+          "privateBytesMB": "102.92",
+          "cpuPercent": "0.1"
+        },
+        {
+          "pid": 17676,
+          "type": "GPU",
+          "workingSetMB": "111.94",
+          "privateBytesMB": "101.68",
+          "cpuPercent": "2.4"
+        },
+        {
+          "pid": 18448,
+          "type": "Utility",
+          "workingSetMB": "53.83",
+          "privateBytesMB": "13.25",
+          "cpuPercent": "0.0"
+        },
+        {
+          "pid": 19288,
+          "type": "Tab",
+          "workingSetMB": "111.86",
+          "privateBytesMB": "66.78",
+          "cpuPercent": "0.8"
+        },
+        {
+          "pid": 17068,
+          "type": "Utility",
+          "workingSetMB": "64.47",
+          "privateBytesMB": "11.62",
+          "cpuPercent": "0.1"
+        },
+        {
+          "pid": 5892,
+          "type": "Tab",
+          "workingSetMB": "131.88",
+          "privateBytesMB": "69.89",
+          "cpuPercent": "1.3"
+        }
+      ]
+    },
+    {
+      "elapsedSec": 1500,
+      "nodeHeapUsedMB": "4.73",
+      "nodeHeapTotalMB": "7.52",
+      "nodeRssMB": "105.46",
+      "processes": [
+        {
+          "pid": 9212,
+          "type": "Browser",
+          "workingSetMB": "105.46",
+          "privateBytesMB": "78.49",
+          "cpuPercent": "0.1"
+        },
+        {
+          "pid": 17676,
+          "type": "GPU",
+          "workingSetMB": "111.88",
+          "privateBytesMB": "101.65",
+          "cpuPercent": "2.2"
+        },
+        {
+          "pid": 18448,
+          "type": "Utility",
+          "workingSetMB": "53.83",
+          "privateBytesMB": "13.25",
+          "cpuPercent": "0.0"
+        },
+        {
+          "pid": 19288,
+          "type": "Tab",
+          "workingSetMB": "101.35",
+          "privateBytesMB": "56.23",
+          "cpuPercent": "0.7"
+        },
+        {
+          "pid": 17068,
+          "type": "Utility",
+          "workingSetMB": "64.47",
+          "privateBytesMB": "11.62",
+          "cpuPercent": "0.1"
+        },
+        {
+          "pid": 5892,
+          "type": "Tab",
+          "workingSetMB": "134.28",
+          "privateBytesMB": "72.29",
+          "cpuPercent": "1.1"
+        }
+      ]
+    },
+    {
+      "elapsedSec": 1530,
+      "nodeHeapUsedMB": "4.94",
+      "nodeHeapTotalMB": "7.52",
+      "nodeRssMB": "112.62",
+      "processes": [
+        {
+          "pid": 9212,
+          "type": "Browser",
+          "workingSetMB": "112.62",
+          "privateBytesMB": "85.96",
+          "cpuPercent": "0.1"
+        },
+        {
+          "pid": 17676,
+          "type": "GPU",
+          "workingSetMB": "111.94",
+          "privateBytesMB": "101.68",
+          "cpuPercent": "2.3"
+        },
+        {
+          "pid": 18448,
+          "type": "Utility",
+          "workingSetMB": "53.83",
+          "privateBytesMB": "13.25",
+          "cpuPercent": "0.0"
+        },
+        {
+          "pid": 19288,
+          "type": "Tab",
+          "workingSetMB": "103.82",
+          "privateBytesMB": "58.68",
+          "cpuPercent": "0.8"
+        },
+        {
+          "pid": 17068,
+          "type": "Utility",
+          "workingSetMB": "64.47",
+          "privateBytesMB": "11.62",
+          "cpuPercent": "0.1"
+        },
+        {
+          "pid": 5892,
+          "type": "Tab",
+          "workingSetMB": "129.71",
+          "privateBytesMB": "67.70",
+          "cpuPercent": "1.2"
+        }
+      ]
+    },
+    {
+      "elapsedSec": 1560,
+      "nodeHeapUsedMB": "5.13",
+      "nodeHeapTotalMB": "7.52",
+      "nodeRssMB": "120.41",
+      "processes": [
+        {
+          "pid": 9212,
+          "type": "Browser",
+          "workingSetMB": "120.41",
+          "privateBytesMB": "93.93",
+          "cpuPercent": "0.1"
+        },
+        {
+          "pid": 17676,
+          "type": "GPU",
+          "workingSetMB": "112.20",
+          "privateBytesMB": "101.96",
+          "cpuPercent": "2.4"
+        },
+        {
+          "pid": 18448,
+          "type": "Utility",
+          "workingSetMB": "53.83",
+          "privateBytesMB": "13.25",
+          "cpuPercent": "0.0"
+        },
+        {
+          "pid": 19288,
+          "type": "Tab",
+          "workingSetMB": "106.42",
+          "privateBytesMB": "61.33",
+          "cpuPercent": "0.8"
+        },
+        {
+          "pid": 17068,
+          "type": "Utility",
+          "workingSetMB": "64.47",
+          "privateBytesMB": "11.62",
+          "cpuPercent": "0.1"
+        },
+        {
+          "pid": 5892,
+          "type": "Tab",
+          "workingSetMB": "132.14",
+          "privateBytesMB": "70.16",
+          "cpuPercent": "1.2"
+        }
+      ]
+    },
+    {
+      "elapsedSec": 1590,
+      "nodeHeapUsedMB": "5.02",
+      "nodeHeapTotalMB": "7.52",
+      "nodeRssMB": "112.04",
+      "processes": [
+        {
+          "pid": 9212,
+          "type": "Browser",
+          "workingSetMB": "112.04",
+          "privateBytesMB": "85.08",
+          "cpuPercent": "0.1"
+        },
+        {
+          "pid": 17676,
+          "type": "GPU",
+          "workingSetMB": "111.94",
+          "privateBytesMB": "101.68",
+          "cpuPercent": "2.3"
+        },
+        {
+          "pid": 18448,
+          "type": "Utility",
+          "workingSetMB": "53.83",
+          "privateBytesMB": "13.25",
+          "cpuPercent": "0.0"
+        },
+        {
+          "pid": 19288,
+          "type": "Tab",
+          "workingSetMB": "108.54",
+          "privateBytesMB": "63.37",
+          "cpuPercent": "0.8"
+        },
+        {
+          "pid": 17068,
+          "type": "Utility",
+          "workingSetMB": "64.47",
+          "privateBytesMB": "11.62",
+          "cpuPercent": "0.1"
+        },
+        {
+          "pid": 5892,
+          "type": "Tab",
+          "workingSetMB": "135.01",
+          "privateBytesMB": "73.03",
+          "cpuPercent": "1.2"
+        }
+      ]
+    },
+    {
+      "elapsedSec": 1620,
+      "nodeHeapUsedMB": "5.22",
+      "nodeHeapTotalMB": "7.52",
+      "nodeRssMB": "120.65",
+      "processes": [
+        {
+          "pid": 9212,
+          "type": "Browser",
+          "workingSetMB": "120.65",
+          "privateBytesMB": "93.83",
+          "cpuPercent": "0.1"
+        },
+        {
+          "pid": 17676,
+          "type": "GPU",
+          "workingSetMB": "111.90",
+          "privateBytesMB": "101.66",
+          "cpuPercent": "2.6"
+        },
+        {
+          "pid": 18448,
+          "type": "Utility",
+          "workingSetMB": "53.83",
+          "privateBytesMB": "13.25",
+          "cpuPercent": "0.0"
+        },
+        {
+          "pid": 19288,
+          "type": "Tab",
+          "workingSetMB": "111.11",
+          "privateBytesMB": "65.95",
+          "cpuPercent": "0.9"
+        },
+        {
+          "pid": 17068,
+          "type": "Utility",
+          "workingSetMB": "64.47",
+          "privateBytesMB": "11.62",
+          "cpuPercent": "0.1"
+        },
+        {
+          "pid": 5892,
+          "type": "Tab",
+          "workingSetMB": "130.27",
+          "privateBytesMB": "68.10",
+          "cpuPercent": "1.4"
+        }
+      ]
+    },
+    {
+      "elapsedSec": 1650,
+      "nodeHeapUsedMB": "5.41",
+      "nodeHeapTotalMB": "7.52",
+      "nodeRssMB": "114.63",
+      "processes": [
+        {
+          "pid": 9212,
+          "type": "Browser",
+          "workingSetMB": "114.63",
+          "privateBytesMB": "88.23",
+          "cpuPercent": "0.1"
+        },
+        {
+          "pid": 17676,
+          "type": "GPU",
+          "workingSetMB": "111.95",
+          "privateBytesMB": "101.68",
+          "cpuPercent": "2.9"
+        },
+        {
+          "pid": 18448,
+          "type": "Utility",
+          "workingSetMB": "53.83",
+          "privateBytesMB": "13.25",
+          "cpuPercent": "0.0"
+        },
+        {
+          "pid": 19288,
+          "type": "Tab",
+          "workingSetMB": "100.75",
+          "privateBytesMB": "55.95",
+          "cpuPercent": "1.0"
+        },
+        {
+          "pid": 17068,
+          "type": "Utility",
+          "workingSetMB": "64.47",
+          "privateBytesMB": "11.62",
+          "cpuPercent": "0.1"
+        },
+        {
+          "pid": 5892,
+          "type": "Tab",
+          "workingSetMB": "132.75",
+          "privateBytesMB": "70.61",
+          "cpuPercent": "1.5"
+        }
+      ]
+    },
+    {
+      "elapsedSec": 1681,
+      "nodeHeapUsedMB": "5.63",
+      "nodeHeapTotalMB": "7.52",
+      "nodeRssMB": "120.52",
+      "processes": [
+        {
+          "pid": 9212,
+          "type": "Browser",
+          "workingSetMB": "120.52",
+          "privateBytesMB": "94.36",
+          "cpuPercent": "0.1"
+        },
+        {
+          "pid": 17676,
+          "type": "GPU",
+          "workingSetMB": "112.20",
+          "privateBytesMB": "101.96",
+          "cpuPercent": "2.8"
+        },
+        {
+          "pid": 18448,
+          "type": "Utility",
+          "workingSetMB": "53.83",
+          "privateBytesMB": "13.25",
+          "cpuPercent": "0.0"
+        },
+        {
+          "pid": 19288,
+          "type": "Tab",
+          "workingSetMB": "102.24",
+          "privateBytesMB": "57.55",
+          "cpuPercent": "1.0"
+        },
+        {
+          "pid": 17068,
+          "type": "Utility",
+          "workingSetMB": "64.47",
+          "privateBytesMB": "11.62",
+          "cpuPercent": "0.1"
+        },
+        {
+          "pid": 5892,
+          "type": "Tab",
+          "workingSetMB": "135.41",
+          "privateBytesMB": "73.27",
+          "cpuPercent": "1.4"
+        }
+      ]
+    },
+    {
+      "elapsedSec": 1711,
+      "nodeHeapUsedMB": "5.49",
+      "nodeHeapTotalMB": "7.52",
+      "nodeRssMB": "111.98",
+      "processes": [
+        {
+          "pid": 9212,
+          "type": "Browser",
+          "workingSetMB": "111.98",
+          "privateBytesMB": "85.23",
+          "cpuPercent": "0.1"
+        },
+        {
+          "pid": 17676,
+          "type": "GPU",
+          "workingSetMB": "111.95",
+          "privateBytesMB": "101.68",
+          "cpuPercent": "2.6"
+        },
+        {
+          "pid": 18448,
+          "type": "Utility",
+          "workingSetMB": "53.83",
+          "privateBytesMB": "13.25",
+          "cpuPercent": "0.0"
+        },
+        {
+          "pid": 19288,
+          "type": "Tab",
+          "workingSetMB": "104.59",
+          "privateBytesMB": "59.89",
+          "cpuPercent": "1.0"
+        },
+        {
+          "pid": 17068,
+          "type": "Utility",
+          "workingSetMB": "64.47",
+          "privateBytesMB": "11.62",
+          "cpuPercent": "0.1"
+        },
+        {
+          "pid": 5892,
+          "type": "Tab",
+          "workingSetMB": "131.48",
+          "privateBytesMB": "69.45",
+          "cpuPercent": "1.3"
+        }
+      ]
+    },
+    {
+      "elapsedSec": 1741,
+      "nodeHeapUsedMB": "5.71",
+      "nodeHeapTotalMB": "8.52",
+      "nodeRssMB": "119.96",
+      "processes": [
+        {
+          "pid": 9212,
+          "type": "Browser",
+          "workingSetMB": "119.96",
+          "privateBytesMB": "93.54",
+          "cpuPercent": "0.1"
+        },
+        {
+          "pid": 17676,
+          "type": "GPU",
+          "workingSetMB": "111.90",
+          "privateBytesMB": "101.66",
+          "cpuPercent": "2.3"
+        },
+        {
+          "pid": 18448,
+          "type": "Utility",
+          "workingSetMB": "53.83",
+          "privateBytesMB": "13.25",
+          "cpuPercent": "0.0"
+        },
+        {
+          "pid": 19288,
+          "type": "Tab",
+          "workingSetMB": "107.12",
+          "privateBytesMB": "62.39",
+          "cpuPercent": "0.8"
+        },
+        {
+          "pid": 17068,
+          "type": "Utility",
+          "workingSetMB": "64.47",
+          "privateBytesMB": "11.62",
+          "cpuPercent": "0.1"
+        },
+        {
+          "pid": 5892,
+          "type": "Tab",
+          "workingSetMB": "134.02",
+          "privateBytesMB": "71.96",
+          "cpuPercent": "1.2"
+        }
+      ]
+    },
+    {
+      "elapsedSec": 1771,
+      "nodeHeapUsedMB": "5.91",
+      "nodeHeapTotalMB": "7.52",
+      "nodeRssMB": "127.52",
+      "processes": [
+        {
+          "pid": 9212,
+          "type": "Browser",
+          "workingSetMB": "127.52",
+          "privateBytesMB": "101.23",
+          "cpuPercent": "0.1"
+        },
+        {
+          "pid": 17676,
+          "type": "GPU",
+          "workingSetMB": "111.93",
+          "privateBytesMB": "101.68",
+          "cpuPercent": "2.2"
+        },
+        {
+          "pid": 18448,
+          "type": "Utility",
+          "workingSetMB": "53.83",
+          "privateBytesMB": "13.25",
+          "cpuPercent": "0.0"
+        },
+        {
+          "pid": 19288,
+          "type": "Tab",
+          "workingSetMB": "109.85",
+          "privateBytesMB": "65.20",
+          "cpuPercent": "0.8"
+        },
+        {
+          "pid": 17068,
+          "type": "Utility",
+          "workingSetMB": "64.47",
+          "privateBytesMB": "11.62",
+          "cpuPercent": "0.1"
+        },
+        {
+          "pid": 5892,
+          "type": "Tab",
+          "workingSetMB": "136.63",
+          "privateBytesMB": "74.63",
+          "cpuPercent": "1.2"
+        }
+      ]
+    },
+    {
+      "elapsedSec": 1800,
+      "nodeHeapUsedMB": "5.77",
+      "nodeHeapTotalMB": "7.52",
+      "nodeRssMB": "118.99",
+      "processes": [
+        {
+          "pid": 9212,
+          "type": "Browser",
+          "workingSetMB": "118.99",
+          "privateBytesMB": "92.25",
+          "cpuPercent": "0.1"
+        },
+        {
+          "pid": 17676,
+          "type": "GPU",
+          "workingSetMB": "111.95",
+          "privateBytesMB": "101.68",
+          "cpuPercent": "2.3"
+        },
+        {
+          "pid": 18448,
+          "type": "Utility",
+          "workingSetMB": "53.83",
+          "privateBytesMB": "13.25",
+          "cpuPercent": "0.0"
+        },
+        {
+          "pid": 19288,
+          "type": "Tab",
+          "workingSetMB": "112.52",
+          "privateBytesMB": "67.82",
+          "cpuPercent": "1.0"
+        },
+        {
+          "pid": 17068,
+          "type": "Utility",
+          "workingSetMB": "64.47",
+          "privateBytesMB": "11.62",
+          "cpuPercent": "0.1"
+        },
+        {
+          "pid": 5892,
+          "type": "Tab",
+          "workingSetMB": "131.58",
+          "privateBytesMB": "69.43",
+          "cpuPercent": "1.2"
+        }
+      ]
+    }
+  ],
+  "playbackMetrics": {
+    "totalCallbacks": 53788,
+    "stalls": 1,
+    "initial": {
+      "currentTime": 1.457132,
+      "totalVideoFrames": 46,
+      "droppedVideoFrames": 0,
+      "webkitDecodedFrameCount": 46,
+      "webkitAudioDecodedByteCount": 28309
+    },
+    "final": {
+      "currentTime": 1801.954123,
+      "totalVideoFrames": 53927,
+      "droppedVideoFrames": 117,
+      "corruptedVideoFrames": 0,
+      "webkitDecodedFrameCount": 53927,
+      "webkitAudioDecodedByteCount": 29007508
+    },
+    "bufferSamplesCount": 1792,
+    "recentBufferSamples": [
+      {
+        "t": 1792.0643,
+        "bufferAhead": 1.8648019999998269,
+        "currentTime": 1791.995198
+      },
+      {
+        "t": 1793.0644,
+        "bufferAhead": 1.8306720000000496,
+        "currentTime": 1792.995328
+      },
+      {
+        "t": 1794.0645,
+        "bufferAhead": 1.763778000000002,
+        "currentTime": 1793.995222
+      },
+      {
+        "t": 1795.0645,
+        "bufferAhead": 1.864703999999847,
+        "currentTime": 1794.995296
+      },
+      {
+        "t": 1796.0646000000002,
+        "bufferAhead": 1.8302309999999125,
+        "currentTime": 1795.995769
+      },
+      {
+        "t": 1797.0647,
+        "bufferAhead": 1.7638449999999466,
+        "currentTime": 1796.995155
+      },
+      {
+        "t": 1798.0587,
+        "bufferAhead": 1.868389999999863,
+        "currentTime": 1797.99061
+      },
+      {
+        "t": 1799.0648,
+        "bufferAhead": 1.8293390000001182,
+        "currentTime": 1798.996661
+      },
+      {
+        "t": 1800.0648,
+        "bufferAhead": 1.7631930000000011,
+        "currentTime": 1799.995807
+      },
+      {
+        "t": 1801.065,
+        "bufferAhead": 1.798443000000134,
+        "currentTime": 1800.996557
+      }
+    ],
+    "stats": {
+      "frameCount": 53787,
+      "minIntervalMs": 5.899999999906868,
+      "maxIntervalMs": 139.5,
+      "avgIntervalMs": 33.50175507091616,
+      "p50Ms": 36.199999999953434,
+      "p95Ms": 42.40000000002328,
+      "p99Ms": 54.60000000009313,
+      "jitterStdDevMs": 6.126442546460272,
+      "effectiveFps": 29.84918246471597
+    }
+  },
+  "summary": {
+    "effectiveDurationSec": "1800.03",
+    "targetDurationSec": 1800,
+    "completedWithoutFatalError": true,
+    "totalFramesPresented": 53788,
+    "effectiveFps": "29.85",
+    "stallsCount": 1,
+    "frameIntervalAvgMs": "33.50",
+    "frameIntervalP99Ms": "54.60",
+    "jitterStdDevMs": "6.13",
+    "memoryDeltaTotalMB": "52.75",
+    "memoryFinalTotalMB": "593.34"
+  }
+}

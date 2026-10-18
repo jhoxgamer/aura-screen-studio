@@ -1,0 +1,50 @@
+{
+  "electronVersion": "34.5.8",
+  "chromeVersion": "132.0.6834.210",
+  "nodeVersion": "20.19.1",
+  "v8Version": "13.2.152.41-electron.0",
+  "mediaSourceSupported": true,
+  "mseTypes": {
+    "video/mp4; codecs=\"avc1.42E01E, mp4a.40.2\"": true,
+    "video/mp4; codecs=\"avc1.640028, mp4a.40.2\"": true,
+    "video/mp4; codecs=\"avc1.4d401f\"": true,
+    "video/webm; codecs=\"vp8, opus\"": true,
+    "video/webm; codecs=\"vp9, opus\"": true,
+    "video/webm; codecs=\"vp8\"": true,
+    "video/webm; codecs=\"vp9\"": true,
+    "video/webm; codecs=\"av1, opus\"": false,
+    "video/mp4; codecs=\"av01.0.08M.08, opus\"": true
+  },
+  "webCodecsSupported": false,
+  "videoEncoderConfigs": {},
+  "audioEncoderConfigs": {},
+  "webrtcSupported": true,
+  "webrtcCodecs": {
+    "video": [
+      "video/VP8",
+      "video/rtx",
+      "video/H264 (level-asymmetry-allowed=1;packetization-mode=1;profile-level-id=42001f)",
+      "video/H264 (level-asymmetry-allowed=1;packetization-mode=0;profile-level-id=42001f)",
+      "video/H264 (level-asymmetry-allowed=1;packetization-mode=1;profile-level-id=42e01f)",
+      "video/H264 (level-asymmetry-allowed=1;packetization-mode=0;profile-level-id=42e01f)",
+      "video/H264 (level-asymmetry-allowed=1;packetization-mode=1;profile-level-id=4d001f)",
+      "video/H264 (level-asymmetry-allowed=1;packetization-mode=0;profile-level-id=4d001f)",
+      "video/AV1 (level-idx=5;profile=0;tier=0)",
+      "video/VP9 (profile-id=0)",
+      "video/VP9 (profile-id=2)",
+      "video/H264 (level-asymmetry-allowed=1;packetization-mode=1;profile-level-id=640020)",
+      "video/red",
+      "video/ulpfec"
+    ],
+    "audio": [
+      "audio/opus 48000Hz",
+      "audio/red 48000Hz",
+      "audio/G722 8000Hz",
+      "audio/PCMU 8000Hz",
+      "audio/PCMA 8000Hz",
+      "audio/CN 8000Hz",
+      "audio/telephone-event 48000Hz",
+      "audio/telephone-event 8000Hz"
+    ]
+  }
+}

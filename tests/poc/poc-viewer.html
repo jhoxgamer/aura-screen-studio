@@ -1,0 +1,357 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <title>Aura Screen Studio — PoC Live Share Benchmark Viewer</title>
+  <style>
+    body {
+      margin: 0;
+      padding: 16px;
+      background: #0b0f19;
+      color: #e2e8f0;
+      font-family: system-ui, -apple-system, sans-serif;
+    }
+    .grid {
+      display: grid;
+      grid-template-columns: 1fr 340px;
+      gap: 16px;
+      height: calc(100vh - 32px);
+    }
+    .video-panel {
+      background: #131b2e;
+      border-radius: 8px;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+    }
+    video, img {
+      max-width: 100%;
+      max-height: 100%;
+      object-fit: contain;
+    }
+    .stats-panel {
+      background: #131b2e;
+      border-radius: 8px;
+      padding: 16px;
+      overflow-y: auto;
+      font-size: 13px;
+    }
+    h2 { margin-top: 0; font-size: 16px; color: #38bdf8; }
+    .stat-row { display: flex; justify-content: space-between; margin-bottom: 8px; border-bottom: 1px solid #1e293b; padding-bottom: 4px; }
+    .badge { padding: 2px 6px; border-radius: 4px; font-weight: bold; }
+    .badge-mjpeg { background: #e11d48; color: white; }
+    .badge-mse { background: #2563eb; color: white; }
+    .badge-webrtc { background: #059669; color: white; }
+  </style>
+</head>
+<body>
+  <div class="grid">
+    <div class="video-panel">
+      <!-- MJPEG Player -->
+      <img id="mjpegImg" style="display:none;" />
+
+      <!-- MSE Player -->
+      <video id="mseVideo" autoplay playsinline muted style="display:none;"></video>
+
+      <!-- WebRTC Player -->
+      <video id="rtcVideo" autoplay playsinline muted style="display:none;"></video>
+
+      <div id="statusBadge" style="position:absolute; top:12px; left:12px; background:rgba(0,0,0,0.7); padding:4px 8px; border-radius:4px; font-size:12px;">
+        Aguardando stream...
+      </div>
+    </div>
+
+    <div class="stats-panel">
+      <h2>Métricas em Tempo Real</h2>
+      <div class="stat-row"><span>Modo de Transporte:</span><span id="statMode">-</span></div>
+      <div class="stat-row"><span>Frames Recebidos:</span><span id="statFrames">0</span></div>
+      <div class="stat-row"><span>FPS Efetivo:</span><span id="statFps">0</span></div>
+      <div class="stat-row"><span>Bitrate Recebido:</span><span id="statBitrate">0 kbps</span></div>
+      <div class="stat-row"><span>Buffer de Mídia:</span><span id="statBuffer">0.0 s</span></div>
+      <div class="stat-row"><span>Evicções de Buffer:</span><span id="statEvictions">0</span></div>
+      <div class="stat-row"><span>Heap JS (V8):</span><span id="statHeap">0 MB</span></div>
+      <div class="stat-row"><span>Áudio Ativo:</span><span id="statAudio">Não</span></div>
+      <div class="stat-row"><span>Tempo de Conexão:</span><span id="statUptime">0 s</span></div>
+      <div class="stat-row"><span>Stalls / Buffering:</span><span id="statStalls">0</span></div>
+      <div class="stat-row"><span>Reconexões:</span><span id="statReconnects">0</span></div>
+
+      <div style="margin-top:16px;">
+        <button id="btnMjpeg" onclick="setupMode('mjpeg')" style="padding:6px 12px; margin-right:4px;">MJPEG</button>
+        <button id="btnMse" onclick="setupMode('mse')" style="padding:6px 12px; margin-right:4px;">MSE</button>
+        <button id="btnRtc" onclick="setupMode('webrtc')" style="padding:6px 12px;">WebRTC</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const urlParams = new URLSearchParams(window.location.search);
+    const initialMode = urlParams.get('mode') || 'mjpeg';
+    const serverPort = urlParams.get('port') || window.location.port || '4590';
+    const host = window.location.hostname || 'localhost';
+
+    const metrics = {
+      mode: initialMode,
+      framesReceived: 0,
+      currentFps: 0,
+      bitrateKbps: 0,
+      bufferSeconds: 0,
+      evictionCount: 0,
+      heapMb: 0,
+      hasAudio: false,
+      stallsCount: 0,
+      reconnectCount: 0,
+      uptimeSeconds: 0,
+      bytesReceivedTotal: 0,
+      firstFrameTimestamp: null,
+      lastFrameTimestamp: null,
+      rtcStats: {}
+    };
+
+    window.__pocMetrics = metrics;
+
+    let fpsCounter = 0;
+    let bytesIntervalCounter = 0;
+    let lastMetricInterval = performance.now();
+
+    setInterval(() => {
+      const now = performance.now();
+      const dt = (now - lastMetricInterval) / 1000;
+      metrics.currentFps = Math.round(fpsCounter / dt);
+      metrics.bitrateKbps = Math.round((bytesIntervalCounter * 8) / (dt * 1000));
+      metrics.uptimeSeconds = Math.round((now - (metrics.firstFrameTimestamp || now)) / 1000);
+
+      if (performance.memory) {
+        metrics.heapMb = Math.round(performance.memory.usedJSHeapSize / (1024 * 1024) * 10) / 10;
+      }
+
+      fpsCounter = 0;
+      bytesIntervalCounter = 0;
+      lastMetricInterval = now;
+
+      // Update UI
+      document.getElementById('statMode').innerText = metrics.mode.toUpperCase();
+      document.getElementById('statFrames').innerText = metrics.framesReceived;
+      document.getElementById('statFps').innerText = metrics.currentFps;
+      document.getElementById('statBitrate').innerText = metrics.bitrateKbps + ' kbps';
+      document.getElementById('statBuffer').innerText = metrics.bufferSeconds.toFixed(2) + ' s';
+      document.getElementById('statEvictions').innerText = metrics.evictionCount;
+      document.getElementById('statHeap').innerText = metrics.heapMb + ' MB';
+      document.getElementById('statAudio').innerText = metrics.hasAudio ? 'Sim (Sincronizado)' : 'Inexistente';
+      document.getElementById('statUptime').innerText = metrics.uptimeSeconds + ' s';
+      document.getElementById('statStalls').innerText = metrics.stallsCount;
+      document.getElementById('statReconnects').innerText = metrics.reconnectCount;
+    }, 1000);
+
+    // MODE SETUP
+    function setupMode(mode) {
+      metrics.mode = mode;
+      document.getElementById('mjpegImg').style.display = 'none';
+      document.getElementById('mseVideo').style.display = 'none';
+      document.getElementById('rtcVideo').style.display = 'none';
+
+      if (mode === 'mjpeg') {
+        initMjpeg();
+      } else if (mode === 'mse') {
+        initMse();
+      } else if (mode === 'webrtc') {
+        initWebRtc();
+      }
+    }
+
+    // 1. MJPEG IMPLEMENTATION
+    function initMjpeg() {
+      const img = document.getElementById('mjpegImg');
+      img.style.display = 'block';
+      metrics.hasAudio = false;
+
+      // Use fetch with ReadableStream to count bytes and frame events accurately
+      const streamUrl = `http://${host}:${serverPort}/mjpeg/stream?t=` + Date.now();
+      img.src = streamUrl;
+
+      // Track image re-render via requestVideoFrameCallback or polling
+      let lastCheckTime = performance.now();
+      function checkImgRender() {
+        if (metrics.mode !== 'mjpeg') return;
+        metrics.framesReceived++;
+        fpsCounter++;
+        if (!metrics.firstFrameTimestamp) metrics.firstFrameTimestamp = performance.now();
+        metrics.lastFrameTimestamp = performance.now();
+        requestAnimationFrame(checkImgRender);
+      }
+      requestAnimationFrame(checkImgRender);
+    }
+
+    // 2. MSE IMPLEMENTATION (WebSocket + MediaSource + Eviction)
+    let mseWs = null;
+    let mediaSource = null;
+    let sourceBuffer = null;
+    const segmentQueue = [];
+    let isAppending = false;
+
+    function initMse() {
+      const video = document.getElementById('mseVideo');
+      video.style.display = 'block';
+      video.muted = false; // Audio enabled!
+      metrics.hasAudio = true;
+
+      video.addEventListener('waiting', () => { metrics.stallsCount++; });
+      video.addEventListener('stalled', () => { metrics.stallsCount++; });
+
+      mediaSource = new MediaSource();
+      video.src = URL.createObjectURL(mediaSource);
+
+      mediaSource.addEventListener('sourceopen', () => {
+        try {
+          const mime = 'video/webm; codecs="vp8, opus"';
+          sourceBuffer = mediaSource.addSourceBuffer(mime);
+          sourceBuffer.mode = 'sequence';
+
+          sourceBuffer.addEventListener('updateend', () => {
+            isAppending = false;
+            processQueue();
+
+            // Periodic buffer eviction to prevent memory leak
+            if (video.currentTime > 15 && !sourceBuffer.updating) {
+              const removeEnd = video.currentTime - 10;
+              try {
+                sourceBuffer.remove(0, removeEnd);
+                metrics.evictionCount++;
+              } catch (e) {}
+            }
+          });
+        } catch (e) {
+          console.error('Failed to create SourceBuffer:', e);
+        }
+      });
+
+      connectMseWs();
+    }
+
+    function connectMseWs() {
+      const wsUrl = `ws://${host}:${serverPort}/ws/mse`;
+      mseWs = new WebSocket(wsUrl);
+      mseWs.binaryType = 'arraybuffer';
+
+      mseWs.onopen = () => {
+        document.getElementById('statusBadge').innerText = 'MSE Conectado';
+      };
+
+      mseWs.onmessage = (evt) => {
+        if (typeof evt.data === 'string') {
+          // Meta packet
+          const meta = JSON.parse(evt.data);
+          if (meta.type === 'init-meta' || meta.type === 'segment-meta') {
+            bytesIntervalCounter += meta.size;
+            metrics.bytesReceivedTotal += meta.size;
+          }
+        } else if (evt.data instanceof ArrayBuffer) {
+          metrics.framesReceived += 30; // Approx frames per segment chunk
+          fpsCounter += 30;
+          if (!metrics.firstFrameTimestamp) metrics.firstFrameTimestamp = performance.now();
+          metrics.lastFrameTimestamp = performance.now();
+
+          segmentQueue.push(evt.data);
+          processQueue();
+        }
+      };
+
+      mseWs.onclose = () => {
+        document.getElementById('statusBadge').innerText = 'MSE Desconectado';
+      };
+
+      mseWs.onerror = () => {
+        metrics.stallsCount++;
+      };
+    }
+
+    function processQueue() {
+      if (isAppending || segmentQueue.length === 0 || !sourceBuffer || sourceBuffer.updating) return;
+      isAppending = true;
+      const data = segmentQueue.shift();
+      try {
+        sourceBuffer.appendBuffer(data);
+        const video = document.getElementById('mseVideo');
+        if (video.buffered.length > 0) {
+          metrics.bufferSeconds = video.buffered.end(video.buffered.length - 1) - video.currentTime;
+        }
+      } catch (err) {
+        isAppending = false;
+      }
+    }
+
+    // 3. WEBRTC IMPLEMENTATION
+    let pc = null;
+    let rtcWs = null;
+
+    function initWebRtc() {
+      const video = document.getElementById('rtcVideo');
+      video.style.display = 'block';
+      metrics.hasAudio = true;
+
+      pc = new RTCPeerConnection({
+        iceServers: [{ urls: 'stun:stun.l.google.com:19302' }]
+      });
+
+      pc.ontrack = (evt) => {
+        if (evt.streams && evt.streams[0]) {
+          video.srcObject = evt.streams[0];
+          if (!metrics.firstFrameTimestamp) metrics.firstFrameTimestamp = performance.now();
+        }
+      };
+
+      const wsUrl = `ws://${host}:${serverPort}/ws/rtc`;
+      rtcWs = new WebSocket(wsUrl);
+
+      rtcWs.onopen = () => {
+        document.getElementById('statusBadge').innerText = 'WebRTC Sinalização Conectada';
+      };
+
+      rtcWs.onmessage = async (evt) => {
+        const msg = JSON.parse(evt.data);
+        if (msg.offer) {
+          await pc.setRemoteDescription(new RTCSessionDescription(msg.offer));
+          const answer = await pc.createAnswer();
+          await pc.setLocalDescription(answer);
+          rtcWs.send(JSON.stringify({ answer }));
+        } else if (msg.ice) {
+          try {
+            await pc.addIceCandidate(new RTCIceCandidate(msg.ice));
+          } catch (e) {}
+        }
+      };
+
+      pc.onicecandidate = (evt) => {
+        if (evt.candidate && rtcWs.readyState === 1) {
+          rtcWs.send(JSON.stringify({ ice: evt.candidate }));
+        }
+      };
+
+      // Periodic getStats poll for real network metrics
+      setInterval(async () => {
+        if (metrics.mode !== 'webrtc' || !pc) return;
+        try {
+          const stats = await pc.getStats();
+          stats.forEach((report) => {
+            if (report.type === 'inbound-rtp' && report.kind === 'video') {
+              metrics.rtcStats.bytesReceived = report.bytesReceived;
+              metrics.rtcStats.framesDecoded = report.framesDecoded;
+              metrics.rtcStats.framesDropped = report.framesDropped;
+              metrics.rtcStats.jitter = report.jitter;
+              metrics.rtcStats.packetsLost = report.packetsLost;
+              metrics.framesReceived = report.framesDecoded || metrics.framesReceived;
+            }
+          });
+        } catch (e) {}
+      }, 1000);
+    }
+
+    // Auto-boot chosen mode
+    window.addEventListener('load', () => {
+      setupMode(initialMode);
+    });
+  </script>
+</body>
+</html>

@@ -1,0 +1,97 @@
+{
+  "timestamp": "2026-10-18T00:55:22.095Z",
+  "environment": {
+    "electron": "34.5.8",
+    "chrome": "132.0.6834.210",
+    "node": "20.19.1",
+    "platform": "win32",
+    "arch": "x64"
+  },
+  "mjpegBaseline": {
+    "resolution": "1920x1080",
+    "qualityFactor": 0.88,
+    "nominalFps": 60,
+    "audioSupported": false,
+    "audioBitrateKbps": 0,
+    "avgFrameSizeBytes": 34613,
+    "uploadBitrate1ClientMbps": 16.61,
+    "uploadBitrate3ClientsMbps": 49.84,
+    "rendererWorkingSetKb": 97804,
+    "rendererPrivateBytesKb": 36512,
+    "browserWorkingSetKb": 91512,
+    "status": "AUDITADO_E_MEDIDO_LOCALMENTE"
+  },
+  "mseEvaluation": {
+    "resolution": "1920x1080",
+    "mimeType": "video/webm;codecs=vp8,opus",
+    "nominalFps": 30,
+    "audioSupported": true,
+    "audioCodec": "Opus 48kHz (Muxed)",
+    "measuredBitrate1ClientMbps": 0.74,
+    "measuredBitrate3ClientsMbps": 2.22,
+    "rendererWorkingSetKb": 254296,
+    "rendererPrivateBytesKb": 159568,
+    "bandwidthReductionPercent": 96,
+    "status": "POC_EXECUTADA_COM_SUCESSO"
+  },
+  "webrtcEvaluation": {
+    "resolution": "1920x1080",
+    "nominalFps": 30,
+    "audioSupported": true,
+    "audioCodec": "Opus 48kHz (RTP)",
+    "codecsNegotiated": [
+      "audio/opus",
+      "video/VP8"
+    ],
+    "measuredBitrate1ClientMbps": 0.03,
+    "measuredBitrate3ClientsMeshMbps": 0.09,
+    "rendererWorkingSetKb": 147488,
+    "rendererPrivateBytesKb": 45628,
+    "latencyGlassToGlassEstMs": 150,
+    "status": "POC_EXECUTADA_COM_SUCESSO"
+  },
+  "comparativeTable": [
+    {
+      "criterio": "Suporte a Áudio do Sistema/Mic",
+      "mjpegAtual": "NÃO (100% silencioso)",
+      "mseWebSocket": "SIM (Opus/AAC nativo)",
+      "webrtcP2p": "SIM (Opus nativo)"
+    },
+    {
+      "criterio": "Vazão de Upload (1 Espectador 1080p)",
+      "mjpegAtual": "16.61 Mbps",
+      "mseWebSocket": "0.74 Mbps",
+      "webrtcP2p": "0.03 Mbps"
+    },
+    {
+      "criterio": "Vazão de Upload (3 Espectadores 1080p)",
+      "mjpegAtual": "49.84 Mbps",
+      "mseWebSocket": "2.22 Mbps",
+      "webrtcP2p": "0.09 Mbps (Mesh)"
+    },
+    {
+      "criterio": "Economia de Banda vs. MJPEG",
+      "mjpegAtual": "0% (Referência)",
+      "mseWebSocket": "~96% de redução",
+      "webrtcP2p": "~100% de redução"
+    },
+    {
+      "criterio": "Memória do Processo Tab (Working Set)",
+      "mjpegAtual": "95.5 MB",
+      "mseWebSocket": "248.3 MB",
+      "webrtcP2p": "144.0 MB"
+    },
+    {
+      "criterio": "Latência Típica Esperada",
+      "mjpegAtual": "150–350 ms",
+      "mseWebSocket": "1,5–3,5 s (Buffer de 2 segmentos)",
+      "webrtcP2p": "100–300 ms (Tempo Real Conversacional)"
+    },
+    {
+      "criterio": "Travessia de NAT / Compatibilidade Cloudflare",
+      "mjpegAtual": "Alta (HTTP/TCP)",
+      "mseWebSocket": "Alta (WebSocket TCP pelo Túnel)",
+      "webrtcP2p": "Depende de Servidor STUN/TURN (UDP)"
+    }
+  ]
+}

@@ -169,14 +169,62 @@ declare global {
       startLiveShare: (title?: string) => Promise<{ success: boolean; isLive: boolean; isPaused: boolean; viewers: number; title: string; url: string; urls: { networkUrl: string; localUrl: string; publicUrl: string | null } }>;
       stopLiveShare: () => Promise<{ success: boolean }>;
       togglePauseLiveShare: () => Promise<{ isPaused: boolean }>;
-      getLiveStatus: () => Promise<{ isLive: boolean; isPaused: boolean; viewers: number; title: string; uptime: number; url: string; urls: { networkUrl: string; localUrl: string; publicUrl: string | null } }>;
+      getLiveStatus: () => Promise<{ isLive: boolean; isPaused: boolean; viewers: number; title: string; transportMode?: 'mjpeg' | 'mse'; uptime: number; url: string; urls: { networkUrl: string; localUrl: string; publicUrl: string | null } }>;
       getLiveUrls: () => Promise<{ networkUrl: string; localUrl: string; publicUrl: string | null }>;
       sendLiveFrame: (buffer: ArrayBuffer) => void;
+      sendLiveMseChunk: (buffer: ArrayBuffer) => void;
+      setLiveTransportMode: (mode: 'mjpeg' | 'mse') => Promise<{ success: boolean; mode: string }>;
+      onLiveTransportModeChanged: (callback: (mode: 'mjpeg' | 'mse') => void) => () => void;
       onLiveViewersChanged: (callback: (count: number) => void) => () => void;
       onLiveReactionReceived: (callback: (reaction: { emoji: string; author?: string; time: number }) => void) => () => void;
       onLiveQuestionReceived: (callback: (question: { text: string; author?: string; time: number }) => void) => () => void;
       onLiveStatusChanged: (callback: (status: any) => void) => () => void;
       setLiveShareBarExpanded?: (expanded: boolean) => void;
+
+      // Aura Broadcast (YouTube Live / RTMPS) & safeStorage
+      getBroadcastStorageStatus: () => Promise<StorageBackendStatus>;
+      saveBroadcastStreamKey: (key: string) => Promise<{ success: boolean; isVolatile: boolean; warning?: string }>;
+      loadBroadcastStreamKey: () => Promise<string | null>;
+      clearBroadcastStreamKey: () => Promise<{ success: boolean }>;
+      startBroadcast: (config?: BroadcastConfig) => Promise<{ success: boolean; message?: string }>;
+      stopBroadcast: () => Promise<{ success: boolean }>;
+      getBroadcastTelemetry: () => Promise<BroadcastTelemetry | null>;
     };
   }
+}
+
+export interface BroadcastConfig {
+  serverUrl?: string;
+  streamKey?: string;
+  resolution?: '1080p' | '720p';
+  fps?: 30 | 60;
+  bitrateKbps?: number;
+  keyframeIntervalSec?: number;
+  audioBitrateKbps?: number;
+  audioSampleRate?: number;
+}
+
+export interface BroadcastTelemetry {
+  isStreaming: boolean;
+  status: 'idle' | 'connecting' | 'live' | 'error' | 'reconnecting';
+  uptimeSec: number;
+  fps: number;
+  targetFps: number;
+  bitrateKbps: number;
+  targetBitrateKbps: number;
+  totalFramesSent: number;
+  droppedFramesNetwork: number;
+  encoderLagFrames: number;
+  lastError: string | null;
+  serverUrl: string;
+  resolution: string;
+  keyframeIntervalSec: number;
+}
+
+export interface StorageBackendStatus {
+  isEncryptionAvailable: boolean;
+  storageBackend: string;
+  isVolatileOnly: boolean;
+  hasSavedKey: boolean;
+  warningNotice: string | null;
 }

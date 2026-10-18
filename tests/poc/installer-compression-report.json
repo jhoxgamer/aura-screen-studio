@@ -1,0 +1,28 @@
+{
+  "timestamp": "2026-10-18T07:56:26.874Z",
+  "binary": "bin/cloudflared.exe",
+  "uncompressedBytes": 55325120,
+  "uncompressedMb": 52.76214599609375,
+  "algorithms": {
+    "deflateL9": {
+      "bytes": 19059566,
+      "mb": 18.176618576049805,
+      "reductionPercent": 65.5
+    },
+    "gzipL9": {
+      "bytes": 19059578,
+      "mb": 18.1766300201416,
+      "reductionPercent": 65.5
+    },
+    "brotliQ11_LZMA_Equivalent": {
+      "bytes": 14348615,
+      "mb": 13.683905601501465,
+      "reductionPercent": 74.1
+    }
+  },
+  "conclusion": {
+    "confirmedEstimatedRangeMb": "24–28 MB",
+    "empiricalMeasuredMb": 13.683905601501465,
+    "recommendation": "Manter binário embutido por confiabilidade zero-dependency e segurança contra MITM"
+  }
+}
