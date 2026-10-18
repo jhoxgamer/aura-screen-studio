@@ -104,8 +104,14 @@ export const ZoomShareBarView: React.FC = () => {
       cleanupStatus?.();
       cleanupReactions?.();
       cleanupQuestions?.();
+      window.electronAPI?.setLiveShareBarExpanded?.(false);
     };
   }, []);
+
+  useEffect(() => {
+    const isExpanded = showQrModal || !!activeQuestion;
+    window.electronAPI?.setLiveShareBarExpanded?.(isExpanded);
+  }, [showQrModal, activeQuestion]);
 
   const handleCopyLink = () => {
     const targetUrl = liveUrls.publicUrl || liveUrls.networkUrl || 'http://localhost:4545/live';
@@ -142,7 +148,7 @@ export const ZoomShareBarView: React.FC = () => {
   const shareUrl = liveUrls.publicUrl || liveUrls.networkUrl || 'http://localhost:4545/live';
 
   return (
-    <div className="w-screen h-screen flex flex-col items-center justify-start select-none pt-1">
+    <div className="w-full h-full flex flex-col items-center justify-start select-none pt-1">
       {/* Floating Aura Screen Sharing Bar */}
       <div className="flex items-center space-x-1.5 bg-[#0B0E14]/95 border border-[#303A4B] shadow-[0_12px_36px_rgba(0,0,0,0.8)] backdrop-blur-2xl rounded-2xl px-2.5 py-1.5 text-xs text-[#F3F5F9] shrink-0">
         

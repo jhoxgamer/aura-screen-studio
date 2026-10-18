@@ -656,7 +656,7 @@ export const PreRecordingView: React.FC<PreRecordingViewProps> = ({ initialTab =
           <div className="flex items-center space-x-1.5">
             <span className="font-semibold text-xs tracking-tight text-[#F3F5F9]">Aura Screen Studio</span>
             <span className="text-[9px] text-[#B7C0CE] bg-[#191F2B] border border-[#303A4B] px-1 py-0.2 rounded font-mono">
-              v{appVersion || '2.5.1'}
+              v{appVersion || '2.5.2'}
             </span>
           </div>
         </div>
@@ -1337,7 +1337,7 @@ export const PreRecordingView: React.FC<PreRecordingViewProps> = ({ initialTab =
             {/* Quick Shortcuts & App Version / Update Check */}
             <div className="flex items-center justify-between pt-1 border-t border-[#303A4B]/60 text-[9px] text-[#929CAF]">
               <span className="font-mono flex items-center gap-1.5">
-                <span>v{appVersion || '2.5.1'}</span>
+                <span>v{appVersion || '2.5.2'}</span>
                 {updateFeedback && (
                   <span className="text-[#83B8FF] font-sans font-medium text-[9px] bg-[#1A2A47] border border-[#83B8FF]/40 px-1 py-0.2 rounded">
                     {updateFeedback}

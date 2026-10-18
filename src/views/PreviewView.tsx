@@ -1085,7 +1085,7 @@ export const PreviewView: React.FC = () => {
   const isPublicInternetLink = shareUrl.includes('trycloudflare.com');
 
   return (
-    <div className="w-full h-full min-h-screen bg-[#0B0E14] text-[#F3F5F9] flex flex-col select-none overflow-hidden font-sans">
+    <div className="w-full h-full bg-[#0B0E14] text-[#F3F5F9] flex flex-col select-none overflow-hidden font-sans">
       {/* Top Header & Breadcrumb Navigation */}
       <div className="h-16 bg-[#121722] border-b border-[#303A4B] px-6 flex items-center justify-between shrink-0">
         {/* Navigation Breadcrumb & Back Button */}
@@ -1985,7 +1985,7 @@ export const PreviewView: React.FC = () => {
                     setTrimStart(val);
                     if (videoRef.current) videoRef.current.currentTime = val;
                   }}
-                  className="w-14 bg-[#0B0E14] border border-[#303A4B] rounded px-1.5 py-0.5 text-[#F3F5F9] font-mono text-xs focus:border-[#78A5FF] outline-none text-center"
+                  className="w-20 bg-[#0B0E14] border border-[#303A4B] rounded px-1.5 py-0.5 text-[#F3F5F9] font-mono text-xs focus:border-[#78A5FF] outline-none text-center"
                 />
                 <button
                   type="button"
@@ -2013,7 +2013,7 @@ export const PreviewView: React.FC = () => {
                     const val = Math.min(duration, Math.max(Number(e.target.value), trimStart + 0.1));
                     setTrimEnd(val);
                   }}
-                  className="w-14 bg-[#0B0E14] border border-[#303A4B] rounded px-1.5 py-0.5 text-[#F3F5F9] font-mono text-xs focus:border-[#78A5FF] outline-none text-center"
+                  className="w-20 bg-[#0B0E14] border border-[#303A4B] rounded px-1.5 py-0.5 text-[#F3F5F9] font-mono text-xs focus:border-[#78A5FF] outline-none text-center"
                 />
                 <button
                   type="button"

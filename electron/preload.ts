@@ -273,6 +273,9 @@ export const electronAPI = {
     const handler = (_: any, status: any) => callback(status);
     ipcRenderer.on('live-share:status-changed', handler);
     return () => ipcRenderer.removeListener('live-share:status-changed', handler);
+  },
+  setLiveShareBarExpanded: (expanded: boolean) => {
+    ipcRenderer.send('live-share:set-bar-expanded', expanded);
   }
 };
 

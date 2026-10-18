@@ -264,7 +264,7 @@ export const LibraryView: React.FC<LibraryViewProps> = ({ onNavigateToRecord, is
                           if (e.key === 'Escape') setEditingId(null);
                         }}
                         autoFocus
-                        className="bg-[#0B0E14] border border-[#78A5FF]/60 rounded px-2 py-0.5 text-xs text-[#F3F5F9] focus:outline-none focus:ring-1 focus:ring-[#78A5FF] w-48"
+                        className="bg-[#0B0E14] border border-[#78A5FF]/60 rounded px-2 py-0.5 text-xs text-[#F3F5F9] focus:outline-none focus:ring-1 focus:ring-[#78A5FF] w-36 sm:w-48"
                       />
                       <button
                         onClick={() => handleSaveRename(rec.id)}
@@ -283,7 +283,7 @@ export const LibraryView: React.FC<LibraryViewProps> = ({ onNavigateToRecord, is
                     </div>
                   ) : (
                     <div className="flex items-center space-x-1.5 group/title">
-                      <h3 className="text-xs font-semibold text-[#F3F5F9] truncate max-w-xs sm:max-w-md group-hover:text-[#78A5FF] transition-colors" title={rec.title}>
+                      <h3 className="text-xs font-semibold text-[#F3F5F9] truncate max-w-[150px] sm:max-w-xs md:max-w-md group-hover:text-[#78A5FF] transition-colors" title={rec.title}>
                         {rec.title}
                       </h3>
                       <button

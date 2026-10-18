@@ -370,7 +370,7 @@ export const SpeakerNotesView: React.FC = () => {
   if (isCollapsed) {
     return (
       <div
-        className="w-screen h-screen flex items-center justify-between px-3 bg-[#121722]/95 backdrop-blur-xl border border-[#303A4B] rounded-full shadow-2xl text-[#F3F5F9] select-none font-sans"
+        className="w-full h-full flex items-center justify-between px-3 bg-[#121722]/95 backdrop-blur-xl border border-[#303A4B] rounded-full shadow-2xl text-[#F3F5F9] select-none font-sans"
         style={{ WebkitAppRegion: 'drag' } as any}
       >
         <div className="flex items-center space-x-2 overflow-hidden pr-2">
@@ -421,7 +421,7 @@ export const SpeakerNotesView: React.FC = () => {
   // -------------------------------------------------------------
   return (
     <div
-      className="w-screen h-screen flex flex-col rounded-2xl border border-[#303A4B] bg-[#0B0E14]/95 backdrop-blur-2xl text-[#F3F5F9] shadow-2xl overflow-hidden select-none font-sans"
+      className="w-full h-full flex flex-col rounded-2xl border border-[#303A4B] bg-[#0B0E14]/95 backdrop-blur-2xl text-[#F3F5F9] shadow-2xl overflow-hidden select-none font-sans"
       style={{ opacity: opacity / 100 }}
     >
       {/* Hidden file input */}

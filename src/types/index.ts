@@ -176,6 +176,7 @@ declare global {
       onLiveReactionReceived: (callback: (reaction: { emoji: string; author?: string; time: number }) => void) => () => void;
       onLiveQuestionReceived: (callback: (question: { text: string; author?: string; time: number }) => void) => () => void;
       onLiveStatusChanged: (callback: (status: any) => void) => () => void;
+      setLiveShareBarExpanded?: (expanded: boolean) => void;
     };
   }
 }

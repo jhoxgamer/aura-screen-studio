@@ -182,7 +182,7 @@ function createCameraBubbleWindow(size: BubbleSize = 'medium') {
 function getBubbleDimensions(size: BubbleSize) {
   switch (size) {
     case 'small':
-      return { width: 190, height: 190 };
+      return { width: 210, height: 210 };
     case 'medium':
       return { width: 260, height: 260 };
     case 'large':
@@ -225,13 +225,13 @@ function createControlBarWindow() {
 
   const primaryDisplay = screen.getPrimaryDisplay();
   const { width, height } = primaryDisplay.workAreaSize;
-  const barWidth = 600;
+  const barWidth = 720;
 
   controlBarWindow = new BrowserWindow({
     width: barWidth,
-    height: 74,
+    height: 80,
     x: Math.round((width - barWidth) / 2),
-    y: Math.round(height - 110),
+    y: Math.round(height - 115),
     frame: false,
     transparent: true,
     alwaysOnTop: true,
@@ -1237,6 +1237,16 @@ async function trimVideoWithFfmpeg(inputPath: string, outputPath: string, startS
   ipcMain.on('live-share:broadcast-frame', (_, arrayBuffer: ArrayBuffer) => {
     if (shareServer && shareServer.isLiveActive()) {
       shareServer.broadcastLiveFrame(Buffer.from(arrayBuffer));
+    }
+  });
+
+  ipcMain.on('live-share:set-bar-expanded', (_, expanded: boolean) => {
+    if (zoomShareBarWindow && !zoomShareBarWindow.isDestroyed()) {
+      const primaryDisplay = screen.getPrimaryDisplay();
+      const { width } = primaryDisplay.workAreaSize;
+      const barWidth = Math.min(990, width - 40);
+      const newHeight = expanded ? 490 : 72;
+      zoomShareBarWindow.setSize(barWidth, newHeight);
     }
   });
 

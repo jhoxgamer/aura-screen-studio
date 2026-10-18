@@ -214,16 +214,16 @@ export const ControlBarView: React.FC = () => {
       )}
 
       <div
-        className="flex items-center space-x-1.5 bg-[#0B0E14]/95 backdrop-blur-xl px-2.5 py-1.5 rounded-2xl border border-[#303A4B] shadow-2xl"
+        className="flex items-center space-x-1.5 bg-[#0B0E14]/95 backdrop-blur-xl px-2.5 py-1.5 rounded-2xl border border-[#303A4B] shadow-2xl shrink-0"
         style={{ WebkitAppRegion: 'drag' } as any}
       >
         {/* Drag Handle */}
-        <div className="cursor-grab active:cursor-grabbing text-[#929CAF] hover:text-[#F3F5F9] transition-colors pl-0.5">
+        <div className="cursor-grab active:cursor-grabbing text-[#929CAF] hover:text-[#F3F5F9] transition-colors pl-0.5 shrink-0">
           <GripVertical className="w-3.5 h-3.5" />
         </div>
 
         {/* Stop Recording & Timer Pill */}
-        <div style={{ WebkitAppRegion: 'no-drag' } as any}>
+        <div style={{ WebkitAppRegion: 'no-drag' } as any} className="shrink-0">
           <button
             onClick={handleStopRecording}
             disabled={isStopping}
@@ -241,7 +241,7 @@ export const ControlBarView: React.FC = () => {
         </div>
 
         {/* Scene Pill */}
-        <div style={{ WebkitAppRegion: 'no-drag' } as any} className="flex items-center space-x-1">
+        <div style={{ WebkitAppRegion: 'no-drag' } as any} className="flex items-center space-x-1 shrink-0">
           <div
             className="flex items-center space-x-1 bg-[#121722] border border-[#303A4B] px-2 py-1 rounded-xl text-[11px] font-semibold text-[#B7C0CE]"
             title={`Cena atual ${sceneNumber}: ${formatTime(sceneSeconds)}`}
@@ -278,7 +278,7 @@ export const ControlBarView: React.FC = () => {
         </div>
 
         {/* Pause / Resume Button */}
-        <div style={{ WebkitAppRegion: 'no-drag' } as any}>
+        <div style={{ WebkitAppRegion: 'no-drag' } as any} className="shrink-0">
           <button
             onClick={handleTogglePause}
             title={isPaused ? `Retomar Gravação (${getShortcutLabel('p')})` : `Pausar Gravação (${getShortcutLabel('p')})`}
@@ -293,7 +293,7 @@ export const ControlBarView: React.FC = () => {
         </div>
 
         {/* Microphone Mute / Unmute & Live Audio VU Meter */}
-        <div style={{ WebkitAppRegion: 'no-drag' } as any}>
+        <div style={{ WebkitAppRegion: 'no-drag' } as any} className="shrink-0">
           <button
             onClick={handleToggleMic}
             title={isMicMuted ? `Ativar Microfone (${getShortcutLabel('m')})` : `Microfone Ativo (${Math.round(micLevel * 100)}%) • Silenciar (${getShortcutLabel('m')})`}
@@ -343,7 +343,7 @@ export const ControlBarView: React.FC = () => {
 
         {/* Camera Bubble Toggle (when recording mode includes camera) */}
         {optionsRef.current?.mode !== 'screen-only' && (
-          <div style={{ WebkitAppRegion: 'no-drag' } as any}>
+          <div style={{ WebkitAppRegion: 'no-drag' } as any} className="shrink-0">
             <button
               onClick={() => window.electronAPI.toggleBubbleVisible?.()}
               title={isCameraVisible ? "Ocultar Câmera Flutuante" : "Exibir Câmera Flutuante"}
@@ -359,7 +359,7 @@ export const ControlBarView: React.FC = () => {
         )}
 
         {/* Restart Recording Entirely */}
-        <div style={{ WebkitAppRegion: 'no-drag' } as any}>
+        <div style={{ WebkitAppRegion: 'no-drag' } as any} className="shrink-0">
           <button
             onClick={handleRestart}
             title="Reiniciar Gravação Inteira do Zero"
@@ -370,7 +370,7 @@ export const ControlBarView: React.FC = () => {
         </div>
 
         {/* Draw Tool Toggle */}
-        <div style={{ WebkitAppRegion: 'no-drag' } as any}>
+        <div style={{ WebkitAppRegion: 'no-drag' } as any} className="shrink-0">
           <button
             onClick={handleToggleDrawing}
             title={`Anotações na Tela (${getShortcutLabel('d')})`}
@@ -385,7 +385,7 @@ export const ControlBarView: React.FC = () => {
         </div>
 
         {/* Teleprompter / Speaker Notes Toggle */}
-        <div style={{ WebkitAppRegion: 'no-drag' } as any}>
+        <div style={{ WebkitAppRegion: 'no-drag' } as any} className="shrink-0">
           <button
             onClick={() => window.electronAPI.toggleSpeakerNotes()}
             title={`Teleprompter / Roteiro (${getShortcutLabel('t')})`}
@@ -400,7 +400,7 @@ export const ControlBarView: React.FC = () => {
         </div>
 
         {/* Cancel / Trash Recording with Confirmation Guard */}
-        <div style={{ WebkitAppRegion: 'no-drag' } as any}>
+        <div style={{ WebkitAppRegion: 'no-drag' } as any} className="shrink-0">
           <button
             onClick={handleCancelClick}
             title={isConfirmingCancel ? "Confirmar descarte definitivo da gravação" : "Descartar Gravação"}

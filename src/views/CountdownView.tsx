@@ -71,7 +71,7 @@ export const CountdownView: React.FC = () => {
   const strokeDashoffset = circumference - progressRatio * circumference;
 
   return (
-    <div className="w-screen h-screen flex flex-col items-center justify-center bg-black/60 backdrop-blur-md select-none overflow-hidden font-sans">
+    <div className="w-full h-full flex flex-col items-center justify-center bg-black/60 backdrop-blur-md select-none overflow-hidden font-sans">
       <div className="relative flex items-center justify-center">
         {/* Circular SVG Countdown Ring */}
         <svg className="w-56 h-56 -rotate-90 transform" viewBox="0 0 200 200">

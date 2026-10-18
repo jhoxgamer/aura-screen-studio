@@ -332,9 +332,9 @@ export const CameraBubbleView: React.FC = () => {
 
         {/* Hover Action Overlay & Controls */}
         <div
-          className={`absolute bottom-2 left-1/2 -translate-x-1/2 flex items-center ${
-            size === 'small' ? 'space-x-0.5 px-2 py-1' : 'space-x-1 px-3 py-1.5'
-          } rounded-full bg-[#0B0E14]/95 backdrop-blur-xl border border-[#303A4B] shadow-2xl transition-all duration-200 z-30 max-w-[95%] ${
+          className={`absolute bottom-2.5 left-1/2 -translate-x-1/2 flex items-center ${
+            size === 'small' ? 'space-x-0.5 px-1.5 py-0.5 max-w-[190px]' : 'space-x-1 px-3 py-1.5'
+          } rounded-full bg-[#0B0E14]/95 backdrop-blur-xl border border-[#303A4B] shadow-2xl transition-all duration-200 z-30 shrink-0 ${
             showControls ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-2 pointer-events-none'
           }`}
           style={{ WebkitAppRegion: 'no-drag' } as any}

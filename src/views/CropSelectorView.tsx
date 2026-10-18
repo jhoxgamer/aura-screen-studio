@@ -167,7 +167,7 @@ export const CropSelectorView: React.FC = () => {
       onMouseDown={handleMouseDown}
       onMouseMove={handleMouseMove}
       onMouseUp={handleMouseUp}
-      className="w-screen h-screen relative bg-black/55 cursor-crosshair select-none overflow-hidden font-sans"
+      className="w-full h-full relative bg-black/55 cursor-crosshair select-none overflow-hidden font-sans"
     >
       {/* Dynamic Crosshair Guidelines */}
       <div

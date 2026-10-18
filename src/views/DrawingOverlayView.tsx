@@ -1133,7 +1133,7 @@ export const DrawingOverlayView: React.FC = () => {
   if (!active) return null;
 
   return (
-    <div className="w-screen h-screen relative overflow-hidden select-none cursor-crosshair">
+    <div className="w-full h-full relative overflow-hidden select-none cursor-crosshair">
       {/* Fullscreen Drawing Canvas */}
       <canvas
         ref={canvasRef}
